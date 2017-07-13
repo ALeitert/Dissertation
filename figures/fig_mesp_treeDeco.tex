@@ -1,0 +1,96 @@
+\tikzsetnextfilename{fig_mesp_treeDeco}
+\begin{tikzpicture}
+    [scale=1.]
+\def\bRad{0.5cm}
+\def\eLen{1cm}
+
+\coordinate (cBi) at (0,0);
+
+\coordinate (cB0) at ($(cBi)-(1*\bRad,0)-(0.75*\eLen,0)$);
+\coordinate (cBl) at ($(cBi)+(1*\bRad,0)+(0.75*\eLen,0)$);
+
+\coordinate (cBx) at (cB0); % ($(cB0)-(2*\bRad,0)-(1.0*\eLen,0)$);
+\coordinate (cBy) at ($(cBl)+(2*\bRad,0)+(1.0*\eLen,0)$);
+
+\coordinate (cBxx) at ($(cBx)+(-135:2*\bRad)+(-135:1.0*\eLen)$);
+\coordinate (cByy) at ($(cBy)+(-45:2*\bRad)+(-45:1.0*\eLen)$);
+
+\coordinate (cBs) at ($(cB0)+(135:2*\bRad)+(135:1.0*\eLen)$);
+\coordinate (cBt) at ($(cBl)+(45:2*\bRad)+(45:1.0*\eLen)$);
+
+\begin{scope}
+    [semithick]
+\draw (cBxx) -- (cBx) -- (cBy) -- (cByy);
+\draw (cBs) -- (cB0);
+\draw (cBt) -- (cBl);
+
+%\draw[fill=white] (cBi) circle (\bRad);
+\draw[fill=white] (cB0) circle (1.25*\bRad);
+\draw[fill=white] (cBl) circle (1.25*\bRad);
+%\draw[fill=white] (cBx) circle (1.25*\bRad);
+\draw[fill=white] (cBy) circle (1.25*\bRad);
+\draw[fill=white] (cBs) circle (\bRad);
+\draw[fill=white] (cBt) circle (\bRad);
+\draw[fill=white] (cBxx) circle (\bRad);
+\draw[fill=white] (cByy) circle (\bRad);
+\end{scope}
+
+\coordinate (cpt) at ($(cBl)+(55:0.8*\bRad)$);
+
+\draw
+    [
+        thick,
+        double=black,
+        double distance=0.4pt,
+        white,
+    ]
+    (cBt)
+    .. controls ++(-135:0.75*\bRad) and ++(135:0.75*\bRad) ..
+    (cpt)
+    .. controls ++(-45:0.75*\bRad) and ++(90:0.75*\bRad) ..
+    (cBy)
+    .. controls ++(-90:0.75*\bRad) and ++(-10:2*\bRad) ..
+%     ($(cBl)+(-90:0.4*\bRad)$)
+%     .. controls ++(180:0.5*\bRad) and ++(-5:0.5*\bRad) ..
+    ($(cB0)+(-90:0*\bRad)$)
+    .. controls ++(170:2*\bRad) and ++(-90:0.75*\bRad) ..
+    coordinate[pos=0.1] (cps)
+    (cBs)
+    ;
+
+\draw
+    [
+        thick,
+        double=black,
+        double distance=0.4pt,
+        white,
+    ]
+    (cByy)
+    .. controls ++(180:1*\bRad) and ++(-5:2*\bRad) ..
+    ($(cBy)+(-120:0.9*\bRad)$)
+    .. controls ++(175:0.75*\bRad) and ++(0:0.75*\bRad) ..
+    ($(cBl)+(-90:0.75*\bRad)$)
+    .. controls ++(180:0.75*\bRad) and ++(5:0.75*\bRad) ..
+    ($(cBx)+(-60:0.9*\bRad)$)
+    .. controls ++(185:2*\bRad) and ++(0:1*\bRad) ..
+    (cBxx)
+    ;
+
+%\fill ($(cBy)+(-120:0.9*\bRad)$) circle (0.75pt);
+\node[sN] (npt) at (cpt) {};
+\node[blbl] at (npt.south) {$p_t$};
+
+\node[sN] (nps) at (cps) {};
+\node[lbl,anchor=south west] at (nps.0) {$p_s$};
+
+%\node at (cBi) {$B_i$};
+\node[anchor=north,lbl] at ($(cB0)-(0,1.25*\bRad)+(10pt,0)$) {$B_x = B_0$};
+\node[anchor=north] at ($(cBl)-(0,1.25*\bRad)$) {$B_l$};
+%\node[anchor=north] at ($(cBx)-(0,1.25*\bRad)$) {$B_x$};
+\node[anchor=north] at ($(cBy)-(0,1.25*\bRad)$) {$B_y$};
+\node[fill=white,inner sep=2pt,lbl] at (cBs) {$s$};
+\node[fill=white,inner sep=2pt,lbl] at (cBt) {$t$};
+\node[fill=white,inner sep=2pt,lbl] at (cBxx) {$x$};
+\node[fill=white,inner sep=2pt,lbl] at (cByy) {$y$};
+
+\end{tikzpicture}

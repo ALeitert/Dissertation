@@ -1,0 +1,243 @@
+\tikzsetnextfilename{fig_mesp_W2}
+\begin{tikzpicture}
+
+\coordinate (cs) at (0,0);
+\coordinate (csp) at (-1.5,0);
+
+\coordinate (cU1) at (1.25,0);
+\coordinate (cUj) at (3.25,0);
+\coordinate (cUk) at (5.25,0);
+\coordinate (cU1jdots) at (2.25,0);
+\coordinate (cUjkdots) at (4.25,0);
+
+\coordinate (cV) at (3.25,2.25);
+
+\coordinate (ct) at (6.5,0);
+\coordinate (ctp) at (8,0);
+
+\begin{scope}
+    [yscale=2]
+
+\draw (cs) -- ($(cU1)+(113.5782:0.5cm)$); 
+\draw (cs) -- ($(cU1)+(-113.5782:0.5cm)$); 
+
+\draw[fill=white] (cU1) circle (0.4999cm);
+\draw[fill=white] (cUj) circle (0.4999cm);
+\draw[fill=white] (cUk) circle (0.4999cm);
+
+\draw (ct) -- ($(cUk)+(66.4218:0.5cm)$); 
+\draw (ct) -- ($(cUk)+(-66.4218:0.5cm)$); 
+
+\draw ($(cU1)+(60:0.5cm)$) -- ++(-30:0.5cm);
+\draw ($(cU1)+(-60:0.5cm)$) -- ++(30:0.5cm);
+
+\draw ($(cU1)+(90:0.5cm)$) -- ++(0:0.683cm);
+\draw ($(cU1)+(-90:0.5cm)$) -- ++(0:0.683cm);
+
+
+\draw ($(cUj)+(60:0.5cm)$) -- ++(-30:0.5cm);
+\draw ($(cUj)+(-60:0.5cm)$) -- ++(30:0.5cm);
+
+\draw ($(cUj)+(120:0.5cm)$) -- ++(210:0.5cm);
+\draw ($(cUj)+(-120:0.5cm)$) -- ++(150:0.5cm);
+
+\draw ($(cUj)+(90:0.5cm)-(0.683cm,0)$) -- ++(0:0.683cm) -- ++(0:0.683cm);
+\draw ($(cUj)+(-90:0.5cm)-(0.683cm,0)$) -- ++(0:0.683cm) -- ++(0:0.683cm);
+
+
+\draw ($(cUk)+(120:0.5cm)$) -- ++(210:0.5cm);
+\draw ($(cUk)+(-120:0.5cm)$) -- ++(150:0.5cm);
+
+\draw ($(cUk)+(90:0.5cm)$) -- ++(180:0.683cm);
+\draw ($(cUk)+(-90:0.5cm)$) -- ++(180:0.683cm);
+
+\end{scope}
+
+\draw [xscale=2.5] (cV) circle (0.5cm);
+
+\path
+    (cUj) to [out=90,in=-90] 
+    coordinate [pos=0.2] (cUj_Vr2_base)
+    coordinate [pos=0.4] (cUj_Vr4_base)
+    coordinate [pos=0.6] (cUj_Vr6_base)
+    coordinate [pos=0.8] (cUj_Vr8_base)
+    ($(cV)+(1.5*0.4,0)$)
+    ;
+
+\path
+    (cUj) to [out=90,in=-90]
+    coordinate [pos=0.2] (cUj_Vl2_base)
+    coordinate [pos=0.4] (cUj_Vl4_base)
+    coordinate [pos=0.6] (cUj_Vl6_base)
+    coordinate [pos=0.8] (cUj_Vl8_base)
+    ($(cV)-(1.5*0.4,0)$)
+    ;
+
+% \node [above] at (current bounding box.north) {Current seed is \pgfcurrentseed};
+\pgfmathsetseed{109940843}
+\foreach \i in {2,4,6,8}
+{
+    \coordinate (cUj_Vr\i) at ($(cUj_Vr\i_base)+(rand*0.15,0)$);
+}
+
+\pgfmathsetseed{109940843}
+\foreach \i in {2,4,6,8}
+{
+    \coordinate (cUj_Vl\i) at ($(cUj_Vl\i_base)-(rand*0.15,0)$);
+}
+
+\draw
+    [
+        rounded corners=3pt,
+        draw=white,
+        double=white,
+        double distance=0.4pt,
+        line width=0.7pt
+    ]
+    (cUj)
+    -- (cUj_Vl2)
+    -- (cUj_Vl4)
+    -- (cUj_Vl6)
+    -- (cUj_Vl8)
+    to[out=110,in=-90,rounded corners=0pt] ($(cV)-(1.5*0.4,0)$);
+
+\draw
+    [
+        rounded corners=3pt,
+        draw=white,
+        double=white,
+        double distance=0.4pt,
+        line width=0.7pt
+    ]
+    (cUj)
+    -- (cUj_Vr2)
+    -- (cUj_Vr4)
+    -- (cUj_Vr6)
+    -- (cUj_Vr8)
+    to[out=80,in=-90,rounded corners=0pt] ($(cV)+(1.5*0.4,0)$);
+
+\draw
+    [
+        rounded corners=3pt,
+    ]
+    (cUj)
+    -- (cUj_Vl2)
+    -- (cUj_Vl4)
+    -- (cUj_Vl6)
+    -- (cUj_Vl8)
+    to[out=110,in=-90,rounded corners=0pt] ($(cV)-(1.5*0.4,0)$);
+
+\draw
+    [
+        rounded corners=3pt,
+    ]
+    (cUj)
+    -- (cUj_Vr2)
+    -- (cUj_Vr4)
+    -- (cUj_Vr6)
+    -- (cUj_Vr8)
+    to[out=80,in=-90,rounded corners=0pt] ($(cV)+(1.5*0.4,0)$);
+
+% \foreach \i in {2,4,6,8}
+% {
+%     \draw[ultra thin,red] (cUj_Vr\i) -- (cUj_Vr\i_base);
+%     \draw[ultra thin,red] (cUj_Vl\i) -- (cUj_Vl\i_base);
+% }
+% \draw[ultra thin,red]
+%     (cUj) to [out=90,in=-90] ($(cV)+(1.5*0.4,0)$);
+% \draw[ultra thin,red]
+%     (cUj) to [out=90,in=-90] ($(cV)-(1.5*0.4,0)$);
+% \draw[red] (cUj_Vr6_base) circle (1pt);
+
+% \draw
+%     [
+%         draw=white,
+%         double=white,
+%         double distance=0.4pt,
+%         line width=0.7pt
+%     ]
+%     (cUj) to [out=90,in=-90] ($(cV)+(1.5*0.4,0)$);
+% 
+% \draw
+%     [
+%         draw=white,
+%         double=white,
+%         double distance=0.4pt,
+%         line width=0.7pt
+%     ]
+%     (cUj) to [out=90,in=-90] ($(cV)-(1.5*0.4,0)$);
+% 
+% \draw
+%     (cUj) to [out=90,in=-90] ($(cV)+(1.5*0.4,0)$);
+% \draw
+%     (cUj) to [out=90,in=-90] ($(cV)-(1.5*0.4,0)$);
+
+
+%\draw
+%    [
+%        draw=white,
+%        double=gray,
+%        double distance=0.2pt,
+%        line width=0.6pt
+%    ]
+%    (cV) -- ($(cV)-(2.5*0.5,0)-(3pt,0)$)
+%    node[llbl,inner sep=1pt] {$N_G[v_i]$};
+
+\draw[fill=white,xscale=1.5] (cV) circle (0.4cm);
+\node [lbl] at ($(cV)-(1.25*0,0)$) {$N_G[v_i]$};
+
+%\node [sN] (vi) at (cV) {};
+%\node [rlbl] at (vi.east) {$v_i$};
+
+\pgfmathsetseed{727830286}
+\draw[rounded corners=3pt]
+    (csp)
+    \foreach \x 
+        [evaluate=\x as \xx using {0.25*\x-1.5}]
+        in {1,...,5}
+    {
+        -- ($(\xx,rand*0.15)$)
+    }
+    -- (cs);
+
+\draw[rounded corners=3pt]
+    (ct)
+    \foreach \x 
+        [evaluate=\x as \xx using {0.25*\x+6.5}]
+        in {1,...,5}
+    {
+        -- ($(\xx,rand*0.15)$)
+    }
+    -- (ctp);
+
+\node[lbl] at (cU1jdots) {$\hbox{.}\,\hbox{.}\,\hbox{.}$};
+\node[lbl] at (cUjkdots) {$\hbox{.}\,\hbox{.}\,\hbox{.}$};
+
+
+\node [sN] (s) at (cs) {};
+\node [sN] (sp) at (csp) {};
+
+\node [sN] (t) at (ct) {};
+\node [sN] (tp) at (ctp) {};
+
+\node [sN,anchor=south] (uij) at (cUj) {};
+
+\node [tlbl] at (sp.north) {$s'$};
+\node [tlbl] at (s.north) {$s$};
+\node [tlbl] at (t.north) {$t$};
+\node [tlbl] at (tp.north) {$t'$};
+
+\node [blbl] at (cUj) {$u_i^j$};
+
+\node [blbl] at ($(cs)!0.5!(csp)$) {$k$};
+\node [blbl] at ($(ct)!0.5!(ctp)$) {$k$};
+\node [lbl,anchor=205] at (cUj_Vr6_base) {$k$};
+
+\node [blbl] at ($(cU1)+(0,-1)$) {$U_1$};
+\node [blbl] at ($(cUj)+(0,-1)$) {$U_j$};
+\node [blbl] at ($(cUk)+(0,-1)$) {$U_k$};
+
+\node [rlbl] at ($(cV)+(1.25,0)$) {$G$};
+
+\end{tikzpicture}
+

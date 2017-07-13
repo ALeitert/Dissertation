@@ -1,0 +1,850 @@
+\chapter
+[%
+    Bandwidth and Line-Distortion%
+]
+{%
+    Bandwidth and Line-Distortion%
+    \chapterNote
+    {
+        Results from this chapter have been published partially
+        at~\emph{SWAT}~2014, Copenhagen, Denmark~\cite{DragKoehLeit2014}, and
+        in~\emph{Algorithmica}~\cite{DragKoehLeit2017}.
+    }%
+}
+    \label{cha:bandwidthLineDist}
+%
+
+Consider a given graph~$G = (V, E)$.
+Then, an injective function~$f \colon V \rightarrow \mathbb{N}$ is called \emph{layout} of~$G$.
+The \emph{bandwidth} of a layout~$f$, denoted as~$\bw(f)$, is defined as maximum stretch of any edge, \ie, $\bw(f) = \max_{uv \in E} \big| f(u) - f(v) \big|$.
+Additionally, the \emph{bandwidth} of a graph~$G$, denoted as~$\bw(G)$, is defined as the minimum bandwidth of all layouts of~$G$.
+Accordingly, the \emph{bandwidth problem} asks, for a given graph~$G = (V, E)$, to find a layout~$f$ with minimum bandwidth.
+
+A \emph{non-contractive embedding~\( f \)} of~$G$ is a layout~$f$ of~$G$ with the additional requirement that, for all vertices $u$ and~$v$, $d(u, v) \leq \big| f(u) - f(v) \big|$.
+The \emph{distortion} of such an embedding~$f$ is the smallest integer~$k$ such that $\big| f(u) - f(v) \big| \leq k \cdot d(u, v)$ for all edges~$uv$ of~$G$.
+The minimum \emph{line-distortion} of a graph~$G$, denoted as~$\ld(G)$, is defined as the minimum distortion of all non-contractive embeddings of~$G$.
+Accordingly, the \emph{line-distortion problem} asks, for a given graph~$G$, to find an embedding~$f$ with minimum distortion.
+
+Both problems may appear to be closely related to each other.
+The only difference between the two parameters is that a minimum distortion embedding has to be non-contractive whereas there is no such restriction for bandwidth.
+It is known that $\bw(G) \leq \ld(G)$ for every connected graph~$G$~\cite{HeggMeisPros2011}.
+However, the bandwidth and the minimum line-distortion of a graph can be very different.
+For example, a cycle of length~$n$ has bandwidth~$2$, whereas its minimum line-distortion is exactly~$n - 1$~\cite{HeggMeisPros2011}.
+
+Computing a minimum distortion embedding of a given graph~$G$ into a line~$\ell$ was recently identified as a fundamental algorithmic problem with important applications in various areas of computer science, like computer vision~\cite{TeneSilvLang2000}, as well as in computational chemistry and biology (see~\cite{Indyk2001,IndykMatous2004}).
+
+In this chapter, we investigate possible connections between the line-distortion, bandwidth, and the path-length of a graph.
+We show that, for every graph~$G$, $\pl(G) \leq \ld(G)$ and $\pb(G) \leq \lceil \ld(G) / 2 \rceil$ hold.
+Additionally, we show that, for every class of graphs with path-length bounded by a constant, there is an efficient constant-factor approximation algorithm for the minimum bandwidth problem.
+Furthermore, we demonstrate that, for graphs with path-length bounded by a constant, there is an efficient constant-factor approximation algorithm for the minimum line-distortion problem.
+In the last section of this chapter, we give a linear time $6$-approximation algorithm for the minimum line-distortion problem and a linear time $4$-approximation algorithm for the minimum bandwidth problem for AT-free graphs.
+
+\section{Existing Results}
+
+Bandwidth is known to be one of the hardest graph problems; it is NP-hard even for very simple graphs like caterpillars of hair-length at most~$3$~\cite{Monien1986}, and it is hard to approximate by a constant factor even
+for trees~\cite{BlacKarpWirt1998} and caterpillars with arbitrary hair-lengths~\cite{DubeyFeige2011}.
+Polynomial-time algorithms for the exact computation of bandwidth are known for very few graph classes, including bipartite permutation graphs~\cite{HeggKratMeis2009} and interval graphs~\cite{KleitmVohra1990,KratscStewar2002,Sprague1994}.
+Constant-factor approximation algorithms are known for AT-free graphs~\cite{KlokKratMuel1999} and convex bipartite graphs~\cite{ShreTayuUen2012}.
+Recently, \name{Golovach} et al.\,\cite{GolHegKraLok2011} showed also that the bandwidth minimization problem is Fixed Parameter Tractable on AT-free graphs by presenting an $n2^{\calO(k\log k)}$ time algorithm.
+For general (unweighted) graphs, the minimum bandwidth can be approximated to within a factor of $\calO \! \left( \log^{3.5} n \right)$~\cite{Feige2000}.
+For trees and chordal graphs, the minimum bandwidth can be approximated to within a factor of $\calO \! \left( \log^{2.5} n \right)$~\cite{Gupta2001}.
+For caterpillars, the minimum bandwidth can be approximated to within a factor of $\calO(\log n / \log \log n)$~\cite{FeigeTalwar2009}.
+
+Table~\ref{tbl:ExisPosBwResults} and Table~\ref{tbl:ExisHardBwResults} summarise the results mentioned above.
+
+\begin{table}
+    [htb]
+    \centering
+    \caption
+    {%
+        Existing solutions for calculating bandwidth.
+    }
+    \label{tbl:ExisPosBwResults}
+%
+    \def\arraystretch{1.15}
+    \begin{tabular}{lccc}
+        \hline
+        Graph Class
+            & Solution Quality
+            & Run Time
+            & \\
+        \hline
+        AT-free
+            & optimal
+            & $n2^{\calO(k \log k)}$
+            & \cite{GolHegKraLok2011} \\
+            & 2-approx.
+            & $\calO(nm)$
+            & \cite{KlokKratMuel1999} \\
+            & 4-approx.
+            & $\calO(m + n \log n)$
+            & \cite{KlokKratMuel1999} \\
+        convex bipartite
+            & 2-approx.
+            & $\calO \! \left( n \log^2 n \right)$
+            & \cite{ShreTayuUen2012} \\
+            & 4-approx.
+            & $\calO(n)$
+            & \cite{ShreTayuUen2012} \\
+        bipartite permutation
+            & optimal
+            & $\calO \! \left( n^4 \log n \right)$
+            & \cite{HeggKratMeis2009} \\
+        interval
+            & optimal
+            & $\calO \! \left( n \log^2 n \right)$
+            & \cite{Sprague1994} \\
+        chordal
+            & $\calO \! \left( \log^{2.5} n \right)$-approx.
+            & polynomial
+            & \cite{Gupta2001} \\
+        caterpillars
+            & $\calO(\log n / \log \log n)$
+            & polynomial
+            & \cite{FeigeTalwar2009} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}
+    [htb]
+    \centering
+    \caption
+    {%
+        Existing hardnes results for calculating bandwidth.
+    }
+    \label{tbl:ExisHardBwResults}
+%
+    \def\arraystretch{1.15}
+    \begin{tabular}{lcc}
+        \hline
+        Graph Class
+            & Result
+            & \\
+        \hline
+        caterpillars (hair-length at most~$3$)
+            & NP-hard
+            & \cite{Monien1986} \\
+        caterpillars
+            & hard to approximate by a constant factor
+            & \cite{DubeyFeige2011} \\
+        trees
+            & hard to approximate by a constant factor
+            & \cite{BlacKarpWirt1998} \\
+        convex bipartite
+            & NP-hard
+            & \cite{ShreTayuUen2012} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+In~\cite{BadDhaGupRab2005}, \name{B\u{a}doiu} et al.\ showed that the line-distortion problem is hard to approximate within a constant factor.
+They gave an exponential-time exact algorithm and a polynomial-time $\calO \! \left( n^{1/2} \right)$-approximation algorithm for arbitrary unweighted input graphs, along with a polynomial-time $\calO \! \left( n^{1/3} \right)$-approximation algorithm for unweighted trees.
+In another paper, \name{B\u{a}doiu} et al.\,\cite{BadChuIndSid2005} showed that the problem is hard to $\calO \! \left( n^{1/12} \right)$-approximate, even for weighted trees.
+They also gave a better polynomial-time approximation algorithm for general weighted graphs, along with a polynomial-time algorithm that approximates the minimum line-distortion $k$ embedding of a weighted tree by a factor that is polynomial in~$k$.
+
+Fast exponential-time exact algorithms for computing the line-distortion of a graph were proposed in~\cite{FelFomLokLos2013,FomiLoksSaur2011}.
+\name{Fomin} et al.\,\cite{FomiLoksSaur2011} showed that a minimum distortion embedding of an unweighted graph into a line can be found in time $5^{n+o(n)}$.
+\name{Fellows} et al.\,\cite{FelFomLokLos2013} gave an $\calO \! \left( n k^4 (2k + 1)^{2k} \right)$ time algorithm that for an unweighted graph~$G$ and integer~$k$ either constructs an embedding of~$G$ into a line with distortion at most~$k$, or concludes that no such embedding exists.
+They extended their approach also to weighted graphs obtaining an $\calO \! \left( n k^{4W} (2k + 1)^{2kW} \right)$ time algorithm, where $W$ is the largest edge weight.
+Thus, the problem of minimum distortion embedding of a given graph~$G$ into a line~$\ell$ is Fixed Parameter Tractable.
+
+Recently, \name{Heggernes} et al.\,\cite{HeggerMeiste2010,HeggMeisPros2011} initiated the study of minimum distortion embeddings into a line of specific graph classes.
+In particular, they gave polynomial-time algorithms for the problem on bipartite permutation graphs and on threshold graphs~\cite{HeggMeisPros2011}.
+Furthermore, \name{Heggernes} et al.\,\cite{HeggerMeiste2010} showed that the problem of computing a minimum distortion embedding of a given graph into a line remains NP-hard even when the input graph is restricted to a bipartite, cobipartite, or split graph, implying that it is NP-hard also on chordal, cocomparability, and AT-free graphs.
+They also gave polynomial-time constant-factor approximation algorithms for split and cocomparability graphs.
+
+Table~\ref{tbl:ExisPosLineDesResults} and Table~\ref{tbl:ExisHardLineDesResults} summarise the results mentioned above.
+
+\begin{table}
+    [htb]
+    \centering
+    \caption
+    {%
+        Existing solutions for calculating the minimum distortion.
+    }
+    \label{tbl:ExisPosLineDesResults}
+%
+    \def\arraystretch{1.25}
+    \begin{tabular}{lccc}
+        \hline
+        Graph Class
+            & Solution Quality
+            & Run Time
+            & \\
+        \hline
+        trees (unweighted)
+            & $\calO \! \left( n^{1/3} \right)$-approx.
+            & polynomial
+            & \cite{BadDhaGupRab2005} \\
+        trees (weighted)
+            & $k^{\calO(1)}$-approx.
+            & polynomial
+            & \cite{BadChuIndSid2005} \\
+        general (unweighted)
+            & optimal
+            & $5^{n+o(n)}$
+            & \cite{FomiLoksSaur2011} \\
+        general
+            & optimal
+            & $\calO \! \left( n k^4 (2k + 1)^{2k} \right)$
+            & \cite{FelFomLokLos2013} \\
+        bipartite permutation
+            & optimal
+            & $\calO \! \left( n^2 \right)$
+            & \cite{HeggMeisPros2011} \\
+        threshold graphs
+            & optimal
+            & linear
+            & \cite{HeggMeisPros2011} \\
+        split
+            & 6-approx.
+            & linear
+            & \cite{HeggerMeiste2010} \\
+        cocomparability
+            & 6-approx.
+            & $\calO \! \left( n \log^2 n + m \right)$
+            & \cite{HeggerMeiste2010} \\
+        \noalign{\smallskip}
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}
+    [htb]
+    \centering
+    \caption
+    {%
+        Existing hardnes results for calculating the minimum distortion.
+    }
+    \label{tbl:ExisHardLineDesResults}
+%
+    \def\arraystretch{1.25}
+    \begin{tabular}{lcc}
+        \hline
+        Graph Class
+            & Result
+            & \\
+        \hline
+        general
+            & $\calO(1)$-approximation is NP-hard
+            & \cite{BadDhaGupRab2005} \\
+        trees (weighted)
+            & Hard to $\calO \! \left( n^{1/12} \right)$-approximate
+            & \cite{BadChuIndSid2005} \\
+        bipartite
+            & NP-hard
+            & \cite{HeggerMeiste2010} \\
+        cobipartite
+            & NP-hard
+            & \cite{HeggerMeiste2010} \\
+        split
+            & NP-hard
+            & \cite{HeggerMeiste2010} \\
+        \hline
+    \end{tabular}
+\end{table}
+
+
+\section{$k$-Dominating Pairs}
+    \label{sec:met-prop}
+
+A pair of vertices $x$ and~$y$ of a graph~$G$ is called a \emph{\( k \)-dominating pair} if every path between $x$ and~$y$ has eccentricity at most~$k$.
+It is known that every AT-free graph has a $1$-dominating pair~\cite{CornOlarStew1997}.
+
+In this section, we investigate the relation of $k$-dominating pairs with the path-length and line-distortion of a graph.
+Additionally, we present approaches to determine if a given graph contains a $k$-domination pair.
+
+\subsection{Relation to Path-Length and Line-Distortion}
+
+\begin{lemma}
+    \label{lem:plDomPairRelation}
+Every graph~\( G \) with \( \pl(G) \leq \lambda \) has a \( \lambda \)-dominating pair.
+\end{lemma}
+
+\begin{proof}
+Consider a path-decomposition $\calP = \big \{ X_1, \ldots, X_q \big \}$ of length~$\pl(G) \leq \lambda$ of~$G$.
+Consider any two vertices $x \in X_1$ and $y \in X_q$ and a path~$P$ between them in~$G$.
+Necessarily, by properties of path decompositions, every path of~$G$ connecting the vertices $x$ and~$y$ has a vertex in every bag of~$\calP$.
+Hence, as each vertex~$v$ of~$G$ belongs to some bag~$X_{i}$ of~$\calP$, there is a vertex~$u \in P$ with $u \in X_i$ and, thus, $d(v,u) \leq \lambda$.
+\end{proof}
+
+Next, we show that the line-distortion of a graph~$G$ gives an upper bound on the minimum $k$ for which $G$ contains a $k$-dominating pair.
+
+\begin{lemma}
+    \label{lem:ldDomPairRelation}
+Every graph~\( G \) with \( \ld(G) \leq \lambda \) has a \( \left \lfloor \frac{\lambda}{2} \right \rfloor \)-dominating pair.
+\end{lemma}
+
+\begin{proof}
+Let $f$ be an optimal line embedding for~$G = (V, E)$.
+This embedding has a first vertex~$v_1$ and a last vertex~$v_n$, \ie, for all~$u \in V$, $f(v_1) \leq f(u) \leq f(v_n)$.
+Let $u$ be an arbitrary vertex of~$G$ and $P$ an arbitrary path from $v_1$ to~$v_n$ in~$G$.
+If $u$ is not on this path, there is an edge~$v_iv_j$ of~$P$ with $f(v_i) < f(u) < f(v_j)$.
+Without loss of generality, let $f(u) - f(v_i) \leq f(v_j) - f(u)$.
+Thus, by definition of line-distortion, we can say that
+\[
+    f(u) - f(v_i) \leq \left \lfloor \frac{f(v_j) - f(v_i)}{2} \right \rfloor \leq \left \lfloor \frac{\lambda}{2} \right \rfloor.
+\]
+Therefore, each vertex~$u$ of~$G$ is in distance at most~$\left \lfloor \frac{\lambda}{2} \right \rfloor$ to each path from $v_1$ to~$v_n$, \ie, $(v_1, v_n)$ is a $\left \lfloor \frac{\lambda}{2} \right \rfloor$-dominating pair.
+\end{proof}
+
+Note that the difference between both factors can be arbitrary large.
+The complete graph~$K_n$ has line-distortion~$n - 1$.
+However, each vertex pair is a $1$-dominating pair.
+
+\subsection{Determining a $k$-Dominating Pair}
+
+In this subsection, we present a polynomial time algorithm to determine if a given graph contains a $k$-dominating pair.
+Additionally, we show that, in a graph with path-length~$\lambda$, one can find a $2 \lambda$-dominating pair in linear time.
+
+Consider a $k$-dominating pair~$(x, y)$ and an arbitrary vertex~$w$.
+By definition, each path~$P$ from $x$ to~$y$ is in distance at most~$k$ to~$w$, \ie, $P \cap N^k[w] \neq \emptyset$.
+Therefore, we get the following observation.
+
+\begin{observation}
+    \label{obs:domPairDisk}
+A pair of vertices $x$ and~$y$ is a $k$-dominating pair if and only if, for every vertex $w \in V \setminus \left( N^k[x] \cup N^k[y] \right)$, the disk~$N^k[w]$ separates $x$ and~$y$.
+\end{observation}
+
+Based on Observation~\ref{obs:domPairDisk}, Algorithm~\ref{algo:kDomPair} below determines if a given graph contains a $k$-dominating pair for a given~$k$.
+The idea is to
+\begin{enumerate*}[(i),mode=unboxed]
+\item
+    compute the connected components of~$G - N^k[v]$ for each~$v$ and
+\item
+    iterate over all pairs~$(x, y)$ and check, for each vertex~$w$ with sufficiently large distance to $x$ and~$y$, if $x$ and~$y$ are in different connected components of~$G - N^k[w]$.
+\end{enumerate*}
+If this is the case, $x$ and~$y$ form a dominating pair.
+
+\begin{algorithm}
+    \caption
+    {%
+        Determines if a given graph contains a $k$-dominating pair.
+    }
+    \label{algo:kDomPair}
+%
+
+\KwIn
+{%
+    A graph~$G = (V, E)$ and a non-negative integer~$k$.
+}
+
+\KwOut
+{%
+    A $k$-dominating pair $(x, y)$ if such a pair exists in~$G$.
+}
+
+Determine the pairwise distances of all vertices.
+
+Create an empty $n \times n$ matrix~$M$.
+
+\ForEach
+{%
+    $v \in V$
+}
+{%
+    Determine the connected components of~$G - N^k[v]$.
+
+    Label each vertex~$x$ in~$G - N^k[v]$ with its connected component and store this label in $M(v, x)$.
+    (Thus, $M(v, x)$ is the label of the connected component of vertex~$x$ in~$G - N^k[v]$.)
+}
+
+\ForEach
+{%
+    vertex pair~$(x, y)$
+}
+{%
+    \If
+    {%
+        for each $w \in V$ with $\max \big \{ d(x, w), d(y, w) \big \} > k$, $M(w, x) \neq M(w, y)$%
+        \label{line:kDOmPairCheckAllW}
+    }
+    {%
+        Output $(x, y)$ and \keyword{Stop}.
+    }
+}
+\end{algorithm}
+
+\begin{theorem}
+Given a graph~\( G \) and an integer~\( k \), Algorithm~\ref{algo:kDomPair} determines if \( G \) contains a \( k \)-dominating pair~\( (x, y) \) in \( \calO \! \left( n^3 \right) \) time.
+\end{theorem}
+
+\begin{proof}
+By Observation~\ref{obs:domPairDisk}, $(x, y)$ is a $k$-dominating pair if, for each vertex~$w \in V \setminus \left( N^k[x] \cup N^k[y] \right)$, $x$ and~$y$ are in different connected components of~$G - N^k[w]$.
+That is, $M(w, x) \neq M(w, y)$.
+Clearly, $w \notin \left( N^k[x] \cup N^k[y] \right)$ if and only if the larger of $d(x, w)$ and~$d(y, w)$is strictly larger than~$k$.
+Therefore, line~\ref{line:kDOmPairCheckAllW} is successful if and only if $(x, y)$ is a dominating pair.
+
+The pairwise distances of all vertices as well as the matrix~$M$ can easily be computed in $\calO \big( n(n + m) \big)$ time by performing a BFS on each vertex.
+Because the pairwise distances are known, it can be checked in constant time for a vertex pair~$(x, y)$ and a vertex~$w$ if $\max \big \{ d(x, w), d(y, w) \big \} > k$ and $M(w, x) \neq M(w, y)$.
+Therefore, the algorithm runs in total $\calO \! \left( n^3 \right)$ time.
+\end{proof}
+
+By performing a binary search over~$k$, we get the following result:
+
+\begin{corollary}
+There is a \( \calO \! \left( n^3 \log n \right) \) time algorithm that computes a \( k \)-dominating pair with minimum~\( k \) of a given graph.
+\end{corollary}
+
+In~\cite{KratscSpinra2006}, \name{Kratsch} and \name{Spinrad} show that finding a dominating pair is essentially as hard as finding a triangle in a graph.
+Thus, it is unlikely that there is a linear time algorithm to find a dominating pair if it exists.
+Yet, by Lemma~\ref{lem:plDomPairRelation}, one can search for $k$-dominating pairs in dependence of the path-length of a graph.
+We do not know how to find a $k$-dominating pair with $k \leq \pl(G)$ for an arbitrary graph~$G$ \emph{in linear time}.
+However, we can prove the following weaker result which is useful in later sections.
+For this, recall that a \emph{spread pair} is a vertex pair~$(x, y)$ such that, for some vertex~$s$, $d(s, x) = \ecc(s)$ and $d(x, y) = \ecc(x)$.
+
+\begin{theorem}
+    \label{theo:domPairApprox}
+In a graph~\( G \), any spread pair is a \( 2 \pl(G) \)-dominating pair.
+\end{theorem}
+
+\begin{proof}
+Consider a path-decomposition $\calP = \big \{ X_1, X_2, \ldots, X_q \big \}$ of~$G$ with length~$\pl(G) = \lambda$.
+Let $(x, y)$ be a spread pair and let $s$ be a vertex of~$G$ such that $d(s, x) = \ecc(s)$.
+We claim that $(x, y)$ is a $2 \lambda$-dominating pair of~$G$.
+
+If there is a bag in~$\calP$ containing both $s$ and~$x$, then $d(s, x) \leq \lambda$ and, by the choice of~$x$, each vertex of~$G$ is within distance at most~$\lambda$ from~$s$ and, hence, within distance at most~$2 \lambda$ from~$x$.
+Evidently, in this case, $(x, y)$ is a $2 \lambda$-dominating pair of~$G$.
+
+Assume now, without loss of generality, that $x \in X_i$ and $s \in X_l$ with $i < l$.
+Consider an arbitrary vertex~$v$ of~$G$ that belongs to only bags with indices smaller than~$i$.
+We show that $d(x, v) \leq 2 \lambda$.
+As $X_i$ separates $v$ from~$s$, a shortest path~$P$ of~$G$ between $s$ and~$v$ must have a vertex~$u$ in~$X_i$.
+We have $d(s, x) \geq d(s, v) = d(s, u) + d(u,v)$ and, by the triangle inequality, $d(s, x) \leq d(s, u) + d(u, x)$.
+Hence, $d(u, v) \leq d(u, x)$ and, since both $u$ and~$x$ belong to same bag~$X_i$, $d(u, x) \leq \lambda$.
+That is, $d(x, v) \leq d(x, u) + d(u, v) \leq 2 d(u, x) \leq 2 \lambda$.
+
+If $d(x, y) \leq 2 \lambda$ then, by the choice of~$y$, each vertex of~$G$ is within distance at most~$2 \lambda$ from~$x$ and, hence, $(x, y)$ is a $2 \lambda$-dominating pair of~$G$.
+So, assume that $d(x, y)> 2 \lambda$, \ie, every bag of~$\calP$ that contains~$y$ has an index greater than~$i$.
+Consider a bag~$X_j$ containing~$y$.
+We have $i < j$.
+Repeating the arguments of the previous paragraph, we can show that $d(y, v) \leq 2 \lambda$ for every vertex~$v$ that belongs to bags with indices greater than~$j$.
+
+Consider now an arbitrary path~$P$ of~$G$ connecting vertices~$x$ and~$y$.
+By properties of path-decompositions, $P$ has a vertex in every bag~$X_h$ of~$\calP$ with $i \leq h \leq j$.
+Hence, for each vertex~$v$ of~$G$ that belongs to a bag~$X_h$ with $i \leq h \leq j$, there is a vertex~$u \in P \cap X_h$ such that $d(v, u) \leq \lambda$.
+As $d(v, x) \leq 2 \lambda$ for each vertex~$v$ from~$X_{i'}$ with $i' < i$ and $d(v, y) \leq 2 \lambda$ for each vertex~$v$ from~$X_{j'}$ with $j' > j$, we conclude that $P$ has eccentricity at most~$2 \lambda$ in~$G$.
+\end{proof}
+
+
+
+\section{Bandwidth of Graphs with Bounded Path-Length}
+    \label{sec:bw-vs-pl}
+
+In this section, we show that there is an efficient algorithm which, for any graph~$G$ with $\pl(G) = \lambda$, produces a layout~$f$ with bandwidth at most~$\calO(\lambda) \bw(G)$.
+Moreover, this statement is true even for all graphs containing a shortest path with eccentricity~$\lambda$.
+Recall that a shortest path~$P$ of a graph~$G$ has \emph{eccentricity~\( k \)} in~$G$ if every vertex~$v$ of~$G$ is at distance at most~$k$ from a vertex of~$P$, \ie, $d(v, P) \leq k$.
+
+We need the following ``local density'' lemma.
+
+\begin{lemma}
+    [\name{Räcke}~\cite{RaeckeLecNotes}]
+    \label{lem:Discbandwidth}
+For each vertex~\( v \) of an arbitrary graph~\( G \) and each positive integer~\( r \),
+\[
+    \frac{\big | N^r[v] \big | - 1}{2r} \leq \bw(G).
+\]
+\end{lemma}
+
+The main result of this section is the following.
+
+\begin{theorem}
+    \label{theo:espBwApprox}
+For a given graph~\( G \) and a given shortest path with eccentricity~\( k \) in~\( G \), a layout~\( f \) with bandwidth at most~\( (4k + 2) \bw(G) \) can be found in linear time.
+\end{theorem}
+
+\begin{proof}
+Let $P = \{ x_0, x_1, \ldots, x_i, \ldots, x_j, \ldots, x_q \}$ be a given shortest path with eccentricity~$k$ in~$G = (V, E)$.
+Based on~$P$, determine a partition~$\calX = \{ X_1, X_2, \ldots \}$ of~$V$ such that each subset~$X_i$ induces a connected subgraph and $v \in X_i$ implies $d(v, x_i) = d(v, P)$.
+This can be done by running a single BFS starting at~$P$.
+Then, a vertex~$v$ is in the subset~$X_i$ if $x_i$ is an ancestor of~$v$ in the resulting BFS-tree.
+Now, create a layout~$f$ of~$G$ by placing all the vertices of~$X_i$ before all vertices of~$X_j$, if $i < j$, and by placing the vertices within each $X_i$ in an arbitrary order.
+See Figure~\ref{fig:bwld_bwApprox} for an illustration.
+
+Clearly, computing~$\calX$ and $f$ can be done in linear time if $P$ is given.
+
+\begin{figure}
+    [htb]
+    \centering
+    \input{figures/fig_bwld_bwApprox}
+    \caption
+    {%
+        Illustration to the proof of Theorem~\ref{theo:espBwApprox}.
+    }
+    \label{fig:bwld_bwApprox}
+\end{figure}
+
+We claim that this layout~$f$ has bandwidth at most~$(4k + 2) \bw(G)$.
+Consider any edge~$uv$ of~$G$ and assume $u \in X_i$ and $v \in X_j$ with $i \leq j$.
+For this edge~$uv$, we have~$f(v) - f(u) \leq \left | \bigcup_{\ell = i}^j X_\ell \right | - 1$.
+Since $P$ is a shortest path with eccentricity~$k$, we also know that $d(x_i, x_j) = j - i \leq d(x_i, u) + 1 + d(x_j, v) \leq 2k + 1$.
+Consider a vertex~$x_c$ of~$P$ with $c = \big \lfloor (i + j) / 2 \big \rfloor$, \ie, a middle vertex of the subpath of~$P$ between $x_i$ and~$x_j$.
+Consider an arbitrary vertex~$w$ in~$X_{\ell}$ for $i \leq \ell \leq j$.
+We know that, by triangle inequality, $d(x_c, w) \leq d(x_c, x_\ell) + d(x_\ell, w)$, by definition of~$x_c$, $d(x_c, x_\ell) \leq \lceil 2k + 1 \rceil / 2$, and, because $\ecc(P) \leq k$, $d(x_\ell, w) \leq k$.
+Thus, we get $d(x_c, w) \leq 2k + 1$.
+In other words, for $r := 2k + 1$, the disk~$N^r[x_c]$ contains all vertices of $\bigcup_{\ell = i}^j X_{\ell}$ and, hence, $\big| N^r[x_c] \big| \geq \left| \bigcup_{\ell = i}^j X_{\ell} \right|$.
+Applying Lemma~\ref{lem:Discbandwidth}, we conclude $f(v) - f(u) \leq \left | \bigcup_{\ell = i}^j X_{\ell} \right | - 1 \leq \big| N^r[x_c] \big| - 1 \leq 2 (2k + 1) \bw(G) = (4k + 2) \bw(G)$.
+\end{proof}
+
+For a given graph~$G$, one can find a shortest path with eccentricity~$k \leq \pl(G)$ in $\calO(n^2 m)$ time in the following way.
+Iterate over all vertex pairs of~$G$.
+For each vertex pair~$(x, y)$, pick a shortest $(x,y)$-path~$P$ and determine the eccentricity of~$P$.
+Finally, output the path~$P$ for which $\ecc(P)$ is minimal.
+By Lemma~\ref{lem:plDomPairRelation}, this minimum is at most~$\pl(G)$.
+
+Alternatively, using Theorem~\ref{theo:domPairApprox}, one can find a shortest path with eccentricity at most~$2 \pl(G)$ in linear time.
+Therefore, Theorem~\ref{theo:espBwApprox} implies:
+
+\begin{corollary}
+    \label{cor:appr-bw-pl}
+For every graph~\( G \), a layout with bandwidth at most~\( (4 \pl(G) + 2) \bw(G) \) can be found in \( \calO(n^2 m) \) time and a layout with bandwidth at most~\( (8 \pl(G) + 2) \bw(G) \) can be found in \( \calO(n + m) \) time.
+\end{corollary}
+
+The above results did not require a path-decomposition of length~$\pl(G)$ of a graph~$G$ as input.
+We also avoided the construction of such a path-decomposition of~$G$ and just relied on the existence of a shortest path in~$G$ with eccentricity~$k$.
+If, however, a path-decomposition with length~$\lambda$ of a graph~$G$ is given in advance together with~$G$, then a better approximation ratio for the minimum bandwidth problem on~$G$ can be achieved.
+
+\begin{theorem}
+    \label{theo:plBwApprox}
+If a graph~\( G \) is given together with a path-decomposition of~\( G \) of length~\( \lambda \), then a layout~\( f \) with bandwidth at most~\( \lambda \bw(G) \) can be found in \( \calO \! \left ( n^2 + n \log^2 n \right ) \) time.
+\end{theorem}
+
+\begin{proof}
+Let $\calP = \big \{ X_1, X_2, \ldots, X_q \big \}$ be a path-decomposition of length~$\lambda$ of~$G = (V, E)$.
+We form a new graph~$G^+ = (V, E^+)$ from~$G$ by adding an edge between a pair of vertices~$u, v \in V$ if and only if $u$ and~$v$ belong to a common bag in~$\calP$.
+From this construction, we conclude that $G$ is a subgraph of~$G^+$ and $G^+$ is a subgraph of~$G^{\lambda}$.
+Note that $G^+$ is an interval graph:
+$\calP$ gives a path-decomposition of~$G^+$ such that each bag~$X_i$ is a clique of~$G^+$.
+In~\cite{Sprague1994}, an $\calO(n \log^2 n)$ time algorithm to compute a minimum bandwidth layout of a graph is given.
+Let $f$ be an optimal layout produced by that algorithm for our interval graph~$G^+$.
+We claim that this layout~$f$, when considered for~$G$, has bandwidth at most~$\lambda \bw(G)$.
+Indeed, following~\cite{KlokKratMuel1999}, we have $\max_{uv \in E} |f(u) - f(v)| \leq \max_{uv \in E^+} |f(u) - f(v)| = \bw \big( G^+ \big) \leq \bw \big( G^\lambda \big) \leq \lambda \bw(G)$.
+Clearly, raising a graph to the $\lambda$-th power can only increase its bandwidth by a factor of~$\lambda$.
+\end{proof}
+
+As shown in Lemma~\ref{lem:bfsLayApproxDist} (page~\pageref{lem:bfsLayApproxDist}), one can compute, for a given graph~$G$, a path-decomposition with length at most~$2 \pl(G)$ in $\calO(n^3)$ time.
+Combining this with Theorem~\ref{theo:plBwApprox}, it follows:
+
+\begin{corollary}
+For a given graph~\( G \), a layout~\( f \) with bandwidth at most~\( 2 \pl(G) \bw(G) \) can be found in \( \calO(n^3) \) time.
+\end{corollary}
+
+Summarising the results of this section, we have the following interesting conclusion.
+
+\begin{theorem}
+    \label{theo:plClassBwApprox}
+For every class of graphs with path-length bounded by a constant, there is an efficient constant-factor approximation algorithm for the minimum bandwidth problem.
+\end{theorem}
+
+In Section~\ref{sec:appr-ld-AT}, using some additional structural properties of AT-free graphs, we give a linear time $4$-approximation algorithm for the minimum bandwidth problem for AT-free graphs.
+This result reproduces an approximation result by \name{Kloks} et al.\,\cite{KlokKratMuel1999} with a better runtime.
+
+
+\section{Path-Length and Line-Distortion}
+    \label{sec:ld-vs-pl}
+
+In this section, we first show that the line-distortion of a graph gives an upper bound on its path-length and then demonstrate that, if the path-length of a graph~$G$ is bounded by a constant, there is an efficient constant-factor approximation algorithm for the minimum line-distortion problem on~$G$.
+
+
+\subsection{Bound on Line-Distortion Implies Bound on Path-Length}
+    \label{sec:ld-bounds-pl}
+
+In this subsection, we show that the path-length of an arbitrary graph never exceeds its line-distortion.
+The following inequalities are true.
+
+\begin{theorem}
+    \label{theo:ldPlRelation}
+For an arbitrary graph~\( G \), \( \pl(G) \leq \ld(G) \), \( \pw(G) \leq \ld(G) \), and \( \pb(G) \leq \lceil \ld(G) / 2 \rceil \).
+\end{theorem}
+
+\begin{proof}
+It is known (see, \eg,~\cite{HeggMeisPros2011}) that every connected graph $G$ has a minimum distortion embedding~$f$ into a line~$\ell$ (called a \emph{canonic} embedding) such that $|f(x) - f(y)| = d(x, y)$ for every two vertices $x$ and~$y$ of~$G$ that are placed next to each other in~$\ell$ by~$f$.
+Assume, in what follows, that $f$ is such a canonic embedding and let $k := \ld(G)$.
+
+Consider the following path-decomposition of~$G$ created from~$f$.
+For each vertex~$v$, form a bag~$B_v$ consisting of all vertices of~$G$ which are placed by~$f$ in the interval~$[f(v), f(v) + k]$ of a line~$\ell$.
+Order these bags with respect to the left ends of the corresponding intervals.
+Evidently, for every vertex~$v \in V$, $v \in B_v$, \ie, each vertex belongs to a bag.
+More generally, a vertex~$u$ belongs to a bag~$B_v$ if and only if $f(v) \leq f(u) \leq f(v) + k$.
+Since $\ld(G) = k$, for every edge~$uv$ of~$G$, $|f(u) - f(v)| \leq k$ holds.
+Hence, both ends of the edge~$uv$ belong either to the bag~$B_u$ (if $f(u) < f(v)$) or to the bag~$B_v$ (if $f(v) < f(u)$).
+Now, consider three bags $B_a$, $B_b$, and~$B_c$ with $f(a) < f(b) < f(c)$ and a vertex~$v$ of~$G$ that belongs to $B_a$ and~$B_c$.
+We have $f(a) < f(b) < f(c) \leq f(v) \leq f(a) + k < f(b) + k$.
+Hence, $v$ belongs to~$B_b$ as well.
+
+It remains to show that each bag~$B_v$, $v \in V$, has in~$G$ diameter at most~$k$, radius at most~$\lceil k / 2 \rceil$, and cardinality at most~$k + 1$.
+Indeed, for any two vertices~$x, y \in B_v$, we have $|f(x) - f(y)| \leq k$, \ie, $d(x, y) \leq |f(x) - f(y)| \leq k$.
+Furthermore, any interval~$[f(v), f(v) + k]$ of length~$k$ can have at most $k + 1$~vertices of~$G$ as the distance between any two vertices placed by~$f$ to this interval is at least~$1$ ($|f(x) - f(y)| \geq d(x, y) \geq 1$).
+Thus, $|B_v| \leq k + 1$ for every $v \in V$.
+
+Now, consider the point~$p_v := f(v) + \lfloor k / 2 \rfloor$ in the interval~$[f(v), f(v) + k]$ of~$\ell$.
+Assume, without loss of generality, that $p_v$ is between $f(x)$ and~$f(y)$ which are the images of two vertices $x$ and~$y$ of~$G$ placed next to each other in~$\ell$ by~$f$.
+Let $f(x) \leq p_v < f(y)$.
+See Figure~\ref{fig:ld-vs-pb} for an illustration.
+Since $f$ is a canonic embedding of~$G$, there must exist a vertex~$c$ on a shortest path between $x$ and~$y$ such that $d(x, c) = p_v - f(x)$ and $d(c, y) = f(y) - p_v = d(x, y) - d(x, c)$.
+We claim that, for every vertex~$w \in B_v$, $d(c, w) \leq \lceil k / 2 \rceil$ holds.
+Assume $f(w) \geq f(y)$ (the case when $f(w) \leq f(x)$ is similar).
+Then, we have $d(c, w) \leq d(c, y) + d(y, w) \leq (f(y) - p_v) + (f(w) - f(y)) = f(w) - p_v = f(w) - f(v) - \lfloor k / 2 \rfloor \leq k - \lfloor k / 2 \rfloor \leq \lceil k / 2 \rceil$.
+\end{proof}
+
+\begin{figure}
+    [htb]
+    \centering
+    \input{figures/fig_bwld_plLdRelation}
+    \caption
+    [%
+        Illustration to the proof of Theorem~\ref{theo:ldPlRelation}.
+    ]
+    {%
+        Illustration to the proof of Theorem~\ref{theo:ldPlRelation}.
+    }
+    \label{fig:ld-vs-pb}
+\end{figure}
+
+It should be noted that the difference between the path-length and the line-distortion of a graph can be very large.
+The graph~$K_n$ has path-length~$1$, whereas the line-distortion of~$K_n$ is~$n - 1$.
+Note also that the bandwidth and the path-length of a graph do not bound each other.
+The bandwidth of~$K_n$ is~$n - 1$ while its path-length is~$1$.
+On the other hand, the path-length of cycle~$C_{2n}$ is~$n$ while its bandwidth is~$2$.
+
+
+\subsection{Line-Distortion of Graphs with Bounded Path-Length}
+    \label{sec:pb-vs-ld}
+
+In this subsection, we show that there is an efficient algorithm that, for any graph~$G$ with $\pl(G) \leq \lambda$, produces an embedding~$f$ of~$G$ into a line with distortion at most~$(8 \lambda + 2) \ld(G)$.
+This statement is true even for all graphs with a shortest path with eccentricity~$\lambda$.
+
+We need the following simple ``local density'' lemma.
+
+\begin{lemma}
+    \label{lem:LocalDensity}
+For every vertex set~\( S \subseteq V \) of an arbitrary graph~\( G = (V, E) \),
+\[
+    |S| - 1 \leq \diam(S) \ld(G).
+\]
+\end{lemma}
+
+\begin{proof}
+Consider an embedding~$f^*$ of $G$ into a line~$\ell$ with distortion~$\ld(G)$.
+Let $a$ and~$b$ be the leftmost and the rightmost, respectively, vertices of~$S$ in~$\ell$, \ie, $f^*(a) \leq f^*(v) \leq f^*(b)$ for all $v \in S$.
+Consider a shortest path~$P$ in~$G$ from $a$ to~$b$.
+Since, for each edge~$xy$ of~$G$, $|f^*(x) - f^*(y)| \leq \ld(G)$ holds, we get $f^*(b) - f^*(a) \leq d(a, b) \ld(G) \leq \diam(S) \ld(G)$.
+On the other hand, since all vertices of~$S$ are mapped to points of~$\ell$ between $f^*(a)$ and~$f^*(b)$, we have $f^*(b) - f^*(a) \geq |S| - 1$.
+\end{proof}
+
+The main result of this section is the following.
+
+\begin{theorem}
+    \label{theo:ldApprox}
+Every graph~\( G \) with a shortest path of eccentricity~\( k \) admits an embedding~\( f \) of~\( G \) into a line with distortion at most~\( (8k + 2) \ld(G) \).
+If a shortest path of~\( G \) of eccentricity~\( k \) is given in advance, then such an embedding~\( f \) can be found in linear time.
+\end{theorem}
+
+\begin{proof}
+Let $P = \{ x_0, x_1, \ldots, x_i, \ldots, x_j, \ldots, x_q \}$ be a shortest path of~$G$ of eccentricity~$k$.
+Build a $\BFS(P,G)$-tree~$T$ of~$G$ (\ie, a Breadth-First-Search tree of~$G$ started at path~$P$).
+Denote by $\{ X_0, X_1, \ldots, X_q \}$ the decomposition of the vertex set~$V$ of~$G$ obtained from~$T$ by removing the edges of~$P$.
+That is, $X_i$ is the vertex set of a subtree (branch) of~$T$ growing from vertex~$x_i$ of~$P$.
+See Figure~\ref{fig:mespApprox_tree} for an illustration.
+Since the eccentricity of~$P$ is~$k$, we have $d_G(v, x_i) \leq k$ for every $i \in \{ 1, \ldots, q \}$ and every $v \in X_i$.
+
+We define an embedding~$f$ of~$G$ into a line~$\ell$ by performing a preorder traversal of the vertices of~$T$ starting at vertex~$x_0$ and visiting first the vertices of~$X_i$ and then the vertices of~$X_{i + 1}$ for each $i \in \{ 0, \ldots, q - 1 \}$.
+We place the vertices of~$G$ on the line~$\ell$ in that order, and also, for each $i \in \{ 0, \ldots, q - 1 \}$, we leave a space of length~$d_T(v_i, v_{i+1})$ between any two vertices $v_i$ and~$v_{i+1}$ placed next to each other (this can be done during the preorder traversal).
+Alternatively, $f$ can be defined by creating a twice around tour of the tree~$T$, which visits vertices of~$X_i$ prior to vertices of~$X_{i+1}$, $i = 0, \ldots, q - 1$, and then returns to~$x_0$ from~$x_q$ along edges of~$P$.
+Following vertices of~$T$ from $x_0$ to~$x_q$ as shown in Figure~\ref{fig:mespApprox_embedding} (\ie, using upper part of the twice around tour), $f(v)$ can be defined as the first appearance of vertex~$v$ in that subtour.
+
+\begin{figure}
+    [htb]
+    \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \input{figures/fig_bwld_mespApprox_tree}
+        \caption
+        {%
+            The decomposition $\{ X_0, X_1, \ldots, X_q \}$ of the vertex set~$V$ of~$G$.
+        }
+        \label{fig:mespApprox_tree}
+    \end{subfigure}
+    \hfil
+    \begin{subfigure}[t]{0.45\textwidth}
+        \centering
+        \input{figures/fig_bwld_mespApprox_embedding}
+        \caption
+        {%
+            The upper part of the twice around tour and an embedding~$f$ obtained from following the upper part of the twice around tour.
+        }
+        \label{fig:mespApprox_embedding}
+    \end{subfigure}
+    \caption
+    [%
+        Illustration to the proof of Theorem~\ref{theo:ldApprox}.
+    ]
+    {%
+        Illustration to the proof of Theorem~\ref{theo:ldApprox}.
+    }
+    \label{fig:ld-vs-pb1}
+\end{figure}
+
+We claim that $f$ is a (non-contractive) embedding with distortion at most~$(8k + 2) \ld(G)$.
+It is sufficient to show that $d_G(x, y) \leq |f(x) - f(y)|$ for every two vertices of~$G$ that are placed by~$f$ next to each other in~$\ell$ and that $|f(v) - f(u)| \leq (8k + 2) \ld(G)$ for every edge~$uv$ of~$G$ (see, \eg,~\cite{BadDhaGupRab2005,HeggMeisPros2011}).
+
+Let $x$ and~$y$ be two arbitrary vertices of~$G$ that are placed by~$f$ next to each other in~$\ell$.
+By construction, we know that $|f(x) - f(y)| = d_T(x, y)$.
+Since $d_G(x, y) \leq d_T(x, y)$, we get also $d_G(x, y) \leq |f(x) - f(y)|$, \ie, $f$ is non-contractive.
+
+Consider now an arbitrary edge~$uv$ of~$G$ and assume $u \in X_i$ and~$v \in X_j$ ($i \leq j$).
+Note that $d_P(x_i, x_j) = j - i \leq 2k + 1$, since $P$ is a shortest path of~$G$ and $d_P(x_i, x_j) = d_G(x_i, x_j) \leq d_G(x_i, u) + 1 + d_G(x_j, v) \leq 2k + 1$.
+Set $S = \bigcup_{h = i}^j X_h$.
+For any two vertices~$x, y \in S$, $d_G(x,y) \leq d_G(x,P) + 2k + 1 + d_G(y, P) \leq k + 2k + 1 + k = 4k + 1$ holds.
+Hence, $\diam_G(S) \leq 4k + 1$.
+Consider subtree~$T_S$ of~$T$ induced by~$S$.
+Clearly, $T_S$ is connected and has $|S| - 1$~edges.
+Therefore, $f(v) - f(u) \leq 2(|S| - 1)$ since each edge of~$T_S$ contributes to $f(v) - f(u)$ at most 2~units.
+Now, by Lemma~\ref{lem:LocalDensity}, $f(v) - f(u) \leq 2(|S| - 1) \leq 2 \diam_G(S) \ld(G) \leq (8k + 2) \ld(G)$.
+\end{proof}
+
+Recall that, by Lemma~\ref{lem:plDomPairRelation}, each graph~$G$ with $\pl(G) \leq \lambda$ has a $\lambda$-dominating pair and, hence, a shortest path with eccentricity~$\lambda$.
+Such a path can easily be found in \( \calO \! \left( n^2 m \right) \)~time by iterating over all vertex pairs.
+Additionally, by Theorem~\ref{theo:domPairApprox}, one can find a shortest path with eccentricity at most~$2 \lambda$ in linear time.
+Thus, Theorem~\ref{theo:ldApprox} implies:
+
+\begin{corollary}
+    \label{cor:appr-ld-pl}
+For a given graph~\( G \), one can compute an embedding of~\( G \) into a line with distortion at most~\( \big( 8 \pl(G) + 2 \big) \ld(G) \) in \( \calO \! \left( n^2 m \right) \) time and with distortion at most~\( \big( 16 \pl(G) + 2 \big) \ld(G) \) in \( \calO(n + m) \) time.
+\end{corollary}
+
+Thus, we have the following interesting conclusion.
+
+\begin{theorem}
+    \label{theo:ld-pl}
+For every class of graphs with path-length bounded by a constant, there is an efficient constant-factor approximation algorithm for the minimum line-distortion problem.
+\end{theorem}
+
+Using the inequality $\pl(G) \leq \ld(G)$ in Corollary~\ref{cor:appr-ld-pl} once more, we reproduce a result of~\cite{BadDhaGupRab2005}.
+
+\begin{corollary}
+    [B\u{a}doiu et al.\,\cite{BadDhaGupRab2005}]
+For every graph~\( G \) with \( \ld(G) = c \), an embedding into a line with distortion at most \( \calO \! \left( c^2 \right) \) can be found in polynomial time.
+\end{corollary}
+
+It should be noted that, since the difference between the minimum eccentricity of a shortest path and the line-distortion of a graph can be very large (close to~$n$), the result in Theorem~\ref{theo:ldApprox} seems to be stronger.
+In Chapter~\ref{cha:mesp} (page~\pageref{cha:mesp}), we investigate the problem of finding a shortest path with minimum eccentricity in a given graph.
+
+\section{Approximation for AT-Free Graphs}
+    \label{sec:appr-ld-AT}
+
+From Theorem~\ref{theo:ld-pl} and results from Section~\ref{sec:SpecialGraphDecomp} (page~\pageref{sec:SpecialGraphDecomp}), it follows already that there is an efficient constant-factor approximation algorithm for the minimum line-distortion problem on such particular graph classes as permutation graphs, trapezoid graphs, cocomparability graphs as well as AT-free graphs.
+Recall that, for arbitrary graphs, the minimum line-distortion problem is hard to approximate within a constant factor~\cite{BadDhaGupRab2005}.
+Furthermore, the problem remains NP-complete even when the input graph is restricted to a chordal, cocomparability, or AT-free graph~\cite{HeggerMeiste2010}.
+Polynomial-time constant-factor approximation algorithms were known only for split and cocomparability graphs; \name{Heggernes} and \name{Meister}~\cite{HeggerMeiste2010} gave efficient $6$-approximation algorithms for both graph classes.
+As far as we know, for AT-free graphs (the class which contains all cocomparability graphs), no prior efficient approximation algorithm was known.
+
+In this section, we give a better approximation algorithm for all AT-free graphs using additional structural properties of AT-free graphs; more precisely, we give a $6$-approximation algorithm that runs in linear time.
+
+
+\begin{theorem}
+    \label{theo:ATfreeLineApprox}
+There is a linear time algorithm to compute an embedding with distortion at most~\( 6 \ld(G) \) for a given AT-free graph~\( G = (V, E) \).
+\end{theorem}
+
+\begin{proof}
+Let $s$ be an arbitrary vertex of~$G$, let $v$ be the vertex last visited (numbered~$1$) by a LexBFS starting at~$s$, and let $w$ be the vertex last visited by a LexBFS starting at~$v$.
+One can compute, in linear time, a shortest path~$P = \{ v = v_0, v_1, \ldots, v_k = w \}$ from $v$ to~$w$ such that, for all~$u \in L_i^{(v)}$ with $i \geq 1$, $uv_i \in E$ or $uv_{i-1} \in E$~\cite{KlokKratMuel1999}.
+Based on~$P$, we partition every layer~$L_i^{(v)}$ in three sets: $\{ v_i \}$, $X_i = \left \{ \, x \Bigm| x \in L_i^{(v)}, v_ix \in E \, \right \}$, and $\overline{X}_i = L_i^{(v)} \setminus \big( \{ v_i \} \cup X_i \big)$.
+See~Figure~\ref{fig:ATfreeLineApprox} for an illustration.
+
+\begin{figure}
+    [htb]
+    \centering
+    \input{figures/fig_bwld_ATfreeApprox}
+    \caption
+    [%
+        Illustration to the proof of Theorem~\ref{theo:ATfreeLineApprox}.
+    ]
+    {%
+        Illustration to the proof of Theorem~\ref{theo:ATfreeLineApprox}.
+        Layering of an AT-free graph.
+    } %
+    \label{fig:ATfreeLineApprox}
+\end{figure}
+
+Note that, due to Lemma~\ref{lem:ATfreeDownNeigh} (page~\pageref{lem:ATfreeDownNeigh}) the diameter of each layer~$L_i^{(v)}$ is at most~$2$, \ie, for each $x, y \in L_i^{(v)}$, $d(x, y) \leq 2$.
+The embedding~$f$ places vertices of~$G$ into a line~$\ell$ in the following order: $\left \langle v_0, \ldots, v_{i-1}, \overline{X}_{i}, X_{i}, v_i, \overline{X}_{i + 1}, X_{i + 1}, v_{i+1}, \ldots, v_k \right \rangle$.
+Between every two vertices~$x$ and~$y$ placed next to each other on the line~$\ell$, to guarantee non-contractiveness, $f$ leaves a space of length~$d(x, y)$ (which is either $1$, or~$2$).
+
+Now, we show that $f$ approximates the minimum line-distortion of~$G$.
+Since a layer~$L_i^{(v)}$ only contains vertices with distance~$i$ to~$v$, there is no edge~$xy$ with $x \in L_{i-1}^{(v)}$ and $y \in L_{i+1}^{(v)}$.
+Therefore, for all $xy \in E$ with $x, y \in L_i^{(v)} \cup L_{i + 1}^{(v)}$, $|f(x) - f(y)| < |f(v_{i - 1}) - f(v_{i + 1})|$.
+Let $S = \{ v_{i - 1}, v_i, v_{i + 1} \} \cup \overline{X}_{i} \cup X_{i} \cup \overline{X}_{i + 1} \cup X_{i + 1}$.
+Then, counting how many vertices are placed by~$f$ between $f(v_{i - 1})$ and $f(v_{i + 1})$ and the distance in~$G$ between vertices placed next to each other, we get $|f(x) - f(y)| \leq 2 |S| - 1$.
+
+\begin{claim}
+    \label{cla:Sdiam}
+\( \diam(S) \leq 3 \)
+\end{claim}
+
+\begin{proof}
+    [Claim]
+Note that, by definition of~$S$, $S = L_{i+1}^{(v)} \cup L_i^{(v)} \cup \{ v_{i-1} \}$.
+Due to Lemma~\ref{lem:ATfreeDownNeigh} (page~\pageref{lem:ATfreeDownNeigh}), the diameter of $L_{i+1}^{(v)}$ and $L_i^{(v)}$ is at most~$2$.
+Also, each vertex~$x \in L_{i+1}^{(v)}$ is adjacent to a vertex~$y \in L_i^{(v)}$.
+Therefore, the diameter of $L_{i+1}^{(v)} \cup L_i^{(v)}$ is at most~$3$.
+It remains to show that, for each $x \in \overline{X}_{i + 1} \cup X_{i + 1}$, $d(v_{i-1}, x) \leq 3$.
+If $x \in X_{i + 1}$, then there is a path $\{ x, v_{i+1}, v_i, v_{i-1} \}$.
+If $x \in \overline{X}_{i + 1}$, then there is a path $\{ x, v_i, v_{i-1} \}$.
+% Therefore, $\diam(S) \leq 3$.
+\end{proof}
+
+From Claim~\ref{cla:Sdiam} and Lemma~\ref{lem:LocalDensity}, it follows that $|f(x) - f(y)| \leq 2 |S| - 1 \leq 6 \ld(G)$ for all $xy \in E$.
+\end{proof}
+
+Algorithm~\ref{algo:ATfreeLineDesApprox} formalises the method described above.
+
+\begin{algorithm}
+    [htb]
+    \caption
+    {%
+        \label{algo:ATfreeLineDesApprox}
+        A $6$-approximation algorithm for the minimum line-distortion of an AT-free graph.
+    }
+
+\KwIn
+{%
+    An AT-free graph~$G = (V, E)$.
+}
+
+\KwOut
+{%
+    An embedding~$f$ of~$G$ into a line.
+}
+
+Compute the distance layers~$L_i^{v}$ a path~$P = \{ v_0, \ldots, v_k \}$ such that, for all~$u \in L_i^{v}$ with $i \geq 1$, $uv_i \in E$ or $uv_{i-1} \in E$ (see~\cite{KlokKratMuel1999}).
+
+Partition each layer~$L_i$ into three sets: $\{ v_i \}$, $X_i = \{ \, x \mid x \in L_i, v_ix \in E \, \}$, and $\overline{X}_i = L_i \setminus \big( \{ v_i \} \cup X_i \big)$.
+
+Create an embedding~$f$ by placing the vertices of~$G$ into a line~$\ell$ in the order~$\left \langle v_0, \ldots, v_{i-1}, \overline{X}_{i}, X_{i}, v_i, \overline{X}_{i + 1}, X_{i + 1}, v_{i + 1}, \ldots, v_k \right \rangle$.
+
+Between every two consecutive vertices $x$ and~$y$ on the line~$\ell$, leave a space of length~$d(x, y)$.
+
+Output $f$.
+\end{algorithm}
+
+Note that $S \subseteq N^2[v_i]$.
+Therefore, it follows from Lemma~\ref{lem:Discbandwidth} that the order in which the vertices of~$G$ are placed by~$f$ into the line~$\ell$ gives also a layout of~$G$ with bandwidth at most~$4 \bw(G)$.
+This reproduces an approximation result by \name{Kloks} et al.\,\cite{KlokKratMuel1999}.
+Their algorithm has complexity~$\calO(m + n \log n)$ for a graph, since it involves an $\calO(n \log n)$ time algorithm by \name{Assmann} et al.\,\cite{AssPecSysZak1981} to find an optimal layout for a caterpillar with hair-length at most~$1$.
+
+\begin{corollary}
+    [\name{Kloks} et al.\,\cite{KlokKratMuel1999}]
+    \label{cor:ATfreeBWApprox}
+There is a linear time algorithm to compute a \( 4 \)-approximation of the minimum bandwidth of an AT-free graph.
+\end{corollary}
+
+Combining Theorem~\ref{theo:pbATfree} (page~\pageref{theo:pbATfree}) and Theorem~\ref{theo:plBwApprox}, we also obtain the following result by \name{Kloks} et al.\,\cite{KlokKratMuel1999} as a corollary.
+
+\begin{corollary}
+    [\name{Kloks} et al.\,\cite{KlokKratMuel1999}]
+    \label{cor:bw-AT-2-appr}
+There is an \( \calO \big( m + n \log^2 n \big) \) time algorithm to compute a \( 2 \)-approximation of the minimum bandwidth of an AT-free graph.
+\end{corollary}

@@ -1,0 +1,732 @@
+\chapter
+[%
+    Computing Decompositions with Small Breadth%
+]
+{%
+    Computing Decompositions with Small Breadth%
+    \chapterNote
+    {
+        Results from this chapter have been published partially
+        at~\emph{SWAT}~2014, Copenhagen, Denmark~\cite{DragKoehLeit2014},
+        at~\emph{COCOA}~2016, Hong Kong, China~\cite{LeiterDragan2016}, and
+        in~\emph{Algorithmica}~\cite{DragKoehLeit2017}.
+    }%
+}
+\label{cha:compDeco}
+%
+
+For each graph class~$\calC$, a central problem is its recognition.
+That is, given a graph~$G$, is $G$ a member of~$\calC$?
+In case of tree- and path-decompositions, we can define recognition as decision problem or as optimization problem.
+Using tree-breadth as example, the decision problem asks, for a given graph~$G$ and a given integer~$\rho \geq 1$, if $\tb(G) \leq \rho$.
+The corresponding optimisation problem asks for a decomposition of~$G$ such that the breadth of this decomposition is minimal.
+In this chapter, we show approaches to determine a tree- or path-decomposition with small breadth (or length) for a given graph.
+We show results for general graphs as well as for special graph classes.
+
+We know from \name{Lokshtanov}~\cite{Lokshtanov2010} and \name{Ducoffe} et al.\,\cite{DucoLegaNiss2016} that it is NP-hard to determine any of the parameters tree-breadth, tree-length, path-breadth, and path-length for a given graph.
+
+\begin{theorem}
+    [\name{Lokshtanov}~\cite{Lokshtanov2010}]
+    \label{theo:TreeLengthNPc}
+For a given graph~\( G \) and a fixed \( \lambda \geq 2 \), it is NP-complete to decide if \( \tl(G) \leq \lambda \).
+\end{theorem}
+
+\begin{theorem}
+    [\name{Ducoffe} et al.\,\cite{DucoLegaNiss2016}]
+Given a graph~\( G \) and an integer~\( k \), it is NP-complete to decide any of the following:
+Is \( \tb(G) \leq k \)?
+Is \( \pb(G) \leq k \)?
+Is \( \pl(G) \leq k \)?
+\end{theorem}
+
+
+\section{Approximation Algorithms}
+
+In this section, we present approaches to compute a decomposition for a given graph which approximates the graph's tree-breadth, tree-length, path-breadth, or path-length.
+Additionally to showing that it is hard to compute any of these parameters optimally, \name{Lokshtanov}~\cite{Lokshtanov2010} and \name{Ducoffe} et al.\,\cite{DucoLegaNiss2016} show that a certain approximation quality is hard, too.
+
+\begin{theorem}
+    [\name{Lokshtanov}~\cite{Lokshtanov2010}]
+If \( \mathit{P} \neq \mathit{NP} \), then there is no polynomial time algorithm to calculate a tree-decomposition, for a given graph~\( G \), of length smaller than~\( \frac{3}{2} \tl(G) \).
+\end{theorem}
+
+\begin{theorem}
+    [\name{Ducoffe} et al.\,\cite{DucoLegaNiss2016}]
+For any $\epsilon > 0$, it is NP-hard to approximate the tree-breadth of a given graph by a factor of~\( (2 - \epsilon) \).
+\end{theorem}
+
+
+\subsection{Layering Based Approaches}
+
+One approach for computing a tree-decomposition for a given graph is to use a layering partition.
+Lemma~\ref{lem:LayPartDist} shows that the radius and diameter of the clusters of a layering partition are bounded by the tree-breadth and tree-length of the underlying graph.
+
+\begin{lemma}
+    [%
+        \name{Dourisboure} et al.\,\cite{DouDraGavYan2007},
+        \name{Dragan} and \name{Köhler}~\cite{DraganKohler2014}%
+    ]
+    \label{lem:LayPartDist}
+In a graph~\( G \) with \( \tb(G) = \rho \) and \( \tl(G) = \lambda \),
+let \( C \) be a cluster of an arbitrary layering partition for~\( G \).
+There is a vertex~\( w \) with \( d_G(w, u) \leq 3 \rho \) for each \( u \in C \).
+Also, \( d_G(u, v) \leq 3 \lambda \) for all \( u, v \in C \).
+\end{lemma}
+
+Recall that the clusters created by a layering partition form a rooted tree.
+This tree can be transformed into a tree-decomposition by expanding its clusters as follows.
+For a cluster~$C$, add all vertices from the parent of~$C$ which are adjacent to a vertex in~$C$.
+That is, for each cluster~$C \subseteq L_i^{(s)}$, create a bag~$B_C = C \cup \left(N_G(C) \cap L_{i-1}^{(s)}\right)$.
+As shown in Lemma~\ref{lem:LayPartDist}, the radius and diameter of a cluster are at most three times larger than the tree-breadth and -length of~$G$, respectively.
+Therefore, the created tree-decomposition has length at most~$3 \lambda + 1$ and breadth at most~$3 \rho + 1$.
+\name{Abu-Ata} and \name{Dragan}~\cite{AbuAtaDragan2016} slightly improve this observation and show that the breadth of such a tree-decomposition is indeed at most~$3 \rho$.
+
+\begin{corollary}
+    [%
+        \name{Dourisboure} et al.\,\cite{DouDraGavYan2007},
+        \name{Abu-Ata} and \name{Dragan}~\cite{AbuAtaDragan2016}%
+    ]
+For a given graph~\( G \), a tree-decomposition with breadth~\( 3 \tb(G) \) and length~\( 3 \tl(G) + 1 \) can be computed in linear time.
+\end{corollary}
+
+A similar strategy as above can be used to approximate the path-breadth and -length of a graph.
+However, there are two major differences.
+First, a layering partition creates a tree and, second, can start at any vertex.
+The first difference can be addressed by using a simple BFS-layering.
+For the second, however, we need to find the right start vertex.
+
+Consider a given start vertex~$s$ and the layers~$L_i^{(s)}$.
+We define an \emph{extended layer~\( \mathbb{L}_i^{(s)} \)} as follows:
+\[
+    \mathbb{L}_i^{(s)} = L_{i}^{(s)} \cup \left \{ \, u \ \middle| \ uv \in E, u \in L_{i-1}^{(s)}, v \in L_{i}^{(s)} \, \right \}
+\]
+
+\begin{lemma}
+    \label{lem:bfsLayApproxDist}
+Let \( \calP = \{ X_1, X_2, \ldots, X_p \} \) be a path-decomposition for~\( G \) with length~\( \lambda \), breadth~\( \rho \), and \( s \in X_1 \).
+Then each extended layer \( \mathbb{L}_i^{(s)} \) has diameter at most~\( 2 \lambda \) and radius at most~\( 3 \rho \).
+\end{lemma}
+
+\begin{proof}
+Let $x$ and~$y$ be two arbitrary vertices in $L_{i}^{(s)}$.
+Also let $x'$ and~$y'$ be arbitrary vertices in $L_{i-1}^{(s)}$ with $xx', yy' \in E$.
+
+First, we show that $\max \big \{ d_G(x, y), d_G(x, y'), d_G(x', y) \big \} \leq 2 \lambda$.
+By induction on~$i$, we may assume that $d_G(y', x') \leq 2 \lambda$ as $x', y' \in L_{i-1}^{(s)}$.
+If there is a bag in~$\calP$ containing both vertices $x$ and~$y$, then $d_G(x, y) \leq \lambda$ and, therefore, $d_G(x, y') \leq \lambda + 1 \leq 2 \lambda$ and $d_G(y, x') \leq \lambda + 1 \leq 2 \lambda$.
+Assume now that all bags containing~$x$ are earlier in~$\calP = \{ X_1, X_2, \ldots, X_p \}$ than the bags containing~$y$.
+Let $B$ be a bag of~$\calP$ containing both ends of edge~$xx'$.
+By the position of this bag~$B$ in~$\calP$ and the fact that $s \in X_1$, any shortest path connecting $s$ with~$y$ must have a vertex in~$B$.
+Let $w$ be a vertex of~$B$ that is on a shortest path of~$G$ connecting vertices $s$ and~$y$ and containing edge~$yy'$.
+Such a shortest path must exist because of the structure of the layering that starts at~$s$ and puts $y'$ and~$y$ in consecutive layers.
+Since $x, x', w \in B$, we have $\max \big \{ d_G(x, w), d_G(x', w) \big \} \leq \lambda$.
+If $w = y'$, we are done; $\max \big \{ d_G(x, y), d_G(x, y'), d_G(x', y) \big \} \leq \lambda + 1 \leq 2 \lambda$.
+So, assume that $w \neq y'$.
+Since $d_G(x, s) = d_G(s, y) = i$ (by the layering) and $d_G(x, w) \leq \lambda$, we must have $d_G(w, y') + 1 = d_G(w, y) = d_G(s, y) - d_G(s, w) = d_G(s, x) - d_G(s, w) \leq d_G(w, x) \leq \lambda$.
+Hence, $d_G(y, x) \leq d_G(y, w) + d_G(w, x) \leq 2 \lambda$, $d_G(y, x') \leq d_G(y, w) + d_G(w, x') \leq 2 \lambda$, and $d_G(y', x) \leq d_G(y', w) + d_G(w, x) \leq 2 \lambda - 1$.
+Therefore, we conclude that the distance between any two vertices in $\mathbb{L}_i^{(s)}$ is at most~$2 \lambda$.
+
+As shown above, the radius of each extended layer~$\mathbb{L}_i^{(s)}$ is at most $4 \rho$ (because $\lambda \leq 2\rho$).
+Consider an extended layer~$\mathbb{L}_i^{(s)}$ and a family~$\calF = \Big \{ \, N_G^{2 \rho}[u] \Bigm| u \in \mathbb{L}_i^{(s)} \, \Big \}$ of disks of~$G$.
+Since $d_G(u, v) \leq 4 \rho$ for every pair $u, v \in \mathbb{L}_i^{(s)}$, the disks of~$\calF$ pairwise intersect.
+Note that each disk~$N_G^{2 \rho}[u] \in \calF$ induces a subpath of~$\calP$.
+If subtrees of a tree~$T$ pairwise intersect, they have a common node in~$T$~\cite{Berge1984}.
+Therefore, there is a bag~$X_j \in \calP$ such that each disk in~$\calF$ intersects $X_j$.
+Let $w$ be the center of~$X_j$, \ie $X_j \subseteq N_G^\rho[w]$.
+Hence, for each vertex~$u$ with $N_G^{2 \rho}[u] \in \calF$, $d_G(w, u) \leq 3 \rho$.
+Thus, for each $i \in \{ 1, \ldots, \ecc(s) \}$ there is a vertex~$w_i$ with $\mathbb{L}_i^{(s)} \subseteq N_G^{3 \rho}[w_i]$.
+\end{proof}
+
+Using Lemma~\ref{lem:bfsLayApproxDist}, Algorithm~\ref{algo:LayPathApprox} below computes a $3$-approximation for the path-breadth and a $2$-approximation for the path-length of a given graph.
+
+\begin{algorithm}
+    [htb]
+    \caption
+    {%
+        A $2$-approximation algorithm for computing the path-length of a graph (respectively, $3$-approximation for path-breadth).
+    }
+    \label{algo:LayPathApprox}
+
+\KwIn
+{%
+    A graph $G = (V, E)$.
+}
+
+\KwOut
+{%
+    A path-decomposition for~$G$.
+}
+
+Compute the pairwise distances of all vertices in~$G$.
+
+\ForEach
+{%
+    $s \in V$
+}
+{%
+    Calculate a decomposition $\calL(s) = \left \{ \, \mathbb{L}_i^{(s)} \Bigm| 1 \leq i \leq \ecc(s) \, \right \}$.
+
+    Determine the length~$l(s)$ of $\calL(s)$ (breadth~$b(s)$, respectively).
+}
+
+Output a decomposition $\calL(s)$ for which $l(s)$ ($b(s)$, respectively) is minimal.
+\end{algorithm}
+
+\begin{theorem}
+    \label{theo:algoLayPathApprox}
+Algorithm~\ref{algo:LayPathApprox} computes a path-decomposition with length~\( 2 \pl(G) \) (with breadth~\( 3 \pb(G) \), respectively) of a given graph~\( G \) in \( \calO \big( n^3 \big) \) time.
+\end{theorem}
+
+\begin{proof}
+Let $\pb(G) = \rho$ and $\pl(G) = \lambda$.
+By Lemma~\ref{lem:bfsLayApproxDist}, there is a vertex~$s$ for which each extended layer~$\mathbb{L}_i^{(s)}$ has diameter at most~$2 \lambda$ (radius at most~$3 \rho$, respectively).
+Thus, the algorithm creates and outputs a decomposition~$\calL(s)$ with length at most~$2 \lambda$ (breadth at most~$3 \rho$, respectively).
+
+Determining pairwise distances and creating the decomposition~$\calL(s)$ for each vertex~$s$ can be done in $\calO(nm)$ total time.
+Then, for a single vertex~$s$, the length and breadth of the decomposition~$\calL(s)$ can be calculated in $\calO \big( n^2 \big)$~time.
+Thus, Algorithm~\ref{algo:LayPathApprox} runs in $\calO \big( n^3 \big)$ total time.
+\end{proof}
+
+\subsection{Neighbourhood Based Approaches}
+
+In the previous subsection, we use distance layerings to construct a decomposition for a given graph.
+While this approach is simple, it has limitations.
+Consider the graph~$G$ in Figure~\ref{fig:LayPartApprox}.
+$G$ has tree-breadth~$1$ and -length~$2$.
+However, a layering partition starting at~$s$ creates a cluster~$C$ with radius~$3$ and diameter~$6$.
+Now, one can create a graph~$H$ containing two copies of~$G$ such that the $s$-vertices are connected by a path.
+Therefore, any layering partition of~$H$ creates such a cluster~$C$.
+
+\begin{figure}
+    [htb]
+    \centering
+    \input{figures/fig_deco_LayPartApprox}
+    \caption
+    [%
+        A graph~$G$ where a layering partition creates a cluster~$C$ with radius~$3 \tb(G)$ and diameter~$3 \tl(G)$.
+    ]
+    {
+        A graph~$G$ where a layering partition creates a cluster~$C$ with radius~$3 \tb(G)$ and diameter~$3 \tl(G)$.
+        The family of disks~$\big \{ N[a], N[b], N[c], N[x], N[y] \big \}$ gives a tree-decomposition with breadth~$1$ and length~$2$.
+        The cluster~$C$ has radius~$3$ (for all~$v \in C$, $d(s, v) = 3$) and diameter~$6$ ($d(x, y) = 6$).
+    }
+    \label{fig:LayPartApprox}
+\end{figure}
+
+An alternative approach to distance layers is to carfully create a bag from the neighbourhood of a vertex.
+Then add the bag to the tree-decomposition, pick a new vertex, and repeat the process.
+This approach is clearly more complicated.
+However, it has a better chance to determine a good decomposition for a given graph.
+
+In~\cite{DourisGavoil2007}, \name{Dourisboure} and \name{Gavoille} present such an algorithm to compute a tree-decomposition which approximates the tree-length of a given graph.
+They show that, for a given graph~$G$, their algorithm successfully computes a tree-decomposition with length at most~$6 \tl(G) - 4$.
+Additionally, they conjecture that their algorithm can also find a tree-decomposition with length at most~$2 \tl(G)$.
+However, \name{Yancey}~\cite{Yancey2014} is able to construct a counter example for this conjecture.
+
+In what follows, we present an algorithm which computes a tree-decomposition with breadth at most~$3 \tb(G) - 1$ for a given graph~$G$.
+To do so, assume for the remainder of this subsection that we are given a graph~$G$ with $\tb(G) = \rho$.
+
+For some vertex~$u$ and some positive integer~$\phi$, let $\calC_G^\phi[u]$ denote the set of connected components in~$G - N_G^\phi[u]$.
+We say that a vertex~$v$ is a \emph{\( \phi \)-partner} of~$u$ for some~$C \in \calC_G^\phi[u]$ if $N_G^\phi[v] \supseteq N_G(C)$ and $N_G^\phi[v] \cap C \neq \emptyset$.
+
+\begin{lemma}
+    \label{lem:potPartnerInCC}
+Let \( u \) be an arbitrary vertex of~\( G \).
+If \( \phi \geq 3 \rho - 1 \), then \( G \) contains, for each connected component~\( C \in \calC_G^\phi[u] \), a vertex~\( v \) such that \( v \) is a \( \phi \)-partner of~\( u \) for~\( C \).
+\end{lemma}
+
+\begin{proof}
+Let $T$ be a tree-decomposition for~$G$ with breadth~$\rho$ and let $B_u$ be a bag of~$T$ containing~$u$.
+Without loss of generality, let $T$ be rooted in~$B_u$.
+Now, let $B_C$ be the bag of~$T$ for which $B_C \cap C \neq \emptyset$ and which is closest to~$B_u$ in~$T$.
+Additionally, let $B_C'$ be the parent of~$B_C$ and let $S = B_C \cap B_C'$.
+Note that, by definition of~$B_C$, $S \subseteq N_G^\phi[u]$ and $B_C$ contains a vertex~$x$ with $d_G(u, x) > \phi$.
+Recall that the distance between two vertices in a bag is at most~$2 \rho$.
+Thus, $d_G(u, s) < \rho$ implies that $d_G(u, x) < 3 \rho \leq \phi$.
+Therefore, for all~$s \in S$, $d_G(u, s) \geq \rho$.
+
+Let $v$ be the center of~$B_C$.
+Because $B_C$ intersects~$C$ and $T$ has breadth~$\rho$, clearly, $d_G(v, C) \leq \rho < \phi$ and, hence, $C \cap N_G^\phi[v] \neq \emptyset$.
+Let $x$ be a vertex of~$G$ in $N_G(C)$.
+By properties of tree-decompositions, each path from $u$ to~$x$ intersect~$S$.
+Thus, there is a vertex~$s \in S$ with $d_G(u, x) = d_G(u, s) + d_G(s, x)$.
+Because $d_G(u, s) \geq \rho \geq d_G(v, s)$, it follows that $d_G(v, x) \leq d_G(u, x) \leq \phi$ and, thus, $N(C) \subseteq N_G^\phi[v]$.
+Therefore, $v$ is a $\phi$-partner of~$u$ for~$C$.
+\end{proof}
+
+\begin{lemma}
+    \label{lem:potPartnerKeepCCs}
+Let \( C \) be a connected component in \( G - B_u \) for some \( B_u \subseteq N_G^\phi[u] \) and some positive~\( \phi \).
+Also, let  \( C \in \calC_G^\phi[u] \) and let \( v \) be a \( \phi \)-partner of~\( u \) for~\( C \).
+Then, for all connected components~\( C_v \) in \( G[C] - N_G^\phi[v] \), \( C_v \in \calC_G^\phi[v] \).
+\end{lemma}
+
+\begin{proof}
+Consider a connected component~$C_v$ in $G[C] - N_G^\phi[v]$.
+Clearly, $C_v \subseteq C$ and there is a connected component~$C' \in \calC_G^\phi[v]$ such that $C' \supseteq C_v$.
+
+Let $x$ be an arbitrary vertex in~$C'$.
+Then, there is a path~$P \subseteq C'$ from $x$ to~$C_v$.
+Because $N_G(C) \subseteq B_u$ and $v$ is a $\phi$-partner of~$u$ for~$C$, $N_G(C) \subseteq B_u \cap N_G^\phi[v]$.
+Also, $N_G(C)$ separates all vertices in~$C$ from all other vertices in~$G$.
+Therefore, $x \in C$ and $C' \subseteq C$; otherwise, $P$ would intersect $N_G^\phi[v]$.
+It follows that each vertex in~$P$ is in the same connected component of~$G[C] - N_G^\phi[v]$ and, thus, $C_v = C'$.
+\end{proof}
+
+Based on Lemma~\ref{lem:potPartnerInCC} and Lemma~\ref{lem:potPartnerKeepCCs}, we can compute, for a given~$\phi \geq 3 \rho - 1$, a tree-decomposition with breadth~$\phi$ as follows.
+Pick a vertex~$u$ and make it center of a bag~$B_u = N_G^\phi$.
+By Lemma~\ref{lem:potPartnerInCC}, $u$ has a $\phi$-partner~$v$ for each connected component~$C_u \in \calC_G^\phi[u]$.
+Then, $N_G^\phi[v]$ splits $C_u$ in more connected components~$C_v$.
+Due to Lemma~\ref{lem:potPartnerKeepCCs}, any of these components~$C_v$ is in~$\calC_G^\phi[v]$.
+Thus, $v$ has a $\phi$-partner~$w$ for~$C_v$.
+Hence, create a bag~$B_v = N_G^\phi[v] \cap (B_u \cup C_u)$ and continue this until the whole graph is covered.
+Algorithm~\ref{algo:3TbApprox} below implements this approach.
+
+\begin{algorithm}
+    [!htb]
+    \caption
+    {%
+        Constructs, for a given graph~$G = (V, E)$ and a given positive integer~$\phi$, a tree-decomposition~$T$ with breadth~$\phi$.
+    }
+    \label{algo:3TbApprox}
+
+\KwIn
+{%
+    A graph~$G = (V, E)$ and a positive integer~$\phi$.
+}
+
+\KwOut
+{%
+    A tree-decomposition~$T$ for~$G$ if $\phi \geq 3 \tb(G) - 1$.
+}
+
+Determine the pairwise distances of all vertices and create an empty tree-decomposition~$T$.
+\label{line:3Tb_Distances}
+
+Initialise an empty queue~$Q$ of triples~$(v, B, C)$ where $v$ is a vertex of~$G$ and $B$ is a bag and $C$ is a connected component, \ie, $B$ and~$C$ are vertex sets.
+\label{line:3Tb_InitQ}
+
+Pick an arbitrary vertex~$u$ and insert $(u, \emptyset, V)$ into~$Q$.
+\label{line:3Tb_PickU}
+
+\While
+{%
+    \( Q \) is non-empty.%
+    \label{line:3Tb_Qloop}
+}
+{%
+    Remove a triple~$(v, B_u, C_u)$ from~$Q$.
+
+    Create a bag~$B_v := N_G^\phi[v] \cap (B_u \cup C_u)$ and add $B_v$ into~$T$.
+    \label{line:3Tb_createBv}
+
+    \ForEach
+    {%
+        connected component~\( C_v \) in \( G[C_u] - B_v \)
+    }
+    {%
+        Find a $\phi$-partner~$w$ of~$v$ for~$C_v$.
+        \label{line:3Tb_findPotPart}
+
+        If no such~$w$ exists, \keyword{Stop}. $\phi < 3 \tb(G) - 1$.
+
+        Insert $(w, B_v, C_v)$ into~$Q$.
+        \label{line:3Tb_InsertTriple}
+    }
+}
+
+Output~$T$.
+\end{algorithm}
+
+\begin{theorem}
+Algorithm~\ref{algo:3TbApprox} successfully constructs, for a given graph~\( G \) and a positive integer~\( \phi \), a tree-decomposition~\( T \) with breadth~\( \phi \) in \( \calO \big( n^3 \big) \) time if \( \phi \geq 3 \tb(G) - 1 \).
+\end{theorem}
+
+\begin{proof}
+    [Correctness]
+To show the correctness of the algorithm, we have to show that the created tree-decomposition~$T$ is a valid tree-decomposition for~$G$ if $\phi \geq 3 \tb(G) - 1$.
+To do so, we show the following invariant for the loop starting in line~\ref{line:3Tb_Qloop}:
+\begin{enumerate*}[(i),mode=unboxed]
+    \item
+        \label{item:3Tb_TvalidTB}
+        $T$ is a valid tree-decomposition with breadth~$\phi$ for the subgraph covered by~$T$,
+    \item
+        \label{item:3Tb_conCompInQ}
+        for each connected component~$C$ in~$G - T$, $Q$ contains a triple~$(v, B, C)$, and
+    \item
+        \label{item:3Tb_conCompCcond}
+        for each triple~$(v, B_u, C_u)$ in~$Q$, $B_u$ is in~$T$, $N_G(C_u) \subseteq B_u$, $C_u \in \calC_G[u]$, and $v$ is a $\phi$-partner of~$u$ for~$C_u$.
+\end{enumerate*}
+
+Let $u$ be the vertex of~$G$ selected in line~\ref{line:3Tb_PickU}.
+In the first iteration of the loop, the triple~$(u, \emptyset, V)$ is removed from~$Q$.
+Then, the algorithm creates the bag~$B_u = N_G^\phi[u] \cap (\emptyset \cup V) = N_G^\phi[u]$ (line~\ref{line:3Tb_createBv}) and adds it into~$T$.
+Clearly, since $B_u$ is the only bag of~$T$ at this point, condition~\ref{item:3Tb_TvalidTB} is satisfied.
+Additionally, each connected component~$C$ in~$G - T$ is also in~$\calC[u]$.
+Next, the algorithms determines a $\phi$-partner~$v$ of~$u$ for each~$C_u \in \calC[u]$ (line~\ref{line:3Tb_findPotPart}).
+Due to Lemma~\ref{lem:potPartnerInCC}, such a $v$ can be found for each such component~$C_u$.
+Therefore, after inserting the triples~$(v, B_u, C_u)$ into~$Q$ (line~\ref{line:3Tb_InsertTriple}), condition~\ref{item:3Tb_conCompInQ} and condition~\ref{item:3Tb_conCompCcond} are satisfied after the first iteration of the loop.
+
+Now, assume by induction that the invariant holds each time line~\ref{line:3Tb_Qloop} is checked.
+If $Q$ is empty, it follows from condition~\ref{item:3Tb_conCompInQ} that $T$ covers the whole graph and, thus, by condition~\ref{item:3Tb_TvalidTB}, $T$ is a valid tree-decomposition for~$G$.
+If $Q$ is not empty, it contains a triple~$(v, B_u, C_u)$ which is then removed by the algorithm.
+Because of condition~\ref{item:3Tb_conCompCcond}, it follows that $B_v$ as created in line~\ref{line:3Tb_createBv} contains~$N_G(C_u)$ and, thus, $N_G(C_u) \subseteq B_u \cap B_v$.
+Therefore, because $C_u$ is not covered by~$T$, $T$ remains a valid tree-decomposition after adding~$B_v$, \ie, condition~\ref{item:3Tb_TvalidTB} is satisfied.
+The bag~$B_v$ splits $C_u$ in a set~$\calC_v'$ of connected components such that, for each $C' \in \calC_v'$, $N_G(C') \subseteq B_v$ and, by Lemma~\ref{lem:potPartnerKeepCCs}, $C' \in \calC[v]$.
+Therefore, due to Lemma~\ref{lem:potPartnerInCC}, $v$ has a $\phi$-partner~$w$ for each $C' \in \calC_v'$.
+Thus, finding such a $\phi$-partner (line~\ref{line:3Tb_findPotPart}) is successful and, after inserting the triples~$(w, B_v, C_v)$ into~$Q$ (line~\ref{line:3Tb_InsertTriple}), condition~\ref{item:3Tb_conCompInQ} and condition~\ref{item:3Tb_conCompCcond} are satisfied.
+\end{proof}
+
+\begin{proof}
+    [Complexity]
+Determining the pairwise distances of all vertices, initialising $Q$ and~$T$, as well as inserting the first triple~$(u, \emptyset, V)$ into~$Q$ (line~\ref{line:3Tb_Distances} to line~\ref{line:3Tb_PickU}) can be clearly done in $\calO(nm)$ time.
+
+In each iteration of the loop starting in line~\ref{line:3Tb_Qloop}, the algorithm splits a connected component~$C_u$ into a set of connected components~$C_v$.
+Because $v$ is a $\phi$-partner of~$u$, it follows that $B_v \cap C_v \neq \emptyset$ and, hence, $C_v \subset C_u$.
+Note that the created components~$C_v$ are pairwise disjoint.
+Therefore, the algorithm creates at most~$n$ connected components~$C_v$, the set of vertices covered by~$T$ strictly grows, and, thus, there are at most~$n$ iterations of the loop.
+
+Because the pairwise distances are known, it takes at most~$\calO(n)$ time to crate the bag~$B_v$ and to add it into~$T$ (line~\ref{line:3Tb_createBv}).
+Determining the connected components~$C_v$ of~$G[C_u] - B_v$ and determining $N_G(C_v)$ for each such~$C_v$ can be easily done in $\calO(m)$~time.
+Therefore, when excluding line~\ref{line:3Tb_findPotPart}, a single iteration of the loop starting in line~\ref{line:3Tb_Qloop} takes at most $\calO(m)$~time.
+
+Let $\mathbb{C}$ be the set of all connected components created by the algorithm.
+Clearly, for each connected component~$C \in \mathbb{C}$, $|N_G(C)| \leq n$.
+Therefore, because at most~$n$ connected component~$C_v$ are created, $\sum_{C \in \mathbb{C}} |N_G(C)| \leq n^2$.
+Because distances can be checked in constant time, it follows that, for a single vertex~$w$, it takes at most $\calO \big( n^2 \big)$ total time to determine, for all $C \in \mathbb{C}$, if $w$ is a $\phi$-partner for~$C$.
+Therefore, line~\ref{line:3Tb_findPotPart} requires at most $\calO \big( n^3 \big)$ total time over all iterations.
+
+Hence, Algorithm~\ref{algo:3TbApprox} runs in total $\calO \big( n^3 \big)$ time.
+\end{proof}
+
+If we want to use Algorithm~\ref{algo:3TbApprox} to find a decomposition with small breadth for a given graph~$G$, we hav to try different values of~$\phi$.
+One way is to perform a one-sided binary search over~$\phi$:
+If Algorithm~\ref{algo:3TbApprox} creates a valid tree-decomposition, decrease~$\phi$.
+Otherwise, increase~$\phi$.
+Therefore:
+
+\begin{corollary}
+For a given graph~\( G \) with tree-breadth~\( \rho \), one can compute a tree-decomposition with breadth~\( 3 \rho - 1 \) in \( \calO \big ( n^3 \log \rho \big) \) time.
+\end{corollary}
+
+
+\section{Strong Tree-Breadth}
+
+\input{chapters/strongBreadth}
+
+
+\section{Computing Decompositions for Special Graph Classes}
+    \label{sec:SpecialGraphDecomp}
+
+In this section, we show how to find good decompositions for some special graph classes.
+
+\begin{theorem}
+    \label{theo:chordalStb}
+Chordal graphs have strong tree-breadth~\( 1 \).
+An according decomposition can be computed in linear time.
+\end{theorem}
+
+\begin{proof}
+Let $\sigma = \langle v_1, v_2, \ldots, v_n \rangle$ be an ordering for the vertices of a graph~$G$, $V_i = \{ v_1, v_2, \ldots, v_i \}$, $G_i$ denote the graph~$G[V_i]$, $N_i[v] = N_G[v] \cap V_i$, and $N_i(v) = N_G(v) \cap V_i$.
+The reverse of such an ordering~$\sigma$ is called a \emph{perfect elimination ordering} for~$G$ if, for each~$i$, $N_i[v_i]$ induces a clique.
+It is well known that a graph is chordal if and only if it admits a perfect elimination ordering~\cite{Dirac1961}.
+
+Assume that we are given such an ordering~$\sigma$, \ie, the reverse of a perfect elimination ordering.
+Additionally, assume by induction over~$i$ that $G_{i-1}$ admits a tree-decomposition~$T_{i-1}$ with strong breadth~$1$ such that centers of bags are pairwise non-adjacent.
+This is clearly the case for~$G_1$.
+We now show how to construct $T_i$ from~$T_{i-1}$.
+
+First, consider the case that $v_i$ has a neighbour~$u$ in~$G_i$ which is center of some bag~$B$ in~$T_{i-1}$.
+Because $u \in N_i[v_i]$ and $N_i[v_i]$ induces a clique, $N_i[v_i] \subseteq N_i[u]$ and, hence, $N_i[v_i]$ does not contain a center of any bag.
+Thus, adding $v_i$ into~$B$ creates a valid tree-decomposition~$T_i$ for~$G_i$ with strong breadth~$1$ and pairwise non-adjacent centers.
+
+Next, consider the case that $v_i$ has no neighbour~$u$ in~$G_i$ that is center of some bag in~$T_{i-1}$.
+Note that $N_i(v_i)$ induces a clique in~$G_{i-1}$.
+It is well known that, for each tree-decomposition~$T$ and for each clique~$K$ of graph, $T$ contains a bag~$B$ with~$K \subseteq B$.
+Thus, there is a bag~$B$ in~$T_{i-1}$ with $N_i(v_i) \subseteq B$.
+Therefore, we can create $T_i$ by adding the bag~$B' = N_i[v_i]$ to~$T_{i-1}$ and making $B'$ adjacent to~$B$.
+This creates a valid tree-decomposition with strong breadth~$1$ and pairwise non-adjacent centers.
+
+Based on the approach described above, we can construct a tree-decomposition with strong breadth~$1$ for a given chordal graph~$G$ as follows.
+First, compute the reverse of a perfect elimination ordering of~$G$.
+Such an ordering can be computed in linear time~\cite{RoseTarjLuek1976}.
+Observe that we can simplify the approach above with the following rule:
+If $v_i$ has no neighbour in~$G_i$ which is center of a bag, make $v_i$ center of a bag.
+Otherwise, proceed with~$v_{i+1}$.
+Therefore, by using a simple binary flag for each vertex, one can compute a tree-decomposition with strong breadth~$1$ for a given chordal graph~$G$ in linear time.
+\end{proof}
+
+\begin{theorem}
+    \label{theo:DHistb}
+Distance-hereditary graphs have strong tree-breadth~\( 1 \).
+An according decomposition can be computed in linear time.
+\end{theorem}
+
+\begin{proof}
+Recall that a graph is distance-hereditary if and only if it admits a pruning sequence~$\sigma$ (see Lemma~\ref{lem:punSeq}, page~\pageref{lem:punSeq}).
+That is, a sequence $\sigma = \langle v_1, v_2, \ldots, v_n \rangle$ such that, for each vertex~$v_i$ and some $j < i$, $v_i$ is a pendant vertex, $v_i$ is a true twin of~$v_j$, or $v_i$ is a false twin of~$v_j$.
+
+Assume that we are given such a pruning sequence.
+Additionally, assume by induction over~$i$ that $G_i$ has a tree-decomposition~$T_i$ with strong breadth~$1$ where the centers of bags are pairwise non-adjacent.
+Then, there are three cases:
+\begin{enumerate}[(i)]
+    \item
+        \emph{\( v_{i+1} \) is a pendant vertex in~\( G_{i+1} \).}
+        If the neighbour~$u$ of~$v_{i+1}$ is a center of a bag~$B_u$, add $v_{i+1}$ to~$B_u$.
+        Thus, $T_{i+1}$ is a valid decomposition for~$G_{i+1}$.
+        Otherwise, if $u$ is not a center, make $v_{i+1}$ center of a bag.
+        Because $u$ is an articulation point, $T_{i+1} = T_i + N_G[v]$ is a valid decomposition for~$G_{i+1}$.
+    \item
+        \emph{\( v_{i+1} \) is a true twin of a vertex~\( u \) in~\( G_{i+1} \).}
+        Simply add $v_{i+1}$ into any bag containing~$u$.
+        The resulting decomposition is a valid decomposition for~$G_{i+1}$.
+    \item
+        \emph{\( v_{i+1} \) is a false twin of a vertex~\( u \) in~\( G_{i+1} \).}
+        If $u$ is not center of a bag, add $v_{i+1}$ into any bag $u$ is in.
+        Otherwise, make a new bag~$B_{i+1} = N_G[v_{i+1}]$ and make it adjacent to the bag~$N_G[u]$.
+        Because no vertex in~$N_G(u)$ is center of a bag, the resulting decomposition is a valid decomposition for~$G_{i+1}$.
+\end{enumerate}
+Therefore, distance-hereditary graphs have strong tree-breadth~$1$.
+
+Next, we show how to compute an according tree-decomposition in linear time.
+The argument above already gives an algorithmic approach.
+First, we compute a pruning sequence for~$G$.
+This can be done in linear time with an algorithm by \name{Damiand} et al.\,\cite{DamiHabiPaul2001}.
+Then, we determine which vertex becomes a center of a bag.
+Note that we can simplify the three cases above with the following rule:
+If $v_i$ has no neighbour in~$G_i$ which is center of a bag, make $v_i$ center of a bag.
+Otherwise, proceed with~$v_{i+1}$.
+This can be easily implemented in linear time with a binary flag for each vertex.
+\end{proof}
+
+Algorithm~\ref{algo:DHtb} formalizes the method described in the proof of Theorem~\ref{theo:DHistb}.
+
+\begin{algorithm}
+    [htb]
+    \caption
+    {%
+        Computes, for a given distance-hereditary graph~$G$, a tree-decomposition~$T$ with strong breadth~$1$.
+    }
+    \label{algo:DHtb}
+
+Compute a pruning sequence $\langle v_1, v_2, \ldots, v_n \rangle$ (see~\cite{DamiHabiPaul2001}).
+
+Create a set~$C := \emptyset$.
+
+\For
+{%
+    \( i := 1 \) \KwTo \( n \)
+}
+{%
+    \If
+    {%
+        \( N_G[v_i] \cap V_i \cap C = \emptyset \)
+    }
+    {%
+        Add $v_i$ to $C$.
+    }
+}
+
+Create a tree-decomposition~$T$ with the vertices in~$C$ as centers of its bags.
+
+\end{algorithm}
+
+\begin{theorem}
+    \label{theo:pbATfree}
+If \( G \) is an AT-free graph, then \( \pl(G) \leq 2 \).
+Furthermore, a path-decomposition of~\( G \) with length at most~\( 2 \) can be computed in \( \calO \big( n^2 \big) \) time.
+\end{theorem}
+
+\begin{proof}
+Let $s$ be an arbitrary vertex of~$G$, let $x$ be the vertex last visited (numbered~$1$) by a LexBFS starting at~$s$, and let $\sigma$ be the ordering obtained by a LexBFS starting at~$x$.
+Clearly, $\sigma$ can be generated in linear time.
+Note that the LexBFS which computes~$\sigma$ also computes all distance layers~$L_i^{(x)}$ of~$G$ with $0 \leq i \leq \ecc(x)$.
+For some vertex~$v \in L_i^{(x)}$, let $N_G^\downarrow(v) = N_G(v) \cap L_{i-1}^{(x)}$.
+
+We can transform an AT-free graph~$G = (V, E)$ into an interval graph~$G^+ = \big( V, E^+ \big)$ by applying the following two operations:
+
+\begin{enumerate}[(1)]
+    \item
+        \label{item:ATfreeMakeLayers}
+        \emph{Make layers complete graphs.}
+        In each layer~$L_i^{(x)}$, make every two vertices~$u, v \in L_i^{(x)}$ adjacent to each other in~$G^+$.
+    \item
+        \label{item:ATfreeMakeNeighs}
+        \emph{Make down-neighbourhoods of adjacent vertices of a layer comparable.}
+        For each~$i$ and every edge~$uv$ of~$G$ with $u, v \in L_i^{(x)}$ and $\sigma(v) < \sigma(u)$, make every $w \in N_G^{\downarrow}(v)$ adjacent to~$u$ in~$G^+$.
+\end{enumerate}
+
+\begin{claim}
+    \label{cla:GplusGsquare}
+\( G^+ \) is a subgraph of~\( G^2 \).
+\end{claim}
+
+\begin{proof}[Claim]
+Clearly, for every edge~$uw$ of~$G^+$ added by operation~\ref{item:ATfreeMakeNeighs}, $d_G(u, w) \leq 2$ holds.
+Also, for every edge~$uv$ of~$G^+$ added by operation~\ref{item:ATfreeMakeLayers}, $d_G(u, v) \leq 2$ holds by Lemma~\ref{lem:ATfreeDownNeigh} (page~\pageref{lem:ATfreeDownNeigh}).
+\end{proof}
+
+\begin{claim}
+    \label{cla:GplusInterval}
+\( G^+ \) is an interval graph.
+\end{claim}
+
+\begin{proof}
+    [Claim]
+It is known~\cite{Olariu1991} that a graph is an interval graph if and only if its vertices admit an \emph{interval ordering}.
+That is, an ordering $\tau \colon V \rightarrow \{ 1, \ldots, n \}$ such that, for any three vertices $a$, $b$, and~$c$ with $\tau(a) < \tau(b) < \tau(c)$, $ac \in E$ implies $bc \in E$.
+We show here that the LexBFS-ordering~$\sigma$ of~$G$ is an interval ordering of~$G^+$.
+Recall that, for each~$v \in L_i^{(x)}$ and every~$u \in L_j^{(x)}$ with $i > j$, it holds that $\sigma(v) < \sigma(u)$ since $\sigma$ is a LexBFS-ordering.
+Consider three arbitrary vertices $a$, $b$, and~$c$ of~$G$ and assume that $\sigma(a) < \sigma(b) < \sigma(c)$ and $ac \in E^+$.
+Assume also that $a \in L_i^{(x)}$ for some~$i$.
+If $c$ belongs to~$L_i^{(x)}$, then $b$ must be in $L_i^{(x)}$ as well.
+Hence, $bc \in E^+$ due to operation~\ref{item:ATfreeMakeLayers}.
+If both $b$ and~$c$ are in $L_{i-1}^{(x)}$, then again $bc \in E^+$ due to operation~\ref{item:ATfreeMakeLayers}.
+Consider now the remaining case that $a, b \in L_i^{(x)}$ and $c \in L_{i-1}^{(x)}$.
+If $ac \in E$, then $bc \in E^+$ because either $ab \in E$ and, thus, operation~\ref{item:ATfreeMakeNeighs} applies, or $ab \notin E$ and, thus, Lemma~\ref{lem:ATfreeDownNeigh} (page~\pageref{lem:ATfreeDownNeigh}) implies $bc \in E^+$.
+If $ac \in E^+ \setminus E$ then, according to operation~\ref{item:ATfreeMakeNeighs}, edge~$ac$ was created in~$G^+$ because some vertex~$a' \in L_i^{(x)}$ existed such that $\sigma(a') < \sigma(a)$ and $a'a, a'c \in E$.
+Since $a'c \in E$ and $\sigma(a') < \sigma(b) < \sigma(c)$, as before, $bc \in E^+$ must hold.
+\end{proof}
+
+To complete the proof, we recall that a graph is an interval graph if and only if it has a path-decomposition with each bag being a maximal clique (see Theorem~\ref{theo:intervalPL}, page~\pageref{theo:intervalPL}).
+Furthermore, such a path-decomposition of an interval graph can easily be computed in linear time.
+Let $\calP^+ = \big \{ X_1, \ldots, X_q \big \}$ be a path-decomposition of our interval graph~$G^+$.
+Then, $\calP := \calP^+ = \big \{ X_1, \ldots, X_q \big \}$ is a path-decomposition of~$G$ with length at most~$2$ since, for every edge~$uv$ of $G^+$, the distance in $G$ between $u$ and $v$ is at most~$2$, as shown in Claim~\ref{cla:GplusGsquare}.
+\end{proof}
+
+Algorithm~\ref{algo:ATfreeDeco} formalizes the steps described in the
+previous proof.
+
+\begin{algorithm}
+    [htb]
+    \caption
+    {%
+        Computes a path-decomposition of length at most~$2$ for a given AT-free graph.
+    }
+    \label{algo:ATfreeDeco}
+
+\KwIn
+{%
+    An AT-free graph $G = (V, E)$.
+}
+
+\KwOut
+{%
+    A path-decomposition of $G$.
+}
+
+Calculate a LexBFS-ordering~$\sigma$ of~$G$ with an arbitrary start vertex~$s \in V$.
+Let $x$ be the last visited vertex, \ie, $\sigma(x) = 1$.
+
+Calculate a LexBFS-ordering~$\sigma'$ of~$G$ starting at~$x$.
+
+Set $E^+ := E$.
+
+\ForEach
+{%
+    vertex pair $u, v$ with $d_G(x,u) = d_G(x,v)$ and $\sigma'(u) < \sigma'(v)$
+}
+{%
+    Add $uv$ to~$E^+$.
+
+    For each $w \in N_G(u)$ with $\sigma'(v) < \sigma'(w)$, add $vw$ to~$E^+$.%
+}
+
+Calculate a path-decomposition~$\calP$ of the interval graph~$G^+ = (V, E^+)$ by determining the maximal cliques of~$G^+$.
+
+Output $\calP$.
+\end{algorithm}
+
+Because the class of cocomparability graphs is a proper subclass of AT-free graphs, we obtain the following corollary.
+
+\begin{corollary}
+    \label{cor:plCocompGr}
+If \( G \) is a cocomparability graph, then \( \pl(G) \leq 2 \).
+Furthermore, a path-decomposition of~\( G \) with length at most~\( 2 \) can be computed in \( \calO \big( n^2 \big) \) time.
+\end{corollary}
+
+Note that the complement of an induced cycle on six vertices has path-breadth~$2$ (see~\cite{DragKoehLeit2017} for details).
+Thus, the bound~$2$ on the path-breadth of cocomparability graphs (and therefore, of AT-free graphs) is sharp.
+
+% Other classes
+
+Consider two parallel lines (upper and lower) in the plane.
+Assume that each line contains $n$~points, labelled $1$ to~$n$.
+Each two points with the same label define a segment with that label.
+The intersection graph of such a set of segments between two parallel lines is called a \emph{permutation graph}.
+
+Assume now that each of the two parallel lines contains $n$~intervals, labelled $1$ to~$n$, and each two intervals with the same label define a trapezoid with that label (a trapezoid can degenerate to a triangle or to a segment).
+The intersection graph of such a set of trapezoids between two parallel lines is called a \emph{trapezoid graph}.
+Clearly, every permutation graph is a trapezoid graph, but not vice versa.
+
+\begin{theorem}
+    \label{theo:pbPermutGr}
+If \( G \) is a permutation graph, then \( \spb(G) = 1 \).
+Furthermore, a path-decomposition of~\( G \) with optimal breadth can be computed in linear time.
+\end{theorem}
+
+\begin{proof}
+We assume that a permutation model of~$G$ is given in advance (if not, we can compute one for~$G$ in linear time~\cite{McConnSpinra1997}).
+That is, each vertex $v$ of $G$ is associated with a segment $s(v)$ such that $uv \in E$ if and only if segments $s(v)$ and $s(u)$ intersect.
+In what follows, ``u.\,p.'' and ``l.\,p.'' refer to a vertex's point on the upper and lower, respectively, line of the permutation model.
+
+First, we compute an (inclusion) maximal independent set~$M$ of~$G$ in linear time as follows.
+Put in~$M$ (which is initially empty) a vertex~$x_1$ whose u.\,p.\ is leftmost.
+For each $i \geq 2$, select a vertex~$x_i$ whose u.\,p.\ is leftmost among all vertices whose segments do not intersect $s(x_1), \ldots, s(x_{i - 1})$.
+In fact, it is enough to check intersection with $s(x_{i - 1})$ only.
+If such a vertex exists, put it in~$M$ and continue.
+If no such vertex exists, $M = \{ x_1, \ldots, x_k \}$ has been constructed.
+
+Now, we claim that $\big \{ N_G[x_1], \ldots, N_G[x_k] \big \}$ is a path-decomposition of~$G$ with strong breadth~$1$ and, hence, with length at most~$2$.
+Clearly, each vertex of~$G$ is in some bag since every vertex not in~$M$ is adjacent to a vertex in~$M$, by the maximality of~$M$.
+Consider an arbitrary edge~$uv$ of~$G$.
+Assume that neither $u$ nor~$v$ is in~$M$ and that the u.\,p.\ of~$u$ is to the left of the u.\,p.\ of~$v$.
+Necessarily, the l.\,p.\ of~$v$ is to the left of the l.\,p.\ of~$u$, since the segments $s(v)$ and $s(u)$ intersect.
+Assume that the u.\,p.\ of~$u$ is between the u.\,p.s of $x_i$ and~$x_{i + 1}$.
+From the construction of~$M$, $s(u)$ and~$s(x_i)$ must intersect, \ie, the l.\,p.\ of~$u$ is to the left of the l.\,p.\ of~$x_i$.
+But then, since the l.\,p.\ of~$v$ is to the left of the l.\,p.\ of~$x_i$, segments $s(v)$ and $s(x_i)$ must intersect, too.
+Thus, edge~$uv$ is in the bag~$N_G[x_i]$.
+
+To show that all bags containing any particular vertex form a contiguous subsequence of the sequence~$\big \langle N_G[x_1], \ldots, N_G[x_k] \big \rangle$, consider an arbitrary vertex~$v$ of~$G$ and let $v \in N_G[x_i] \cap N_G[x_j]$ for $i < j$.
+Consider an arbitrary bag~$N_G[x_l]$ with $i < l < j$.
+We know that the vertices $x_i, x_l, x_j \in M$ are pairwise non-adjacent.
+Furthermore, the segment~$s(v)$ intersects the segments $s(x_i)$ and~$s(x_j)$.
+As segment~$s(x_l)$ is between $s(x_i)$ and~$s(x_j)$, necessarily, $s(v)$ intersects $s(x_l)$ as well.
+\end{proof}
+
+\begin{theorem}
+    \label{theo:pbTrapGr}
+If \( G \) is a trapezoid graph, then \( \pb(G) = 1 \).
+Furthermore, a path-decomposition of~\( G \) with breadth~\( 1 \) can be computed in \( \calO(n^2) \) time.
+\end{theorem}
+
+\begin{proof}
+We show that every trapezoid graph~$G$ is a minor of a permutation graph.
+
+First, we compute in $\calO(n^2)$ time a trapezoid model for~$G$~\cite{MaSpinra1994}.
+Then, we replace each trapezoid $\calT_i$ in this model with its two diagonals obtaining a permutation model with~$2 n$ vertices.
+Let $H$ be the permutation graph of this permutation model.
+It is easy to see that two trapezoids $\calT_1$ and~$\calT_2$ intersect if and only if a diagonal of~$\calT_1$ and a diagonal of~$\calT_2$ intersect.
+
+Now, $G$ can be obtained back from~$H$ by a series of $n$~edge contractions.
+For each trapezoid~$\calT_i$, contract the edge of~$H$ that corresponds to two diagonals of~$\calT_i$.
+
+Since contracting edges does not increase the path-breadth (Lemma~\ref{lem:decoBorderBags}, page~\pageref{lem:decoBorderBags}), we get $\pb(G) = \pb(H) = 1$ by Theorem~\ref{theo:pbPermutGr}.
+Any path-decomposition of~$H$ with breadth~$1$ is a path-decomposition of~$G$ with breadth~$1$.
+\end{proof}
+
+A bipartite graph is \emph{chordal bipartite} if each cycle of length at least~$6$ has a chord.
+To the best of our knowledge, there is no linear time algorithm known to recognise chordal bipartite graphs.
+However, in~\cite{DraganLomono2007}, \name{Dragan} and \name{Lomonosov} show that any chordal bipartite graph~$G = (X, Y, E)$ admits a tree-decomposition with the set of bags $\calB = \big \{ B_1, B_2 , \ldots, B_{|X|} \big \}$, where $B_i = N_G[x_i]$, $x_i \in X$.
+Therefore, we can still compute a tree-decomposition in linear time with three steps.
+First, compute a 2-colouring.
+Second, select a colour and make the neighbourhood of all vertices with this colour bags.
+Third, use the algorithm in~\cite{TarjanYannak1984} to check if the selected bags give a valid tree-decomposition.
+Thus, it follows:
+
+\begin{theorem}
+    [\name{Dragan} and \name{Lomonosov}~\cite{DraganLomono2007}]
+Each chordal bipartite graph has strong tree-breadth~\( 1 \).
+An according tree-decomposition can be found in linear time.
+\end{theorem}
+

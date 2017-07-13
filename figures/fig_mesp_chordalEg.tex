@@ -1,0 +1,39 @@
+\tikzsetnextfilename{fig_mesp_chordalEg}
+\begin{tikzpicture}
+\foreach \x [evaluate=\x as \xx using {min(\x,2)}] in {0,1,2,3}
+{
+    \foreach \y in {0,...,\xx}
+    {
+        \node[sN] (n\x\y) at (\x,\y) {};
+    }
+}
+
+\node[sN] (n40) at (4,0) {};
+\node[sN] (n42) at (4,2) {};
+\node[sN] (ns) at (-2,0) {};
+\node[sN] (nt) at (-1,0) {};
+
+\node[lbl,anchor=south west,inner sep=1.5pt] at (n42.north east) {$u$};
+\node[lbl,anchor=south east,inner sep=.5pt] at (n22.north west) {$u'$};
+\node[lbl,anchor=south west,inner sep=1.5pt] at (n31.north east) {$v$};
+\node[lbl,anchor=south east,inner sep=.5pt] at (n21.north west) {$v'$};
+\node[lbl,anchor=south west,inner sep=1.5pt] at (n40.north east) {$w$};
+\node[lbl,anchor=south east,inner sep=1.5pt] at (ns.north west) {$s$};
+
+\begin{pgfonlayer}{background}
+    \draw (0,0) -- (2,2);
+    \draw (1,0) -- (3,2);
+    \draw (2,0) -- (3,1);
+
+    \draw (0,0) -- (4,0);
+    \draw (1,1) -- (3,1);
+    \draw (2,2) -- (4,2);
+
+    \draw (1,0) -- (1,1);
+    \draw (2,0) -- (2,2);
+    \draw (3,0) -- (3,1);
+
+    \draw (-2,0) -- (0,0);
+\end{pgfonlayer}
+
+\end{tikzpicture}

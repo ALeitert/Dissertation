@@ -1,0 +1,29 @@
+# LaTeX files
+*.aux
+*.auxlock
+*.bbl
+*.blg
+*.fls
+*.gz
+*.lof
+*.log
+*.lot
+*.out
+*.thm
+*.toc
+
+# Precompiled header
+*.fmt
+
+# Files for latexmk
+*_latexmk
+
+# Files created by TikZ
+tikzCache/*
+
+# Files created by Kile
+*.kilepr
+*.backup
+
+# Created document
+*.pdf

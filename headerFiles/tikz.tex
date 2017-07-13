@@ -1,0 +1,75 @@
+% -------------------------------------------
+%  Header file.
+%
+%  Contains all TikZ related definitions.
+% -------------------------------------------
+
+% Package
+\usepackage{tikz}
+
+% Libaries
+\usetikzlibrary
+{
+    arrows,
+    calc,
+    decorations.pathmorphing,
+    decorations.pathreplacing,
+    external,
+    fadings,
+    fit,
+    matrix,
+    positioning,
+    shapes,
+}
+
+% Cache images
+% Note, the command \tikzexternalize is not working, if it is in a precompiled header.
+\tikzset{external/up to date check=md5}
+\tikzsetexternalprefix{tikzCache/}
+
+\tikzset
+{
+    external/system call =
+    {
+        pdflatex
+            -fmt="\fmt"
+            \tikzexternalcheckshellescape
+            -halt-on-error
+            -interaction=batchmode
+            -jobname "\image" "\texsource"
+    }
+}
+
+% Layers
+\pgfdeclarelayer{background}
+\pgfdeclarelayer{lowerBG}
+\pgfsetlayers{lowerBG,background,main}
+
+
+% -------------------------------------------
+% Basic styles
+
+% Base for nodes
+\tikzstyle{nodeBase}=[minimum size=0.25cm,inner sep=0pt]
+
+% base for visible nodes
+\tikzstyle{visNode}=[nodeBase,draw,fill=white]
+
+% Normal nodes
+\tikzstyle{nN}=[visNode,circle,fill=black!20]
+
+% Small nodes
+\tikzstyle{sN}=[nN,minimum size=0.15cm]
+
+% Tiny nodes
+\tikzstyle{tN}=[nN,minimum size=0.09cm]
+
+% Invisable nodes
+\tikzstyle{hN}=[nodeBase,circle]
+
+% Label
+\tikzstyle{lbl}=[font=\small]
+\tikzstyle{llbl}=[left,lbl]
+\tikzstyle{rlbl}=[lbl,right]
+\tikzstyle{tlbl}=[lbl,above]
+\tikzstyle{blbl}=[lbl,below]

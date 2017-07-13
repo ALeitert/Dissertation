@@ -1,0 +1,164 @@
+\newcommand{\cord}[2]{(#1*\xlen,#2*\ylen)}
+\tikzsetnextfilename{fig_bwld_ATfreeApprox}
+\begin{tikzpicture}
+
+\def\xlen{1cm}
+\def\ylen{1cm}
+
+\coordinate (i) at (0,0);
+\coordinate (ip1) at (0,\ylen);
+\coordinate (ip2) at (0,2*\ylen);
+\coordinate (im1) at (0,-\ylen);
+\coordinate (im2) at (0,-2*\ylen);
+
+% Vertices
+
+\node[blbl] at (im2) {$P$};
+
+\node[sN] (vi) at (i) {};
+\node[llbl] (vi_lbl) at (vi.west) {$v_i$};
+
+\node[sN] (vip1) at (ip1) {};
+\node[llbl] (vip1_lbl) at (vip1.west) {$v_{i+1}$};
+
+\node[sN] (vim1) at (im1) {};
+\node[llbl] at (vim1.west) {$v_{i-1}$};
+
+
+\node[sN] (vXip1) at \cord{1}{1} {};
+\node[sN] (vXi) at \cord{1}{0} {};
+\node[sN] (vXim1) at \cord{1}{-1} {};
+
+\node[sN] (vcoXip1) at \cord{3}{1} {};
+\node[sN] (vcoXi) at \cord{3}{0} {};
+\node[sN] (vcoXim1) at \cord{3}{-1} {};
+
+\node[rlbl,inner sep=0] (Xip1) at \cord{1.5}{1} {$X_{i+1}$};
+\node[rlbl,inner sep=0] (Xi) at \cord{1.5}{0} {$X_{i}$};
+\node[rlbl,inner sep=0] (Xim1) at \cord{1.5}{-1} {$X_{i-1}$};
+
+\node[rlbl,inner sep=0] (coXip1) at \cord{3.5}{1} {$\overline{X}_{i+1}$};
+\node[rlbl,inner sep=0] (coXi) at \cord{3.5}{0} {$\overline{X}_{i}$};
+\node[rlbl,inner sep=0] (coXim1) at \cord{3.5}{-1} {$\overline{X}_{i-1}$};
+
+\begin{pgfonlayer}{background}
+
+\node
+    [
+        fill=lightgray!5,
+        draw=gray,
+        fit=\cord{1}{1}\cord{2}{1},
+        inner xsep=0.33*\xlen,
+        inner ysep=0.3*\ylen,
+    ]
+    (Xip1Box) {};
+
+\node
+    [
+        fill=lightgray!5,
+        draw=gray,
+        fit=\cord{3}{1}\cord{4}{1},
+        inner xsep=0.33*\xlen,
+        inner ysep=0.3*\ylen,
+    ]
+    (coXip1Box) {};
+
+\node
+    [
+        fill=lightgray!10,
+        draw=gray,
+        fit=\cord{1}{0}\cord{2}{0},
+        inner xsep=0.33*\xlen,
+        inner ysep=0.3*\ylen,
+    ]
+    (XiBox) {};
+
+\node
+    [
+        fill=lightgray!10,
+        draw=gray,
+        fit=\cord{3}{0}\cord{4}{0},
+        inner xsep=0.33*\xlen,
+        inner ysep=0.3*\ylen,
+    ]
+    (coXiBox) {};
+
+\node
+    [
+        fill=lightgray!15,
+        draw=gray,
+        fit=\cord{1}{-1}\cord{2}{-1},
+        inner xsep=0.33*\xlen,
+        inner ysep=0.3*\ylen,
+    ]
+    (Xim1Box) {};
+
+\node
+    [
+        fill=lightgray!15,
+        draw=gray,
+        fit=\cord{3}{-1}\cord{4}{-1},
+        inner xsep=0.33*\xlen,
+        inner ysep=0.3*\ylen,
+    ]
+    (coXim1Box) {};
+
+
+\node
+    [
+        draw=gray,
+        fit=\cord{-0.85}{1}(Xip1Box)(coXip1Box),
+        inner sep=3pt,
+    ]
+    (Lip1) {};
+
+\node
+    [
+        draw=gray,
+        fit=\cord{-0.85}{0}(XiBox)(coXiBox),
+        inner sep=3pt,
+    ]
+    (Li) {};
+
+\node
+    [
+        draw=gray,
+        fit=\cord{-0.85}{-1}(Xim1Box)(coXim1Box),
+        inner sep=3pt,
+    ]
+    (Lim1) {};
+
+\end{pgfonlayer}
+
+\node[rlbl] at (Lip1.east) {$L_{i+1}$};
+\node[rlbl] at (Li.east) {$L_{i}$};
+\node[rlbl] at (Lim1.east) {$L_{i-1}$};
+
+\begin{pgfonlayer}{background}
+
+\draw[thick,dashed] \cord{0}{1.5} -- (ip2);
+\draw[thick,dashed] \cord{0}{-1.5} -- (im2);
+\draw[thick] \cord{0}{-1.5} -- \cord{0}{1.5};
+
+\draw (i) to[out=45,in=225] (vcoXip1.center);
+\draw (im1) to[out=45,in=225] (vcoXi.center);
+
+\begin{scope}
+\clip \cord{0}{-1.75} rectangle \cord{1.5}{1.75};
+\draw[] (ip1) to[out=45,in=225] (3*\xlen,2*\ylen);
+\draw[dashed] (im2) to[out=45,in=225] (vcoXim1.center);
+\end{scope}
+
+\begin{scope}
+\clip \cord{1.5}{-1.75} rectangle \cord{3}{1.75};
+\draw[] (im2) to[out=45,in=225] (vcoXim1.center);
+\draw[dashed] (ip1) to[out=45,in=225] (3*\xlen,2*\ylen);
+\end{scope}
+
+\draw (ip1) -- (vXip1.center);
+\draw (i) -- (vXi.center);
+\draw (im1) -- (vXim1.center);
+
+\end{pgfonlayer}
+
+\end{tikzpicture}

@@ -1,0 +1,1850 @@
+\chapter
+[%
+    The Minimum Eccentricity Shortest Path Problem%
+]
+{%
+    The Minimum Eccentricity Shortest Path Problem%
+    \chapterNote
+    {
+        Results from this chapter have been published partially
+        at~\emph{WADS}~2015, Victoria, Canada~\cite{DraganLeiter2015},
+        at~\emph{WG}~2015, Munich, Germany~\cite{DraganLeiter2015a}, and
+        in the \emph{Journal of Graph Algorithms and Applications}~\cite{DraganLeiter2016}.
+    }%
+}
+    \label{cha:mesp}
+%
+
+In Section~\ref{sec:bw-vs-pl} (page~\pageref{sec:bw-vs-pl}) and Section~\ref{sec:ld-vs-pl} (page~\pageref{sec:ld-vs-pl}), we use the path-length of a graph to obtain a shortest path~$P$ with eccentricity~$\lambda$ and then use $P$ to calculate approximations for the Bandwidth and Line-Distortion problems.
+However, after determining~$P$, we do not use the bounded path-length again.
+This leads to the question if we can directly determine such a path.
+We call this the \emph{Minimum Eccentricity Shortest Path} problem, \emph{MESP} for short.
+
+\begin{definition}
+    \label{def:MESP}
+For a given a graph~\( G \), the \emph{Minimum Eccentricity Shortest Path} problem asks to find a shortest path~\( P \) such that, for each shortest path~\( Q \), \( \ecc(P) \leq \ecc(Q) \).
+\end{definition}
+
+Note that our Minimum Eccentricity Shortest Path problem is close but different from the \emph{Central Path} problem in graphs introduced in~\cite{Slater1982}.
+It asks, for a given graph~$G$, to find a not necessarily shortest path~$P$ such that any other path of~$G$ has eccentricity at least~$\ecc(P)$.
+The Central Path problem generalizes the Hamiltonian Path problem and, therefore, is NP-complete even for chordal graphs~\cite{Muller1996}.
+Our problem, however, is polynomial time solvable for chordal graphs (see Corollary~\ref{cor:mespChordal}).
+
+In this chapter, we investigate the Minimum Eccentricity Shortest Path problem.
+We analyse the hardness of the problem, show algorithms to compute an optimal solution, and present approximation algorithms differing in quality and runtime.
+This is done for general graphs as well as for special graph classes.
+Additionally, we show that, if a shortest path with eccentricity~$k$ is given, a $k$-dominating set can be found in pseudo-polynomial time.
+
+\section{Hardness}
+    \label{sec:mesp_Hardness}
+
+In this section, we show that finding a minimum eccentricity shortest path is NP-hard, even if restricted to planar bipartite graphs with maximum vertex-degree~$3$.
+Additionally, we show that the problem is W[2]-hard for sparse graphs.
+To do that, we define the decision version of the Minimum Eccentricity Shortest Path problem, named \emph{\( k \)-ESP}, as follows:
+Given a graph~$G$ and an integer~$k$, does $G$ contain a shortest path~$P$ with eccentricity at most~$k$?
+
+\begin{theorem}
+    \label{theo:kDomShortNPc}
+The decision version of the Minimum Eccentricity Shortest Path problem is NP-complete.
+\end{theorem}
+
+\begin{proof}
+To prove Theorem~\ref{theo:kDomShortNPc}, we use a version of 3-SAT which is called \emph{Planar Monotone 3-SAT}.
+It was introduced by \name{de Berg} and \name{Khosravi} in~\cite{deBergKhosra2010}.
+Consider an instance of 3-SAT given in CNF with the variables~$\calP = \{ p_1, \ldots, p_n \}$ and the clauses~$\calC = \{ c_1, \ldots, c_m \}$.
+A clauses is called \emph{positive} if it consists only of positive variables (\ie, $p_a \lor p_b \lor p_c$) and is called \emph{negative} if it consists only of negative variables (\ie, $\neg p_a \lor \neg p_b \lor \neg p_c$).
+Consider the bipartite graph~$\calG = (\calP, \calC, \calE)$ where $p_ic_j \in \calE$ if and only if $c_j$ contains $p_i$ or $\neg p_i$.
+An instance of 3-SAT is \emph{planar monotone} if each clause is either positive or negative and there is a planar embedding for~$\calG$ such that all variables are on a (horizontal) line~$L$, all positive clauses are above~$L$, all negative clauses are below~$L$, and no edge is crossing~$L$.
+Planar Monotone 3-SAT is NP-complete~\cite{deBergKhosra2010}.
+
+Now, assume that we are given an instance~$\calI$ of Planar Monotone 3-SAT with the variables~$\calP = \{ p_1, \ldots, p_n \}$ and the clauses~$\calC = \{ c_1, \ldots, c_m \}$.
+Also, let $k = \max \{ n, m \}$.
+We create a graph~$G$ as shown in Figure~\ref{fig:kDomShortNPc}.
+For each variable~$p_i$ create two vertices, one representing~$p_i$ and one representing~$\neg p_i$.
+Create one vertex~$c_i$ for every clause~$c_i$.
+Additionally, create two vertices $u_0$, $u_n$ and, for each $i$ with $0 \leq i \leq n$, a vertex~$v_i$.
+Connect each variable vertex~$p_i$ and $\neg p_i$ with $v_{i-1}$ and $v_i$ directly with an edge.
+Connect each clause with the variables contained in it with a path of length~$k$.
+Also connect $v_0$ with $u_0$ and $v_n$ with $u_n$ with a path of length~$k$.
+
+Recall that, by definition of~$\calI$, the corresponding bipartite graph~$\calG$ has a planar embedding where all variables are on a line.
+Therefore, we can clearly achieve a planar embedding for~$G$ when placing its vertices as shown in Figure~\ref{fig:kDomShortNPc}.
+
+\begin{figure}
+    [htb]
+    \centering
+    \input{figures/fig_mesp_NPc}
+    \caption
+    [%
+        Reduction from Planar Monotone 3-SAT to $k$-ESP.
+    ]
+    {
+        Reduction from Planar Monotone 3-SAT to $k$-ESP.
+        Illustration to the proof of Theorem~\ref{theo:kDomShortNPc}.
+    }
+    \label{fig:kDomShortNPc}
+\end{figure}
+
+Note that every shortest path in~$G$ not containing $v_0$ and~$v_n$ has an eccentricity larger than~$k$.
+Also, a shortest path from $v_0$ to~$v_n$ has length~$2n$ ($d(v_{i-1}, v_i) = 2$, passing through $p_i$ or~$\neg p_i$).
+Since $k \geq n$, no shortest path from $v_0$ to~$v_n$ is passing through a vertex~$c_i$; in this case the minimal length would be $2k + 2$.
+Additionally, note that, for all vertices in~$G$ except the vertices which represent clauses, the distance to a vertex~$v_i$ with $0 \leq i \leq n$ is at most~$k$.
+
+We now show that $\calI$ is satisfiable if and only if $G$ has a shortest path with eccentricity~$k$.
+
+First, assume $\calI$ is satisfiable.
+Let $f\colon \calP \rightarrow \{ T, F \}$ be a satisfying assignment for the variables.
+As shortest path~$P$, we choose a shortest path from $v_0$ to $v_n$.
+Thus, we have to chose between $p_i$ and $\neg p_i$.
+We chose $p_i$ if and only if $f(p_i) = T$.
+Because $\calI$ is satisfiable, there is a $p_i$ for each $c_j$ such that either $f(p_i) = T$ and $d(c_j,p_i) = k$, or $f(p_i) = F$ and $d(c_j, \neg p_i) = k$.
+Thus, $P$ has eccentricity~$k$.
+
+Next, consider a shortest path~$P$ in~$G$ of eccentricity~$k$.
+As mentioned above, $P$ contains either $p_i$ or~$\neg p_i$.
+Now, we define $f\colon \calP \rightarrow \{ T, F \}$ as follows:
+\[
+    f(p_i) =
+        \begin{cases}
+            T & \text{if $p_i \in P$,} \\
+            F & \text{else, \ie $\neg p_i \in P$.} \\
+        \end{cases}
+\]
+Because $P$ has eccentricity~$k$ and only vertices representing a variable in the clause~$c_j$ are at distance~$k$ to vertex~$c_j$, $f$~is a satisfying assignment for~$\calI$.
+\end{proof}
+
+While the reduction works in principle for any version of SAT (given as CNF), choosing Planar Monotone 3-SAT allows to construct a planar graph~$G$.
+
+Note that the created graph is bipartite.
+Set the colour of each vertex~$v_i$ to black and of each $p_j$ and~$\neg p_j$ to white.
+For some vertex~$x$ on the shortest path from $c_i$ to~$p_j$ (or~$\neg p_j$), set the colour of~$x$ based on its distance to~$p_j$ (or $\neg p_j$), \ie, $x$ is white if $d(x, p_i)$ is even and black otherwise.
+
+Additionally, \name{V.\,B.\,Le}\footnote{University of Rostock, Germany} pointed out that, by slightly modifying the created graph as follows, it can be shown that the problem remains NP-complete even if the graph has the maximum vertex-degree~$3$.
+First, increase $k$ to $k = \max \{ 2n - 1, m \}$ and update all distances in the graph accordingly.
+Therefore, $2k + 2 > 4n - 2$.
+Then, replace each vertex~$v_i$ where $1 \leq i \leq n - 1$ with three vertices $v_i^-$, $v_i'$, and~$v_i^+$ such that $N(v_i^-) = \{ p_i, \neg p_i, v_i' \}$, $N(v_i') = \{ v_i^-, v_i^+ \}$, and $N(v_i^+) = \{ p_{i+1}, \neg p_{i+1}, v_i' \}$.
+Note that a path from $v_0$ to~$v_n$ which, for all~$i$, passes through $p_i$ or~$\neg p_i$ has length~$4n - 2$.
+This is still a shortest path because each path from $v_0$ to~$v_n$ passing through some $c_i$ has length~$2k + 2 > 4n - 2$.
+Also, since $d(p_i, p_{i+1}) = 4$, the graph remains bipartite.
+Next, to limit the degree of a vertex~$p_i$ (or~$\neg p_i$), instead of connecting it directly to all clauses containing it, make $p_i$ adjacent to the root of a binary tree~$T_i$ with height~$\lceil \log_2 k \rceil$.
+Then, connect each clause containing~$p_i$ to a leaf of~$T_i$ using a path with length~$k - \lceil \log_2 k \rceil - 1$ and, last, remove unused branches of~$T_i$.
+Because this does not effect planarity or colouring, we get:
+
+\begin{corollary}
+    \label{cor:mespNPc_planarBipMaxDeg}
+The decision version of the MESP problem remains NP-complete if restricted to planar bipartite graphs with maximum vertex-degree~\( 3 \).
+\end{corollary}
+
+We can slightly modify the MESP problem such that a start vertex~$s$ and an end vertex~$t$ of the path are given.
+That is, for a given a graph~$G$ and two vertices~$s$ and~$t$, find a shortest $(s,t)$-path~$P$ such that, for each shortest $(s,t)$-path~$Q$, $\ecc(P) \leq \ecc(Q)$.
+We call this the $(s,t)$-MESP problem.
+From the reduction above, it follows that the decision version of this problem is NP-complete, too.
+
+\begin{corollary}
+    \label{cor:stMespNPc}
+The decision version of the \( (s,t) \)-MESP problem is NP-complete, even if restricted to planar bipartite graphs with maximum vertex-degree~\( 3 \).
+\end{corollary}
+
+Note that the factor~$k$ in the reduction above depends on the input size.
+In~\cite{Kratsch2000}, it was already mentioned that, for $k = 1$, the problem can be solved in $\calO \big( n^3m \big)$ time by modifying an algorithm given in~\cite{DeogunKratsc1995}.
+There, the problem was called \emph{Dominating Shortest Path} problem.
+Therefore, it is an interesting question how hard MESP is if $k$ is bounded by a constant.
+
+To answer this question, we show next that the problem is W[2]-hard in general and for sparse graphs.
+Therefore, we do not expect that MESP is Fixed Parameter Tractable, \ie, there is probably no algorithm that finds an optimal solution in $f(k) \, n^{\calO(1)}$ time.
+In Section~\ref{sec:mesp_OptSol}, we generalise the result from~\cite{Kratsch2000} to show that MESP can be solved in pseudo-polynomial time.
+
+\begin{theorem}
+    \label{theo:mespW2}
+The Minimum Eccentricity Shortest Path problem is W[2]-hard.
+\end{theorem}
+
+\begin{proof}
+To show W[2]-hardness, we make a parametrised reduction from the Dominating Set problem which is known to be W[2]-complete~\cite{DowneyFellow2013}.
+
+Consider a given graph~$G = (V, E)$ with $V = \{ v_1, v_2, \ldots, v_n \}$ and a given~$k$.
+Based on $G$ and~$k$, we construct a graph~$H$ (containing $G$ as subgraph) as follows.
+Start with $G$ and add $k$~sets of vertices $U_1$, $U_2$, \dots, $U_k$ with $U_i = \Big \{ u^i_1, u^i_2, \ldots, u^i_n \Big \}$.
+For each $j$ with $1 \leq j < k$, make a join between $U_j$ and~$U_{j+1}$.
+Add the vertices $s$, $s'$, $t$, and~$t'$ and connect $s$ with~$s'$ and $t$ with~$t'$, respectively, with a path of length~$k$.
+Additionally, make $s$ adjacent to all vertices in~$U_1$ and make $t$ adjacent to all vertices in~$U_k$.
+Connect each vertex~$u_i^j \in U_j$ with each vertex in~$N_G[v_i]$ with a path of length~$k$ for all $j$ with $1 \leq j \leq k$.
+Figure~\ref{fig:mespW2} gives an illustration.
+
+\begin{figure}
+    [htb]
+    \centering
+    \input{figures/fig_mesp_W2}
+    \caption
+    [%
+        Reduction from Dominating Set to $k$-ESP.
+    ]
+    {
+        Reduction from Dominating Set to $k$-ESP.
+        Illustration to the graph~$H$ as constructed in the proof of Theorem~\ref{theo:mespW2}.
+    }
+    \label{fig:mespW2}
+\end{figure}
+
+
+Because $d_H \big( s, s' \big) = d_H \big( t, t' \big) = k$, each shortest path in~$H$ not containing $s$ and~$t$ has an eccentricity larger than~$k$.
+Also, a shortest path from $s$ to~$t$ has length $k + 1$, intersects all sets~$U_j$, and does not intersect~$V$.
+
+First, assume that $H$ has a shortest path~$P$ with eccentricity~$k$.
+By definition of~$P$ and construction of~$H$, for every~$v \in V$, there is a vertex~$u_i^j \in P$ such that $d_H \! \left( v, u_i^j \right) = d_H(v, P) = k$ and, hence, $v \in N_G[v_i]$.
+Therefore, the set $D = \Big \{ \, v_i \in V \Bigm| \text{there is a $j$ with $u_i^j \in P$} \, \Big \}$ is a dominating set for~$G$ with cardinality at most~$k$.
+
+Next, assume there is a dominating set~$D$ for~$G$ with cardinality at most~$k$.
+Without loss of generality, let $D = \big \{ v_1, v_2, \ldots, v_k \big \}$.
+Then, we define $P = \left \{ s, u^1_1, u^2_2, \ldots, u_k^k, t \right \}$.
+By construction of~$H$, each vertex~$v \in N_G[v_i]$ is at distance~$k$ to~$u_i^i$.
+Thus, because $D$ is a dominating set, there is a vertex~$u_i^i \in P$ for each vertex~$v \in V$ with $d_H \! \left( v, u_i^i \right) = k$.
+Therefore, $P$ has eccentricity~$k$ in~$H$.
+\end{proof}
+
+Note that the graph~$H$ constructed in the reduction above has at most $\calO \big( kn^2 \big)$ edges.
+Thus, we can transform $H$ into a sparse graph~$H'$ by simply adding $\Theta \big( kn^2 \big)$ pendent vertices which are adjacent to~$s$.
+Clearly, $H'$ has a shortest path with eccentricity~$k$ if and only if $H$ has a shortest path with eccentricity~$k$.
+Thus, we get the following result.
+
+\begin{corollary}
+    \label{cor:mespW2Sparse}
+The Minimum Eccentricity Shortest Path problem remains W[2]-hard when restricted to sparse graphs.
+\end{corollary}
+
+Later, Corollary~\ref{cor:FPTBoundDegree} shows that MESP is Fixed Parameter Tractable for graphs with bounded degree.
+
+\section{Computing an Optimal Solution}
+    \label{sec:mesp_OptSol}
+
+In this section, we investigate how to find an optimal solution for MESP.
+First, we present a pseudo-polynomial time algorithm to solve MESP on general graphs.
+Then, we analyse the problem for sparse graphs.
+Additionally, we present an approach to solve MESP for tree-structured graphs and show that, for some graph classes, the problem is solvable in polynomial time.
+
+\subsection{General Graphs}
+
+The next algorithm shows that the $k$-ESP problem remains polynomial for a fixed~$k$.
+Our algorithm is a generalisation of the algorithm mentioned in~\cite{Kratsch2000}.
+It is based on Lemma~\ref{lem:localLayerDom} below.
+Informally, Lemma~\ref{lem:localLayerDom} states that, if a graph has a shortest path~$P$ with eccentricity~$k$ starting at~$s$, each layer~$L_i^{(s)}$ is dominated by a subpath of $P$ of length at most~$2k$.
+
+\begin{lemma}
+    \label{lem:localLayerDom}
+Let \( P = \big \{ s = v_0, v_1, \ldots, v_l \big \} \) be a shortest path with eccentricity~\( k \), \( v_i \in L_i^{(s)} \), and \( P_{i, k} = \Big \{ v_{\max \{ 0, i - k \}}, \ldots, v_{\min \{ i + k, l \}} \Big \} \).
+Then, \( L_i^{(s)} \subseteq N^k[P_{i,k}] \).
+\end{lemma}
+
+\begin{proof}
+Assume there is a vertex $u \in L_i^{(s)} \setminus N^k[P_{i,k}]$.
+Consider any vertex~$v_j \in P \setminus P_{i,k}$.
+By the definition of $P_{i,k}$ it follows that $|i-j| > k$.
+Thus, because $u \in L_i^{(s)}$ and $v_j \in L_j^{(s)}$, $d(v_j, u) \geq |i-j| > k$.
+This contradicts with $P$ having eccentricity~$k$.
+\end{proof}
+
+For Algorithm~\ref{algo:kDSP} below, we say a shortest path $\tau = \{ v_{i-k}, \ldots, v_{j} \}$ with $i \leq j \leq i+k$ is a \emph{layer-dominating path for a layer~\( L_i^{(s)} \)} if
+\begin{itemize}
+    \item
+        $v_l \in L_l^{(s)}$ for $i - k \leq l \leq j$,
+    \item
+        $j < i + k$ implies that there is no edge $v_jw \in E$ with $w \in L_{j + 1}^{(s)}$, and
+    \item
+        $N^k[\tau] \supseteq L_i^{(s)}$ with $N^k[\tau] := \bigcup_{l = i - k}^{j} N^k[v_l]$.
+\end{itemize}
+We say that a layer-dominating path $\sigma = \{ v_{i-k}, \ldots, v_{j} \}$ for layer~$L_i^{(s)}$ is \emph{compatible} with a layer-dominating path $\tau = \{ u_{i+1-k}, \ldots, u_{j'} \}$ for layer~$L_{i+1}^{(s)}$ if $j'- j \in \{ 0, 1 \}$ and $v_l = u_l$ for $i + 1 - k \leq l \leq j$.
+That is, $\sigma$ and~$\tau$ share a path of length~$j - i - 1 + k$.
+
+\begin{algorithm}
+    [htb]
+    \caption
+    {
+        \label{algo:kDSP}
+        Determines if there is a shortest path of eccentricity at most~$k$ starting at a given vertex~$s$.
+    }
+\KwIn
+{%
+    A graph $G = (V, E)$ and a positive integer~$k$.
+}
+
+\KwOut
+{%
+    A shortest path with eccentricity at most~$k$ if existent in~$G$.
+}
+
+Calculate the layers $L_i^{(s)}=\{ \, v \in V \mid d_G(s,v) = i \, \}$ with $0 \leq i \leq \ecc_G(s)$.
+
+\If
+{%
+    $\ecc_G(s) \leq 2k$
+}
+{
+    For each shortest path~$P$ from~$s$, determine if $\ecc_G(P) \leq k$.
+    In this case, \Return~$P$.
+    If there is no such $P$, then $G$ does not contain a shortest path of eccentricity at most~$k$ starting at~$s$.
+    \label{line:kDSP_smallEcc}
+}
+
+\For
+{%
+    $i = k$ \KwTo $\ecc_G(s) - k$%
+    \label{line:kDSP_kDomTupleLoopStart}
+}
+{
+    Create an empty vertex set $V'_i$.
+
+    \ForEach
+    {
+        layer-dominating path~$\tau$ for layer~$L_{i}^{(s)}$
+    }
+    {
+        Add a vertex~$v_\tau$, representing the path~$\tau$, to $V'_i$.
+        \label{line:kDSP_kDomTupleLoopEnd}
+    }
+}
+\ForEach
+{%
+    $v_\tau \in V'_{\ecc_G(s) - k}$
+}
+{
+    If $N_G^k[\tau] \nsupseteq \bigcup_{j=\ecc_G(s)-k}^{\ecc_G(s)} L_j^{(s)}$, remove $v_\tau$ from $V'_{\ecc_G(s) - k}$.
+    \label{line:kDSP_removePrimeVertices}
+}
+
+Create a graph $G' = (V', E')$ with $V' = V'_k \cup \cdots \cup V'_{\ecc_G(s) - k}$ and $E' = \{ \, v_\sigma v_\tau \mid \text{$\sigma$ is compatible with $\tau$} \, \}$.
+\label{line:kDSP_createEprime}
+
+$G$ contains a shortest path of eccentricity at most~$k$ starting at~$s$ if and only if $G'$ contains a path from a vertex~$v_\sigma \in V'_k$ to a vertex~$v_\tau \in V'_{\ecc_G(s) - k}$.
+\label{line:kDSP_searchGprime}
+\end{algorithm}
+
+\begin{theorem}
+    \label{theo:optMespAlgo}
+Algorithm~\ref{algo:kDSP} determines if there is a shortest path of eccentricity at most~\( k \) starting from a given vertex~\( s \) in \( \calO \big( n^{2k+1} m \big) \) time.
+\end{theorem}
+
+\begin{proof}
+    [Correctness]
+To show the correctness of the algorithm, we need to show that line~\ref{line:kDSP_searchGprime} is correct.
+Without loss of generality, we can assume that $\ecc_G(s) > 2k$.
+Otherwise, the algorithm would have stopped in line~\ref{line:kDSP_smallEcc}.
+
+First, assume that there is a shortest path $P = \{ s = u_0, \ldots, u_l \}$ of length~$l$ in~$G$ with $\ecc_G(P) \leq k$.
+Note that $\ecc_G(s) - k \leq l \leq \ecc_G(s)$.
+Then, by Lemma~\ref{lem:localLayerDom}, each subpath $\tau = \{ u_{i-k}, \ldots, u_j \}$ ($k \leq i \leq \ecc_G(s) - k$, $j = \min\{l, i+k\}$) is a layer-dominating path for layer~$L_i^{(s)}$.
+Additionally, if $j = l$, then $N_G^k[\tau] \supseteq \bigcup_{j=\ecc_G(s) - k}^{\ecc_G(s)}L_j^{(s)}$.
+Thus, the algorithm creates a vertex~$v_\tau \in V'_i$ in line~\ref{line:kDSP_kDomTupleLoopEnd} which represents a subpath of~$P$ for each $i$ with $k \leq i \leq \ecc_G(s) - k$.
+If $v_\tau \in V'_i$ and $v_\sigma \in  V'_{i+1}$ represent subpaths of $P$, $v_\tau$ and~$v_\sigma$ are adjacent in~$G'$ because $\tau$ and~$\sigma$ are compatible.
+Therefore, there is a path in~$G'$ from a vertex in~$V'_k$ to a vertex in~$V'_{\ecc_G(s)-k}$.
+
+Next, assume that $G'$ contains a path~$P'$ from a vertex~$u \in V'_k$ to a vertex~$v \in V'_{\ecc_G(s) - k}$.
+Each vertex~$v_\sigma \in V'_i \cap P'$ represents a layer-dominating path for layer~$L_i^{(s)}$ in~$G$.
+By definition of layer-dominating paths, if $v_\sigma \in V'_i$ is adjacent to $v_\tau \in V'_{i+1}$, the paths $\sigma$ and~$\tau$ in~$G$ (of length $2k$) can be combined to a longer path (of length $2k + 1$).
+If $\tau$ has length less than $2k$, it is a subpath of~$\sigma$.
+Thus, $P'$ represents a path~$P$ in~$G$ from $s$ to a vertex~$w \in L_{q}^{(s)}$ with $\ecc_G(s)-k \leq q \leq \ecc_G(s)$.
+
+Each vertex~$v_\tau \in V'_i \cap P'$ represents a layer-dominating path~$\tau$ for layer~$L_i^{(s)}$.
+Because of line~\ref{line:kDSP_removePrimeVertices}, $v_\tau \in V'_{\ecc_G(s)-k}$ implies $N_G^k[\tau] \supseteq \bigcup_{j=\ecc_G(s) - k}^{k}L_j^{(s)}$.
+Thus, $P$ is a shortest path starting from~$s$ with $\ecc_G(P) \leq k$.
+\end{proof}
+
+\begin{proof}
+    [Complexity]
+If $\ecc_G(s) \leq 2k$, the algorithm stops after line~\ref{line:kDSP_smallEcc}.
+In this case there are at most $\calO \big( n^{2k} \big)$ shortest paths starting from~$s$.
+Thus, finding a shortest path with eccentricity~$k$ can be done in $\calO \big( n^{2k} m \big)$ time by deciding in $\calO(m)$ time if a path has eccentricity~$k$.
+
+Next, assume $\ecc_G(s) > 2k$.
+The graph can only contain $\calO \big( n^{2k+1} \big)$ layer-dominating paths because each such path has at most $2k + 1$~vertices in it.
+Therefore, creating the vertices of $G'$ (line~\ref{line:kDSP_kDomTupleLoopStart} to line~\ref{line:kDSP_removePrimeVertices}) can be done in $\calO \big( n^{2k+1} m \big)$ time.
+
+Store the found layer-dominating paths in a forest structure~$\calT$ as follows.
+For each vertex~$v$ of~$G$, $\calT$ contains a tree~$T_v$ rooted at~$v$ of depth at most~$2k$.
+This tree~$T_v$ stores all layer-dominating paths of~$G$ starting at~$v$.
+% The children of~$v$ in~$T_v$ are all neighbours~$u$ of~$v$ in~$G$ such that $d_G(s, u) = d_G(s, v) + 1$.
+Any node~$u$ in~$T_v$ (including the root~$v$) at depth less than~$2k$ has as the children all neighbours~$w$ of~$u$ in~$G$ such that $d_G(s, w) = d_G(s, w) + 1$.
+Every node of~$T_v$ represents a unique path of~$G$ corresponding to the path of~$T_v$ from the root~$v$ to this node.
+A leaf~$t$ of~$T_v$ has a pointer to a layer-dominating path~$\tau$ (and, hence, to the corresponding vertex~$v_\tau$ in~$G'$) if the path~$\tau = \{ v, \ldots, t \}$ from the root~$v$ to the leaf~$t$ forms a layer-dominating path~$\tau$ in~$G$.
+
+Now, given a layer-dominating path $\sigma = \{ v_{i-k}, v_{i-k+1}, \ldots, v_j \}$, we can determine all layer-dominating paths~$\tau$ which $\sigma$ is compatible with in $\calO(m)$ time as follows.
+Take the tree~$T_{v_{i-k+1}}$ in~$\calT$ and, following path~$\sigma$, decent to node~$v_j$ of~$T_{v_{i-k+1}}$ representing path $\{ v_{i-k+1}, \ldots, v_j \}$.
+Then, leaves of~$T_{v_{i-k+1}}$ attached to~$v_j$ have pointer to all paths~$\tau$ which $\sigma$ is compatible with.
+
+Since $G'$ has at most $\calO \big( n^{2k+1} \big)$ vertices, creating $G'$ (in line~\ref{line:kDSP_createEprime}) takes at most $\calO \big( n^{2k+1} m \big)$ time.
+Thus, the overall running time for Algorithm~\ref{algo:kDSP} is $\calO \big( n^{2k+1} m \big)$.
+\end{proof}
+
+Algorithm~\ref{algo:kDSP} determines if there is a shortest path of eccentricity at most~$k$ for a given vertex~$s$.
+If a start vertex is not given, iterating Algorithm~\ref{algo:kDSP} over each vertex determines if there is a shortest path of eccentricity at most~$k$ in a given graph~$G$ in $\calO \big( n^{2k+2} m \big)$ time.
+If $k$ is unknown, a path with minimum eccentricity can be found by trying different values for~$k$ starting with~$1$.
+Then, the runtime is $\calO \big( n^4 m \big) + \calO \big( n^6 m \big) + \cdots + \calO \big( n^{2k+2} m \big) = \calO \big( n^{2k+2} m \big)$.
+
+\begin{corollary}
+If a given graph~\( G \) contains a shortest path with eccentricity~\( k \), the MESP problem can be solved for~\( G \) in \( \calO \big( n^{2k+2} m \big) \) time, even if \( k \) is unknown.
+\end{corollary}
+
+Algorithm~\ref{algo:kDSP} requires $\calO \big( n^{2k + 1} m \big)$ time because there can be up-to $\calO(2k + 1)$ layer-dominating paths with length~$2k$ (see complexity proof of Theorem~\ref{theo:optMespAlgo}).
+Now, consider the case that a given graph~$G$ has maximum vertex-degree~$\Delta$.
+Therefore, such a graph contains at most $\calO \big( \Delta^{2k} n \big)$ layer-dominating paths of length~$2k$ and, hence, Algorithm~\ref{algo:kDSP} requires at most $\calO \big( \Delta^{2k} nm \big)$ time.
+Thus:
+
+\begin{corollary}
+    \label{cor:FPTBoundDegree}
+The Minimum Eccentricity Shortest Path problem is Fixed Parameter Tractable for graphs with maximum degree~$\Delta$.
+If such a graph~\( G \) contains a shortest path with eccentricity~\( k \), the MESP problem can be solved for~\( G \) in \( \calO \big( \Delta^{2k} n^2m \big) \) time, even if \( k \) is unknown.
+\end{corollary}
+
+
+\subsection{Distance-Hereditary Graphs}
+
+In this subsection, we present an algorithm that solves the Minimum Eccentricity Shortest Path problem for distance-hereditary graphs in linear time.
+Our algorithm is based on the following result.
+
+\begin{theorem}
+    [\name{Dragan} and \name{Leitert}~\cite{DraganLeiter2016}]
+    \label{theo:mespDistHereDiameter}
+Let \( x, y \) be a diametral pair of vertices of a distance-hereditary graph~\( G \), and \( k \) be the minimum eccentricity of a shortest path in~\( G \).
+Then, there is a shortest path~\( P \) between \( x \) and~\( y \) with \( \ecc(P) = k \).
+\end{theorem}
+
+Recall that a diametral path in a tree can be found as follows.
+Select an arbitrary vertex~$v$.
+Find a most distant vertex~$x$ from~$v$ and then a most distant vertex~$y$ from~$x$.
+The shortest path from $x$ to~$y$ is a diametral path.
+Thus, it follows from Theorem~\ref{theo:mespDistHereDiameter}:
+
+\begin{corollary}
+    \label{cor:mespTrees}
+For a tree, a shortest path with minimum eccentricity can be computed in linear time by simply performing two BFS calls.
+\end{corollary}
+
+It is known~\cite{DraganNicola2000} that a diametral pair of a distance-hereditary graph can be found in linear time.
+Hence, according to Theorem~\ref{theo:mespDistHereDiameter}, to find a shortest path of minimum eccentricity in a distance-hereditary graph in linear time, one needs to efficiently extract a best eccentricity shortest path for a given pair of end-vertices.
+In what follows, we demonstrate that, for a distance-hereditary graph, such an extraction can be done in linear time as well.
+
+We will need few auxiliary lemmas.
+
+\begin{lemma}
+    \label{lem:dhgGateVertex}
+In a distance-hereditary graph~\( G \), for each pair of vertices \( s \) and~\( t \), if \( x \) is a vertex on a shortest path from \( v \) to~\( \Pi_v = \Pr(v, I(s,t)) \) with \( d(x, \Pi_v) = 1 \), then \( \Pi_v \subseteq N(x) \).
+\end{lemma}
+
+\begin{proof}
+Let $p$ and~$q$ be two vertices in $\Pi_v$ and $d(v, \Pi_v) = r$.
+By Lemma~\ref{lem:prelDistHere} (page~\pageref{lem:prelDistHere}), $N(p) \cap L_{r-1}^{(v)} = N(q) \cap L_{r-1}^{(v)}$.
+Thus, each vertex $x$ on a shortest path from $v$ to $\Pi_v$ with $d(x,\Pi_v) = 1$ (which is in $N(p) \cap L_{r-1}^{(v)}$ by definition) is adjacent to all vertices in $\Pi_v$, \ie, $\Pi_v \subseteq N(x)$.
+\end{proof}
+
+For an interval $I(s, t)$ between two vertices $s$ and~$t$, a \emph{slice~\( S_i(s, t) \)} is defined as the set of vertices in~$I(s, t)$ with distance~$i$ to~$s$, \ie, $S_i(s, t) = L_i^{(s)} \cap I(s, t)$.
+
+\begin{lemma}
+    \label{lem:dhgSliceJoin}
+In a distance-hereditary graph~\( G \), let \( S_i(s, t) \) and \( S_{i+1}(s, t) \) be two consecutive slices of an interval~\( I(s, t) \).
+Each vertex in \( S_i(s, t) \) is adjacent to each vertex in~\( S_{i+1}(s,t) \).
+\end{lemma}
+
+\begin{proof}
+Consider Lemma~\ref{lem:prelDistHere} (page~\pageref{lem:prelDistHere}) from perspective of~$t$.
+Thus, $S_i(s,t) \subseteq N(v)$ for each vertex~$v \in S_{i+1}(s,t)$.
+Additionally, from perspective of $s$, $S_{i+1}(s,t) \subseteq N(u)$ for each vertex~$u \in S_{i}(s,t)$.
+\end{proof}
+
+\begin{lemma}
+    \label{lem:dhgProjSliceInter}
+In a distance-hereditary graph~\( G \), if a projection~\( \Pi_v = \Pr(v, I(s, t)) \) intersects two slices of an interval~\( I(s, t) \), each shortest \( (s, t) \)-path intersects~\( \Pi_v \).
+\end{lemma}
+
+\begin{proof}
+Because of Lemma~\ref{lem:dhgGateVertex}, there is a vertex $x$ with $N(x) \supseteq \Pi_v$ and $d(v,x) = d(v, \Pi_v) - 1$.
+Thus, $\Pi_v$ intersects at most two slices of interval $I(s,t)$ and those slices have to be consecutive, otherwise $x$ would be a part of the interval.
+Let $S_i(s,t)$ and $S_{i+1}(s,t)$ be these slices.
+Note that $d(s, x) = i + 1$.
+Thus, by Lemma~\ref{lem:prelDistHere} (page~\pageref{lem:prelDistHere}), $N(x) \cap S_i(s,t) = N(u) \cap S_i(s,t)$ for each $u \in S_{i+1}(s,t)$.
+Therefore, $S_i(s,t) \subseteq \Pi_v$, \ie, each shortest path from $s$ to~$t$ intersects $\Pi_v$.
+\end{proof}
+
+From the lemmas above, we can conclude that, for determining a shortest $(s,t)$-path with minimal eccentricity, a vertex~$v$ is only \emph{relevant} if $d(v, I(s,t)) = \ecc(I(s,t))$ and the projection of $v$ on the interval $I(s,t)$ only intersects one slice.
+Algorithm~\ref{algo:MinEccDistHere} below uses this observation to find  such a path in linear time.
+
+\begin{algorithm}
+    [htb]
+    \caption
+    {
+        \label{algo:MinEccDistHere}
+        Computes a shortest $(s,t)$-path~$P$ with minimal eccentricity for a given distance-hereditary graph~$G$ and a vertex pair~$s,t$.
+    }
+
+\KwIn
+{
+    A distance-hereditary graph~$G = (V, E)$ and two distinct vertices $s$ and~$t$.
+}
+
+\KwOut
+{
+    A shortest path~$P$ from $s$ to~$t$ with minimal eccentricity.
+}
+
+Compute the sets $V_i = \{ \, v \mid d(v, I(s, t)) = i \, \}$ for $1 \leq i \leq \ecc(I(s,t))$.
+
+Each vertex $v \notin I(s,t)$ gets a pointer~$g(v)$ initialised with $g(v) := v$ if $v \in V_1$, and $g(v) := \varnothing$ otherwise.
+
+\For
+{
+    $i := 2$ \KwTo $\ecc(I(s,t))$
+    \label{line:dhgFindGateLoop}
+}
+{
+    For each $v \in V_i$, select a vertex~$u \in V_{i-1} \cap N(v)$ and set $g(v) := g(u)$.
+    \label{line:dhgFindGateIteration}
+}
+
+\ForEach
+{
+    $v \in V_{\ecc(I(s,t))}$
+}
+{
+    If $N(g(v))$ intersects only one slice of $I(s,t)$, flag $g(v)$ as \emph{relevant}.
+    \label{line:dhgFlagRelevant}
+}
+
+Set $P := \{ s, t \}$.
+
+\For
+{
+    $i := 1$ \KwTo $d(s,t) - 1$
+    \label{line:dhgSelectPLoop}
+}
+{
+    Find a vertex~$v \in S_i(s,t)$ for which the number of \emph{relevant} vertices in $N(v)$ is maximal.
+
+    Add $v$ to $P$.
+    \label{line:dhgSelectPAddV}
+}
+
+\end{algorithm}
+
+
+\begin{lemma}
+    \label{lem:path-pair}
+For a distance-hereditary graph~\( G \) and an arbitrary vertex pair~\( s, t \), Algorithm~\ref{algo:MinEccDistHere} computes a shortest \( (s, t ) \)-path with minimal eccentricity in linear time.
+\end{lemma}
+
+\begin{proof}
+The loop in line~\ref{line:dhgFindGateLoop} determines for each vertex~$v$ outside of the interval~$I(s,t)$ a \emph{gate vertex}~$g(v)$ such that $N(g(v)) \supseteq \Pr(v, I(s,t))$ and $d(v, I(s,t)) = d(v, g(v)) + 1$ (see Lemma~\ref{lem:dhgGateVertex}).
+From Lemma~\ref{lem:dhgProjSliceInter} and Lemma~\ref{lem:dhgSliceJoin}, it follows that for a vertex~$v$ which is not in $V_{\ecc(I(s, t))}$ or its projection to $I(s,t)$ is intersecting two slices of $I(s, t)$, $d(v, P(s, t)) \leq \ecc(I(s, t))$ for every shortest path $P(s, t)$ between $s$ and~$t$.
+Therefore, line~\ref{line:dhgFlagRelevant} only marks $g(v)$ if $v \in V_{\ecc(I(s, t))}$ and its projection $\Pr(v, I(s,t))$ intersects only one slice.
+Because only one slice is intersected and each vertex in a slice is adjacent to all vertices in the consecutive slice (see Lemma~\ref{lem:dhgSliceJoin}), in each slice the vertex of an optimal (of minimum eccentricity) path $P$ can be selected independently from the preceding vertex.
+If a vertex~$x$ of a slice~$S_i(s,t)$ has the maximum number of \emph{relevant} vertices in $N(x)$, then $x$ is good to put in~$P$.
+Indeed, if $x$ dominates all relevant vertices adjacent to vertices of $S_i(s,t)$, then $x$ is a perfect choice to put in $P$.
+Else, any vertex~$y$ of a slice~$S_i(s, t)$ is a good vertex to put in $P$.
+Hence, $P$ is optimal if the number of \emph{relevant} vertices adjacent to $P$ is maximal.
+Thus, the path selected in line~\ref{line:dhgSelectPLoop} to~line~\ref{line:dhgSelectPAddV} is optimal.
+\end{proof}
+
+Running Algorithm~\ref{algo:MinEccDistHere} for a diametral pair of vertices of a distance-hereditary graph~$G$, by Theorem~\ref{theo:mespDistHereDiameter}, we get a shortest path of~$G$ with minimum eccentricity.
+Thus, we have proven the following result.
+
+\begin{theorem}
+    \label{tm:opt-path}
+A shortest path with minimum eccentricity of a distance-hereditary graph can be computed in linear time.
+\end{theorem}
+
+
+\subsection{A General Approach for Tree-Structured Graphs}
+    \label{sec:mespProjGapApproach}
+
+In a graph~$G$, consider a shortest path~$P$ which starts at a vertex~$s$.
+Each vertex~$x$ has a projection~$\Pi_x = \Pr(x, P)$.
+In case of a tree this is a single vertex.
+However, in general, $\Pi_x$ can contain multiple vertices and does not necessarily induce a connected subgraph.
+In this case, there are two vertices $u$ and~$w$ in $\Pi_x$ such that all vertices~$v$ in the subpath~$Q$ between $u$ and~$w$ are not in~$\Pi_x$.
+Formally, $u,w \in \Pi_x$, $Q = \{ \, v \in P \mid d(s,u) < d(s,v) < d(s, w) \, \}$, and $Q \cap \Pi_x = \emptyset$.
+
+Now, assume the cardinality of $Q$ is at most~$\gamma$, \ie, $d(u,w) \leq \gamma + 1$ for each $P$, $x$, $u$ and~$w$.
+Then, we refer to $\gamma$ as the \emph{projection gap} of $G$.
+
+\begin{definition}
+    [%
+        Projection Gap%
+    ]
+In a graph~\( G \), let \( P = \{ v_0, \ldots, v_l \} \) be a shortest path with \( d(v_0, v_i) = i \).
+The \emph{projection gap} of \( G \) is \( \gamma \), \( \pg(G) = \gamma \) for short, if, for every vertex~\( x \) of~\( G \) and every two vertices \( v_i, v_k \in \Pr(x, P) \), \( d(v_i, v_k) > \gamma + 1 \) implies that there is a vertex~\( v_j \in \Pr(x, P) \) with \( i < j < k \).
+\end{definition}
+
+Based on this definition, we can make the following observation.
+
+\begin{lemma}
+    \label{lem:valProp}
+In a graph \( G \) with \( \pg(G) = \gamma \), let \( P \) be a shortest path starting at~\( s \), \( Q \) be a subpath of~\( P \), \( |Q| > \gamma \), \( u \) and~\( w \) be two vertices in \( P \setminus Q \) such that \( d(s, u) < d(s,Q) < d(s, w) \), and \( x \) be an arbitrary vertex in~\( G \).
+If \( d(x, u) < d(x, Q) \), then \( d(x, w) \geq d(x, Q) \).
+\end{lemma}
+
+\begin{proof}
+Assume that $d(x, u) < d(x, Q)$ and $d(x, w) < d(x, Q)$.
+Without loss of generality, let $d(x, u) = d(x, w) < d(x, v)$ for all $v \in P$ with $d(s,u) < d(s,v) < d(s, w)$.
+Let $P'$ be the subpath of $P$ from $u$ to~$w$.
+Note that $\Pr(x, P') = \{ u, w \}$ and $Q \subset P'$.
+Thus, $d(u, w) \geq |Q| + 1 > \gamma + 1$.
+This contradicts with $\pg(G) = \gamma$.
+\end{proof}
+
+Informally, Lemma~\ref{lem:valProp} says that, when exploring a shortest path~$P$, if the distance to a vertex~$x$ did not decrease during the last $\gamma + 1$ vertices of~$P$, it will not decrease when exploring the remaining subpath.
+Based on this, we show that a minimum eccentricity shortest path can be found in polynomial time if $\pg(G)$ is bounded by some constant.
+Additionally, we show that for some graph classes the projection gap has an upper bound leading to polynomial time algorithms for these classes.
+
+\subsubsection{Algorithm.}
+
+For the remainder of this subsection, we assume that we are given a graph~$G$ with $\pg(G) = \gamma$ containing a vertex~$s$.
+We need the following notions and notations:
+\begin{itemize}
+\item
+$Q_{i}$ and~$Q_j$ are subpaths of length~$\gamma$ of some shortest paths starting at~$s$.
+They do not need to be subpath of the same shortest path.
+Let $v_i \in Q_i$ and $v_j \in Q_j$ be the two vertices such that $d(s, Q_i) = d(s, v_i)$ and  $d(s, Q_j) = d(s, v_j)$.
+Without loss of generality, let $d(s, v_i) \leq d(s, v_j)$.
+We say, $Q_{i}$ is \emph{compatible} with $Q_j$ (with respect to~$s$) if $|Q_{i} \cap Q_j| = \gamma - 1$, $v_{i}$ is adjacent to~$v_j$, and $d(s, v_i) < d(s, v_j)$.
+Let $\calC_s(Q_j)$ denote the set of subpaths compatible with~$Q_j$.
+
+\item
+$R_s(Q_j) = \{ \, w \mid Q_j \subseteq I(s, w) \, \} \cup Q_j$ is the set of vertices~$w$ such that there is a shortest path from $s$ to~$w$ containing $Q_j$ (or $w \in Q_j$).
+
+\item
+$I_s(Q_j) = I(s, v_j) \cup Q_j$ are the vertices that are on a shortest path from $s$ to~$Q_j$ (or in~$Q_j$).
+
+\item
+$V^\downarrow_s(Q_j) = \{ \, x \mid d(x, Q_j) = d(x, R_s(Q_j)) \, \}$ is the set of vertices~$x$ which are closer to~$Q_j$ than to all other vertices in~$R_s(Q_j)$.
+Thus, given a shortest path~$P$ containing~$Q_j$ and starting at~$s$, expanding $P$ beyond $Q_j$ will not decrease the distance from $x$ to~$P$.
+\end{itemize}
+Note that $Q_j \subseteq V^\downarrow_s(Q_j)$ and $Q_j = I_s(Q_j) \cap R_s(Q_j)$.
+
+\begin{lemma}
+    \label{lem:kValeyVert}
+For each vertex~\( x \) in~\( G \), \( d(x, Q_j) = d(x, I_s(Q_j)) \) or \( d(x, Q_j) = d(x, R_s(Q_j)) \).
+\end{lemma}
+
+\begin{proof}
+Assume that $d(x, Q_j) > d(x, I_s(Q_j))$ and $d(x, Q_j) > d(x, R_s(Q_j))$.
+Then, there is a vertex~$u_i \in I_s(Q_j)$ and a vertex~$u_r \in R_s(Q_j)$ with $d(x, u_i) < d(x, Q_j)$ and $d(x, Q_j) > d(x, u_r)$.
+Because $u_i$, $Q_j$, and $u_r$ are on a shortest path starting at~$s$ and $|Q_j| > \gamma$, this contradicts Lemma~\ref{lem:valProp}.
+\end{proof}
+
+\begin{lemma}
+    \label{lem:kValeyVertSubset}
+If \( Q_{i} \) is compatible with \( Q_j \), then \( V^\downarrow_s(Q_{i}) \subseteq V^\downarrow_s(Q_j) \).
+\end{lemma}
+
+\begin{proof}
+Assume that $V^\downarrow_s(Q_{i}) \nsubseteq V^\downarrow_s(Q_j)$, \ie, there is a vertex~$x \in V^\downarrow_s(Q_{i}) \setminus V^\downarrow_s(Q_j)$.
+Then, $d(x, Q_j) > d(x, R_s(Q_j))$.
+Thus, by Lemma~\ref{lem:kValeyVert}, $d(x, Q_j) = d(x, I_s(Q_j))$.
+Because $Q_{i} \subseteq I_s(Q_j)$, $d(x, Q_{i}) \geq d(x, I_s(Q_j)) = d(x, Q_j)$.
+Since $x \in V^\downarrow_s(Q_{i})$, $d(x, Q_{i}) = d(x, R_s(Q_{i}))$.
+Also, because $x \notin V^\downarrow_s(Q_{i})$, $d(x, Q_j) > d(x, R_s(Q_j))$.
+Thus, $d(x, R_s(Q_{i})) > d(x, R_s(Q_j))$.
+On the other hand, because $R_s(Q_{i}) \supseteq R_s(Q_j)$, $d(x, R_s(Q_{i})) \leq d(x, R_s(Q_j))$ and a contradiction arises.
+\end{proof}
+
+For a subpath $Q_j$, let $\calP_s(Q_j)$ denote the set of shortest paths~$P$ which start at~$s$ such that $Q_j \subseteq P \subseteq I_s(Q_j)$.
+Then, we define $\varepsilon_s(Q_j)$ as follows:
+\[
+    \varepsilon_s(Q_j) = \min_{P \in \calP_s(Q_j)} \max_{x \in V^\downarrow_s(Q_j)} d(x, P)
+\]
+Consider a subpath $Q_j$ for which $R_s(Q_j) = Q_j$, \ie, a shortest path containing $Q_j$ cannot be extended any more.
+Then, $V^\downarrow_s(Q_j) = V$.
+Therefore, for any path $P \in \calP_s(Q_j)$, $\max_{x \in V^\downarrow_s(Q_j)} d(x, P) = \ecc(P)$.
+
+\begin{lemma}
+    \label{lem:valEpsilon}
+If \( \calC_s(Q_j) \) is non-empty, then
+\[
+    \varepsilon_s(Q_j)
+    =
+    \min_{Q_{i} \in \calC_s(Q_j)} \max \left[
+        \max_{x \in V^\downarrow_s(Q_j) \setminus V^\downarrow_s(Q_{i})} \min \big( d(x, Q_{i}), d(x, Q_{j}) \big),
+        \varepsilon_s(Q_{i})
+    \right].
+\]
+\end{lemma}
+
+\begin{proof}
+By definition,
+\[
+    \varepsilon_s(Q_j)
+    =
+    \min_{P \in \calP_s(Q_j)} \max_{x \in V^\downarrow_s(Q_j)} d(x, P).
+\]
+Let $Q_{i}$ be compatible with~$Q_j$.
+Because, by Lemma~\ref{lem:kValeyVertSubset}, $V^\downarrow_s(Q_{i}) \subseteq V^\downarrow_s(Q_j)$, we can partition $V^\downarrow_s(Q_j)$ into $V^\downarrow_s(Q_j) \setminus V^\downarrow_s(Q_{i})$ and $V^\downarrow_s(Q_{i})$.
+For simplicity, we write $V^\downarrow_s(Q_j) \setminus V^\downarrow_s(Q_{i})$ as $V^\downarrow_s[Q_j|Q_i]$.
+Thus, $\varepsilon_s(Q_j) =$
+\[
+    \min_{Q_{i} \in \calC_s(Q_j)} \min_{P \in \calP_s(Q_{i})} \max \left[
+        \max_{x \in V^\downarrow_s[Q_j|Q_i]} d(x, P \cup Q_j),
+        \max_{x \in V^\downarrow_s(Q_{i})} d(x, P \cup Q_j)
+    \right].
+\]
+Note that we changed the definition of~$P$ from $P \in \calP_s(Q_j)$ to $P \in \calP_s(Q_{i})$, \ie, $P$ may not contain the last vertex of $Q_j$ any more.
+
+If $x \in V^\downarrow_s[Q_j|Q_i]$, then $d(x, Q_{i}) > d(x, R_s(Q_{i}))$.
+Thus, by Lemma~\ref{lem:kValeyVert}, $d(x, Q_{i}) = d(x, I_s(Q_{i}))$.
+Note that, by definition of~$P$, $d(x, Q_i) \geq d(x, P) \geq d(x, I_s(Q_i))$.
+Therefore, $d(x, P) = d(x, Q_i)$ and
+\[
+    \max_{x \in V^\downarrow_s[Q_j|Q_i]} d(x, P \cup Q_j)
+    =
+    \max_{x \in V^\downarrow_s[Q_j|Q_i]} \min \big( d(x, Q_{i}), d(x, Q_{j}) \big).
+\]
+For simplicity, we define
+\[
+    \varepsilon_s(Q_i, Q_j)
+    :=
+    \max_{x \in V^\downarrow_s[Q_j|Q_i]} \min \big( d(x, Q_{i}), d(x, Q_{j}) \big).
+\]
+Note that $\varepsilon_s(Q_i, Q_j)$ does not depend on $P$.
+Therefore, because $\min_{u} \max [ c, f(u) ] = \max [ c, \min_{u} f(u) ]$,
+\[
+    \varepsilon_s(Q_j)
+    =
+    \min_{Q_{i} \in \calC_s(Q_j)} \max \left[
+        \varepsilon_s(Q_i, Q_j),
+        \min_{P \in \calP_s(Q_{i})} \max_{x \in V^\downarrow_s(Q_{i})} d(x, P \cup Q_j)
+    \right].
+\]
+If $x \in V^\downarrow_s(Q_{i})$, then $d(x, Q_{i}) = d(x, R_s(Q_{i})) \leq d(x, R_s(Q_j)) = d(x, Q_j)$.
+Therefore,
+\[
+    \min_{P \in \calP_s(Q_{i})} \max_{x \in V^\downarrow_s(Q_{i})} d(x, P \cup Q_j)
+    =
+    \min_{P \in \calP_s(Q_{i})} \max_{x \in V^\downarrow_s(Q_{i})} d(x, P)
+    =
+    \varepsilon_s(Q_{i}).
+\]
+Thus,
+\[
+    \varepsilon_s(Q_j)
+    =
+    \min_{Q_{i} \in \calC_s(Q_j)} \max \left[
+        \max_{x \in V^\downarrow_s(Q_j) \setminus V^\downarrow_s(Q_{i})} \min \big( d(x, Q_{i}), d(x, Q_{j}) \big),
+        \varepsilon_s(Q_{i})
+    \right].
+    \qedhere
+\]
+\end{proof}
+
+Based on Lemma~\ref{lem:valEpsilon}, Algorithm~\ref{algo:valMESP} computes a shortest path starting at~$s$ with minimal eccentricity.
+The algorithm has two parts.
+First, it computes the pairwise distance of all vertices and $d(x, R_s(v))$ for each vertex pair $x$ and~$v$ where, similarly to $R_s(Q_j)$, $R_s(v) = \{ \, z \in V \mid v \in I(s, z) \, \}$.
+This allows to easily determine if a vertex~$x$ is in~$V^\downarrow_s(Q_j)$.
+Second, it computes $\varepsilon_s(Q_j)$ for each subpath~$Q_j$.
+For this, the algorithm uses dynamic programming.
+After calculating $\varepsilon_s(Q_i)$ for all subpaths with distance~$i$ to~$s$, the algorithm uses Lemma~\ref{lem:valEpsilon} to calculate $\varepsilon_s(Q_j)$ for all subpaths~$Q_j$ which $Q_i$ is compatible with.
+
+\begin{algorithm}
+    [htb!]
+    \caption
+    {
+        Determines, for a given graph~$G$ with $\pg(G) \leq \gamma$ and a vertex~$s$, a minimal eccentricity shortest path starting at~$s$.
+    }
+    \label{algo:valMESP}
+
+\KwIn
+{
+    A graph~$G = (V, E)$, an integer~$\gamma$, and a vertex~$s \in V$.
+}
+
+\KwOut
+{
+    A shortest path~$P$ starting at~$s$ with minimal eccentricity.
+}
+
+Determine the pairwise distances of all vertices.
+\label{line:pairwDistance}
+
+\ForEach
+{
+    $v, x \in V$
+}
+{
+    Set $d(x, R_s(v)) := d(x, v)$.
+    \label{line:defaultR}
+}
+
+\For
+{
+    $i = \ecc(s) - 1$ \KwDownTo $0$
+    \label{line:compRsStart}
+}
+{
+    \ForEach
+    {
+        $v \in L_i^{(s)}$
+    }
+    {
+        \ForEach
+        {
+            $w \in N(v) \cap L_{i+1}^{(s)}$
+        }
+        {
+            \ForEach
+            {
+                $x \in V$
+            }
+            {
+                Set $d(x, R_s(v)) := \min \Big[ d \big( x, R_s(v) \big), d \big( x, R_s(w) \big) \Big]$.
+                \label{line:distRv}
+            }
+        }
+    }
+}
+
+\For
+{
+    $j = 0$ \KwTo $\ecc(s) - \gamma$
+    \label{line:QjLoop}
+}
+{
+    \ForEach
+    {
+        $Q_j$ with $d(s, Q_j) = j$
+        \label{line:selectQj}
+    }
+    {
+        \ForEach
+        {
+            $x \in V$
+            \label{line:xQjLoop}
+        }
+        {
+            Let $z_j$ be the vertex in $Q_j$ with the largest distance to~$s$.
+            If $d(x, Q_j) \leq d(x, R_s(z_j))$, add $x$ to $V^\downarrow_s(Q_j)$ and store $d(x, Q_j)$.
+            \label{line:computeVsOj}
+        }
+
+        \If
+        {
+            $j = 0$
+        }
+        {
+            $\displaystyle \varepsilon_s(Q_j) := \max_{x \in V^\downarrow_s(Q_j)} d(x, Q_j)$
+            \label{line:compStartEpsilon}
+        }
+        \Else
+        {
+            $\displaystyle \varepsilon_s(Q_j) := \infty$
+            \label{line:QjEpsilonInf}
+        }
+
+        \ForEach
+        {
+            $Q_i \in \calC_s(Q_j)$
+            \label{line:QiLoop}
+        }
+        {
+            $\displaystyle
+                \varepsilon'_s(Q_j) :=
+                \max \left[
+                    \max_{x \in V^\downarrow_s(Q_j) \setminus V^\downarrow_s(Q_i)} \min \big( d(x, Q_i), d(x, Q_j) \big),
+                    \varepsilon_s(Q_i)
+                \right]
+            $
+            \label{line:compEpsilonPrime}
+
+            \If
+            {
+                $\varepsilon'_s(Q_j) < \varepsilon_s(Q_j)$
+                \label{line:comareEpsilon}
+            }
+            {
+                Set $\varepsilon_s(Q_j) := \varepsilon'_s(Q_j)$ and $p(Q_j) := Q_i$.
+                \label{line:setP}
+            }
+        }
+    }
+}
+
+Find a subpath~$Q_j$ such that a shortest path containing $Q_j$ cannot be extended any more and for which $\varepsilon_s(Q_j)$ is minimal.
+\label{line:findMinQj}
+
+Construct a path~$P$ from $Q_j$ to $s$ using the $p()$-pointers and output it.
+\label{line:constructP}
+\end{algorithm}
+
+\begin{theorem}
+For a given graph~\( G \) with \( \pg(G) = \gamma \) and a vertex~\( s \), Algorithm~\ref{algo:valMESP} computes a shortest path starting at~\( s \) with minimal eccentricity.
+It runs in \( \calO \big( n^{\gamma + 3} \big) \) time if \( \gamma \geq 2 \), in \( \calO \big( n^2 m \big) \) time if \( \gamma = 1 \), and in \( \calO(nm) \) time if \( \gamma = 0 \).
+\end{theorem}
+
+\begin{proof}
+    [Correctness]
+The algorithm has two parts.
+The first part (line~\ref{line:pairwDistance} to line~\ref{line:distRv}) is a preprocessing which computes $d(x, R_s(v))$ for each vertex pair $x$ and~$v$.
+The second part computes $\varepsilon_s(Q_j)$ which is then used to determine a path with minimal eccentricity.
+
+For the first part, without loss of generality, let $d(s, v) = i$, $N^\uparrow_s(v) = N(v) \cap L_{i+1}^{(s)}$, and let $x$ be an arbitrary vertex.
+By definition of $R_s$, $N^\uparrow_s(v) = \emptyset$ implies $R_s(v) = \{ v \}$, \ie, $d(x, R_s(v)) = d(x, v)$.
+Therefore, $d(x, R_s(v))$ is correct for all vertices~$v$ with $N^\uparrow_s(v) = \emptyset$ after line~\ref{line:defaultR}.
+By induction, assume that $d(x, R_s(w))$ is correct for all vertices~$w \in N^\uparrow_s(v)$.
+Because $R_s(v) = \bigcup_{w \in N^\uparrow_s(v)} R_s(w) \cup \{ v \}$, $d(x, R_s(v)) = \min(\min_{w \in N^\uparrow_s(v)} d(x, R_s(w)), d(x, v))$.
+Therefore, line~\ref{line:distRv} correctly computes~$d(x, R_s(v))$.
+
+The second part of Algorithm~\ref{algo:valMESP} iterates over all subpaths~$Q_j$ in increasing distance to~$s$.
+Line~\ref{line:computeVsOj} checks if a given vertex~$x$ is in $V^\downarrow_s(Q_j)$.
+By definition, $R_s(Q_j) = Q_j \cup R_s(z_j)$ where $z_j$ is the vertex in $Q_j$ with the largest distance to~$s$.
+Thus, $d(x, R_s(Q_j)) = \min( d(x, R_s(z_j)), d(x, Q_j))$.
+By definition of $V^\downarrow_s$, $x \in V^\downarrow_s(Q_j)$ if and only if $d(x, Q_j) = d(x, R_s(Q_j))$.
+Therefore, $x \in V^\downarrow_s(Q_j)$ if and only if $d(x, Q_j) \leq d(x, R_s(z_j))$, \ie, line~\ref{line:computeVsOj} computes $V^\downarrow_s(Q_j)$ correctly.
+
+Recall the definition of $\varepsilon_s(Q_j)$:
+\[
+    \varepsilon_s(Q_j) = \min_{P \in \calP_s(Q_j)} \max_{x \in V^\downarrow_s(Q_j)} d(x, P)
+\]
+If $d(s, Q_j) = 0$, $d(x, P) = d(x, Q_j)$.
+Therefore, $\varepsilon_s(Q_j) = \max_{x \in V^\downarrow_s(Q_j)} d(x, Q_j)$ as computed in line~\ref{line:compStartEpsilon}.
+Note that there is no subpath~$Q_i$ which is compatible with $Q_j$, if $d(s, Q_j) = 0$.
+Therefore, the loop starting in line~\ref{line:QiLoop} is skipped for these~$Q_j$.
+Thus, the algorithm correctly computes $\varepsilon_s(Q_j)$, if $d(s, Q_j) = 0$.
+
+By induction, assume that $\varepsilon_s(Q_i)$ is correct for each $Q_i \in \calC(Q_j)$.
+Thus, Lemma~\ref{lem:valEpsilon} can be used to compute $\varepsilon_s(Q_j)$.
+This is done in the loop starting in line~\ref{line:QiLoop}.
+Therefore, at the beginning of line~\ref{line:findMinQj}, $\varepsilon_s(Q_j)$ is computed correctly for each subpath~$Q_j$.
+
+Recall that, if $P \in \calP(Q_j)$ and $R_s(Q_j) = Q_j$, then $V^\downarrow_s(Q_j) = V$ and, therefore, $\max_{x \in V^\downarrow_s(Q_j)} d(x, P) = \ecc(P)$.
+Thus, $R_s(Q_j) = Q_j$ implies that $\varepsilon_s(Q_j)$ is the minimal eccentricity of all shortest paths starting in~$s$ and containing~$Q_j$.
+Therefore, if $Q_j$ is picked by line~\ref{line:findMinQj}, then $\varepsilon_s(Q_j)$ is the minimal eccentricity of all shortest paths starting in~$s$.
+\end{proof}
+
+\begin{proof}
+    [Complexity]
+First, we analyse line~\ref{line:pairwDistance} to line~\ref{line:distRv}.
+Line~\ref{line:pairwDistance} runs in $\calO(nm)$ time.
+This allows to access the distance between two vertices in constant time.
+Thus, the total running time for line~\ref{line:defaultR} is~$\calO(n)$.
+Because line~\ref{line:distRv} is called at most once for each vertex~$x$ and edge~$vw$, implementing line~\ref{line:compRsStart} to line~\ref{line:distRv} can be done in $\calO(nm)$ time.
+
+For the second part of the algorithm (starting in line~\ref{line:QjLoop}), if $\gamma \geq 2$, let all subpaths be stored in a trie as follows:
+There are $\gamma + 1$ layers of internal nodes.
+Each internal node is an array of size~$n$ (one entry for each vertex) and each entry points to an internal node of the next layer representing $n$~subtrees.
+This requires $\calO \big( n^{\gamma + 1} \big)$ memory.
+Leafs are objects representing a subpath.
+
+If $\gamma = 1$, a subpath is a single edge, and, if $\gamma = 0$, a subpath is a single vertex.
+Thus, no extra data structure is needed for these cases.
+In all three cases, a subpath can be accessed in $\calO(\gamma)$ time.
+
+Next, we analyse the runtime of line~\ref{line:xQjLoop} to line~\ref{line:QjEpsilonInf} for a single subpath~$Q_j$.
+Accessing $Q_j$ can be done in $\calO(\gamma)$ time.
+Line~\ref{line:computeVsOj} requires at most $\calO(\gamma)$ time for a single call and is called at most $\calO(n)$ times.
+Line~\ref{line:compStartEpsilon} requires $\calO(n\gamma)$ time and line~\ref{line:QjEpsilonInf} runs in constant time.
+Therefore, for a given subpath, line~\ref{line:xQjLoop} to line~\ref{line:QjEpsilonInf} require $\calO(\gamma n + n)$ time.
+
+For line~\ref{line:compEpsilonPrime} to line~\ref{line:setP}, consider a given pair of compatible subpaths $Q_i$ and~$Q_j$.
+Accessing both subpaths can be done in $\calO(\gamma)$ time.
+Assuming the vertices in $V^\downarrow_s(Q_i)$ and~$V^\downarrow_s(Q_j)$ are sorted and stored with their distance to $Q_i$ and~$Q_j$, line~\ref{line:compEpsilonPrime} requires at most $\calO(n)$ time.
+Note that $Q_i$ and $Q_j$ intersect in $\gamma - 1$ vertices.
+Thus, $\min \big( d(x, Q_i), d(x, Q_j) \big) =  \min \big( d(x, v_i), d(x, Q_j) \big)$ where $v_i$ is the vertex in $Q_i$ closest to~$s$.
+Line~\ref{line:comareEpsilon} and line~\ref{line:setP} run in constant time.
+Therefore, for a given pair of compatible subpaths, line~\ref{line:compEpsilonPrime} to line~\ref{line:setP} require $\calO(n)$ time.
+
+Let $\phi$ be the number of subpaths and $\psi$ be the number of pairs of compatible subpaths.
+Then, the overall runtime for line~\ref{line:QjLoop} to line~\ref{line:setP} is $\calO(\phi (\gamma n + n) + \psi n)$ time, $\calO(\phi)$ time for line~\ref{line:findMinQj}, and $\calO(n)$ time for line~\ref{line:constructP}.
+Together with the first part of the algorithm, the total runtime of Algorithm~\ref{algo:valMESP} is $\calO(mn + \phi (\gamma n + n) + \psi n)$.
+
+Because a subpath contains $\gamma + 1$ vertices, there are up-to $\calO \big( n^{\gamma + 1} \big)$ subpaths and up-to $\calO \big( n^{\gamma + 2} \big)$ compatible pairs if $\gamma \geq 2$, \ie, $\phi \leq n^{\gamma + 1}$ and $\psi \leq n^{\gamma + 2}$.
+Therefore, if $\gamma \geq 2$, Algorithm~\ref{algo:valMESP} runs in $\calO \big( n^{\gamma+3} \big)$ time.
+
+If $\gamma = 1$, a subpath is a single edge and there are at most $mn$ compatible pairs of subpaths, \ie, $\phi \leq m$ and $\psi \leq nm$.
+For the case when $\gamma = 0$, a subpath is a single vertex ($\phi \leq n$) and a pair of compatible subpaths is an edge ($\psi \leq m$).
+Therefore, Algorithm~\ref{algo:valMESP} runs in $\calO \big( n^2m \big)$ time if $\gamma = 1$, and in $\calO(nm)$ time if $\gamma = 0$.
+\end{proof}
+
+Note that Algorithm~\ref{algo:valMESP} computes a shortest path starting in a given vertex~$s$.
+Thus, a shortest path with minimum eccentricity among all shortest paths in $G$ can be determined by running Algorithm~\ref{algo:valMESP} for all start vertices~$s$, resulting in the following:
+
+\begin{theorem}
+For a given graph~\( G \) with \( \pg(G) = \gamma \), a  minimum eccentricity shortest path can be found in \( \calO \big( n^{\gamma + 4}  \big) \) time if \( \gamma \geq 2 \), in \( \calO \big( n^3 m \big) \) time if \( \gamma = 1 \), and in \( \calO \big( n^2 m \big) \) time if \( \gamma = 0 \).
+\end{theorem}
+
+\subsubsection{Projection Gap for Some Special Graph Classes.}
+
+Above, we show that a minimum eccentricity shortest path can be found in polynomial time if the projection gap is bounded by a constant.
+In what follows, we determine the projection gap for chordal graphs, dually chordal graphs, graphs with bounded tree-length or tree-breadth, and $\delta$-hyperbolic graphs.
+
+\paragraph{Chordal Graphs.}
+
+\begin{lemma}
+If \( G \) is a chordal graph, then \( \pg(G) = 0 \).
+\end{lemma}
+
+\begin{proof}
+Assume that $\pg(G) \geq 1$.
+Then, there is a shortest path~$P = \{ u, \ldots, w \}$ and a vertex~$x$ with $\Pr(x, P) = \{ u, w \}$ and $d(u, w) > 1$.
+By Lemma~\ref{lem:ChordalMConvex} (page~\ref{lem:ChordalMConvex}), $u$ and~$w$ are adjacent.
+This contradicts with $d(u, w) > 1$.
+\end{proof}
+
+\begin{corollary}
+    \label{cor:mespChordal}
+For chordal graphs, a minimum eccentricity shortest path can be found in \( \calO \big( n^2 m \big) \) time.
+\end{corollary}
+
+
+\paragraph{Dually Chordal Graphs.}
+
+\begin{lemma}
+If \( G \) is a dually chordal graph, then \( \pg(G) \leq 1 \).
+\end{lemma}
+
+\begin{proof}
+Assume there is a shortest path~$P = \{ u, v_1, \ldots, v_i , w \}$ and a vertex~$x$ with $\Pr(x, P) \supseteq \{ u, w \}$.
+To show that $\pg(G) \leq 1$, we show that $d(u, w) = i + 1 > 2$ implies there is a vertex~$v_k \in \Pr(x, P)$ with $1 \leq k \leq i$.
+
+Consider a family of disks $\calD = \big \{ N[u], N[v_{1}], \ldots, N[v_{i}], N[w], N^r[x]  \big \}$ where $r = d(x, P) - 1$.
+Let $H$ be the intersection graph of $\calD$, $a$ be the vertex in~$H$ representing $N[u]$, $b_k$ representing $N[v_{k}]$ (for $1 \leq k \leq i$), $c$ representing $N[w]$, and $z$ representing~$N^r[x]$.
+Because the intersection graph of disks of a dually chordal graph is chordal~\cite{BraDraCheVol1998}, $H$ is chordal, too.
+$H$ contains the edges $za$ and~$zc$, $ab_1$, $cb_i$, and $b_kb_{k+1}$ for all $1 \leq k < i$.
+Note that, if $d(u, w) > 2$, $a$ and~$c$ are not adjacent in~$H$.
+However, the path $\{ a, b_1, \ldots, b_k, c \}$ connects $a$ and~$c$.
+Therefore, because $H$ is chordal and by Lemma~\ref{lem:ChordalMConvex} (page~\pageref{lem:ChordalMConvex}), there is a $k$ with $1 \leq k \leq i$ such that $z$ is adjacent to~$b_k$ in~$H$.
+Thus, $d(x, v_k) \leq r + 1$, \ie, $v_k \in \Pr(x, P)$.
+\end{proof}
+
+\begin{corollary}
+For dually chordal graphs, a minimum eccentricity shortest path can be found in \( \calO \big( n^3 m \big) \) time.
+\end{corollary}
+
+\paragraph{Graphs with bounded Tree-Length or Tree-Breadth.}
+
+\begin{lemma}
+If \( G \) has tree-length~\( \lambda \) or tree-breadth~\( \rho \), a factor~\( \gamma \geq \pg(G) \) can be computed in \( \calO \big( n^3 \big) \) time such that \( \gamma \leq 3 \lambda - 1 \) or \( \gamma \leq 6 \rho - 1 \), respectively.
+\end{lemma}
+
+\begin{proof}
+To compute $\gamma$, first determine the pairwise distances of all vertices.
+Then, compute a layering partition for each vertex~$x$.
+Let $\gamma + 1$ be the maximum diameter of all clusters of all layering partitions.
+
+As shown in Lemma~\ref{lem:LayPartDist} (page~\pageref{lem:LayPartDist}), the diameter of each cluster is at most~$3 \lambda$ if $G$ has tree-length~$\lambda$ and at most~$6 \rho$ if $G$ has tree-breadth~$\rho$.
+Therefore, for each shortest path~$P$, $\diam(\Pr(x, P)) \leq 3 \lambda$ and $\diam(\Pr(x, P)) \leq 6 \rho$, respectively.
+Thus, $\pg(G) \leq \gamma \leq 3 \lambda - 1$ and $\pg(G) \leq \gamma \leq 6 \rho - 1$.
+
+Computing the pairwise distances of all vertices can be done in $\calO(nm)$ time.
+A layering partition can be computed in linear time (Lemma~\ref{lem:LayPartLinearTime}, page~\pageref{lem:LayPartLinearTime}).
+For a given layering partition, the diameter of each cluster can be computed in $\calO \big( n^2 \big)$ time if the pairwise distances of all vertices are known.
+Thus, $\gamma$ can be computed in $\calO \big( n^3 \big)$ time.
+\end{proof}
+
+Note that it is not necessary to know the tree-length or tree-breath of~$G$ to compute~$\gamma$.
+Thus, by computing~$\gamma$ and then running Algorithm~\ref{algo:valMESP} for each vertex in $G$, we get:
+
+\begin{corollary}
+For graphs with tree-length~\( \lambda \) or tree-breadth~\( \rho \), a minimum eccentricity shortest path can be found in \( \calO \big( n^{3\lambda+3} \big) \) time or \( \calO \big( n^{6\rho+3} \big) \) time, respectively.
+\end{corollary}
+
+
+\paragraph{$\delta$-Hyperbolic Graphs.}
+
+\begin{lemma}
+If \( G \) is \( \delta \)-hyperbolic, then \( \pg(G) \leq 4 \delta \).
+\end{lemma}
+
+\begin{proof}
+Consider two vertices $u$ and~$w$ such that $u,w \in \Pr(x, P)$ for some vertex~$x$ and shortest path~$P$.
+Let $v \in P$ be a vertex such that $d(u, v) - d(v, w) \leq 1$ and $d(u, v) \geq d(v, w)$, \ie, $v$ is a middle vertex on the subpath from $u$ to~$w$.
+
+Assume that $d(u, w) > 4\delta + 1$.
+Thus, $d(u, v) \geq d(v, w) \geq 2\delta + 1$ and $d(u, w) > d(u, v) + 2\delta$.
+Therefore, by Lemma~\ref{lem:deltaHyper} (page~\pageref{lem:deltaHyper}), $d(v, x) < \max \{ d(x, u), d(x, w) \}$.
+This contradicts that $u,w \in \Pr(x, P)$.
+Hence, the diameter of a projection is at most $4 \delta + 1$ and, therefore, $\pg(G) \leq 4 \delta$.
+\end{proof}
+
+\begin{corollary}
+For \( \delta \)-hyperbolic graphs, a minimum eccentricity shortest path can be found in \( \calO \big( n^{4\delta+4} \big) \) time.
+\end{corollary}
+
+
+\section{Approximation Algorithms}
+    \label{sec:mespApprox}
+
+In this section, we present different approximation algorithms.
+The algorithms differ in their approximation factor and runtime.
+First, we show algorithms for general graphs.
+Then, we present approaches to compute an approximation for graphs with bounded tree-length and graphs with bounded hyperbolicity.
+Additionally, we present an approach to compute an approximation based on the layering partition of a graph.
+
+\subsection{General Graphs}
+    \label{sec:mespGeneralAppr}
+
+In~\cite{DraganLeiter2015}, we show that a spread path gives an $8$-approximation for MESP.
+Recently, \name{Birmelé} et al.\,\cite{BirmDeMoPlan2016} were able to improve this result.
+
+\begin{theorem}
+    [\name{Birmelé} et al.\,\cite{BirmDeMoPlan2016}]
+    \label{theo:mesp5Approx}
+Let \( G \) be a graph having a shortest path of eccentricity~\( k \).
+Any spread path in~\( G \) has eccentricity at most~\( 5k \).
+This bound is tight.
+\end{theorem}
+
+From Theorem~\ref{theo:mesp5Approx}, it follows that a $5$-approximation for MESP can be computed in linear time by simply performing two BFS calls.
+\name{Birmelé} et al.\,\cite{BirmDeMoPlan2016} additionally show that Algorithm~\ref{algo:mesp3Approx} below computes a $3$-approximation in linear time.
+However, the runtime of this approach has a much higher constant factor.
+
+\begin{algorithm}
+    [htb]
+    \caption
+    {%
+        \cite{BirmDeMoPlan2016}
+        Computes a $3$-approximation for MESP.
+    }
+    \label{algo:mesp3Approx}
+%
+\KwIn
+{%
+    A graph~$G = (V, E)$.
+}
+
+\KwOut
+{%
+    A shortest path with eccentricity at most~$2k$, where $k$ is the minimum eccentricity of all paths in~$G$.
+}
+
+Compute a spread path~$P$ in~$G$ from $x$ to~$y$ and determine its eccentricity.
+
+Initialise an empty queue~$Q$ of triples~$(u, v, s)$ where $u$ and~$v$ are vertices of~$G$ and $s$ is an integer.
+
+Insert $(x, y, 0)$ into~$Q$.
+
+\While
+{%
+    $Q$ is non-empty.
+}
+{%
+    Remove a triple~$(u, v, s)$ from~$Q$.
+
+    Compute a shortest path~$P'$ from $u$ to~$v$ and determine a vertex~$w$ with maximal distance to~$P'$.
+
+    \If
+    {%
+        $d(P', w) < \ecc(P)$
+    }
+    {%
+        Set $P := P'$.
+    }
+
+    \If
+    {%
+        $s < 8$
+    }
+    {%
+        Insert $(u, w, s + 1)$ and $(v, w, s + 1)$ into~$Q$.
+    }
+}
+
+Output $P$.
+\end{algorithm}
+
+\begin{theorem}
+    [\name{Birmelé} et al.\,\cite{BirmDeMoPlan2016}]
+Algorithm~\ref{algo:mesp3Approx} calculates a \( 3 \)-approximation for the MESP problem in linear time.
+\end{theorem}
+
+Next, we present a 2-approximation algorithm.
+It is based on the following two lemmas.
+
+\begin{lemma}
+    \label{lem:LayerRadius}
+In a graph~\( G \), let \( P \) be a shortest path from \( s \) to~\( t \) of eccentricity at most~\( k \).
+For each layer~\( L_i^{(s)} \), there is a vertex \( p_i \in P \) such that the distance from \( p_i \) to each vertex \( v \in L_i^{(s)} \) is at most~\( 2k \).
+Additionally, \( p_i \in L_i^{(s)} \) if \( i \leq d(s,t) \), and \( p_i = t \) if \( i \geq d(s,t) \).
+\end{lemma}
+
+\begin{proof}
+For each vertex~$v$, let $p(v) \in P$ be a vertex with $d(p(v), v) \leq k$.
+
+For each $i \leq d(s,t)$, let $p_i \in P \cap L_i^{(s)}$ be the vertex in~$P$ with distance~$i$ to~$s$.
+For an arbitrary vertex~$v \in L_i^{(s)}$, let $j = d(s,p(v))$.
+Because $\ecc(P) \leq k$ and $P$ is a shortest path, $|i-j| \leq k$.
+Thus, $d(p_i,v) \leq d(p_i,p(v)) + d(p(v),v) \leq 2k$.
+
+Let $L' = \{ \, v \mid d(s,v) \geq d(s,t) \, \}$.
+Because $P$ has eccentricity at most~$k$, $d(p,t) \leq k$ for all $p \in \{ \, p(v) \mid v \in L' \, \}$.
+Therefore, $d(t,v) \leq 2k$ for all $v \in L'$.
+\end{proof}
+
+\begin{lemma}
+    \label{lem:3kDomPath}
+If \( G \) has a shortest path of eccentricity at most~\( k \) from \( s \) to~\( t \), then every path~\( Q \) with \( s \in Q \) and \( d(s,t) \leq \max_{v \in Q}d(s,v) \) has eccentricity at most~\( 3k \).
+\end{lemma}
+
+\begin{proof}
+Let $P$ be a shortest path from $s$ to~$t$ with $\ecc(P) \leq k$ and $Q$ an arbitrary path with $s \in Q$ and $d(s,t) \leq \max_{v \in Q}d(s,v)$.
+Without loss of generality, we can assume that $Q$ starts at~$s$.
+Also, let $u$ be an arbitrary vertex.
+Since $\ecc(P) \leq k$, there is a vertex $p \in P$ with $d(u,p) \leq k$.
+Because $d(s,t) \leq \max_{v \in Q}d(s,v)$, there is a vertex~$q \in Q$ with $d(s,p) = d(s,q)$.
+By Lemma~\ref{lem:LayerRadius}, the distance between $p$ and $q$ is at most $2k$.
+Thus, the distance from $q$ to $u$ is at most~$3k$.
+\end{proof}
+
+\begin{corollary}
+    For a given graph~\( G \) and two vertices \( s \) and~\( t \), each shortest \( (s,t) \)-path is a \( 3 \)-approximation for the \( (s,t) \)-MESP problem.
+\end{corollary}
+
+Note that the bounds given in Lemma~\ref{lem:LayerRadius} and Lemma~\ref{lem:3kDomPath} are tight.
+Figure~\ref{fig:approxExample} gives an example.
+
+\begin{figure}
+    [htb]
+    \centering
+    \input{figures/fig_mesp_approxExample}
+    \caption
+    [%
+        Example for Lemma~\ref{lem:LayerRadius} and Lemma~\ref{lem:3kDomPath}.
+    ]
+    {
+        Example for Lemma~\ref{lem:LayerRadius} and Lemma~\ref{lem:3kDomPath}.
+        The shortest path from $s$ to~$t$ which contains $x$ has eccentricity~$1$ and the distance from $x$ to~$v$ is~$2$.
+        The shortest path from $s$ to~$t$ which contains $u$ and~$w$ has eccentricity~$3$.
+    }
+    \label{fig:approxExample}
+\end{figure}
+
+For Algorithm~\ref{algo:2ApproxDSP} below, we say the \emph{layer-wise eccentricity} of a shortest $(s,t)$-path~$Q$ is~$\phi$ if, for each layer~$L_i^{(s)}$, $\max \left \{ \, d(q_i, u) \Bigm| u \in L_i^{(s)} \, \right \} \leq \phi$ where $q_i \in Q \cap L_i^{(s)}$ if $i \leq d(s, t)$ and $q_i = t$ if $i > d(s, t)$.
+By Lemma~\ref{lem:LayerRadius}, a shortest path with eccentricity~$k$ has a layer-wise eccentricity of~$2k$.
+Therefore, determining a shortest path with minimum layer-wise eccentricity gives a 2-approximation for the MESP problem.
+To find such a path, Algorithm~\ref{algo:2ApproxDSP} computes, for each vertex~$s$, the maximal distance of a vertex~$v$ to all other vertices~$u$ in the same layer~$L_i^{(s)}$ and uses a modified BFS to find a shortest path with minimal layer-wise eccentricity starting at~$s$.
+
+\begin{algorithm}
+    [htb]
+    \caption
+    {
+        A 2-approximation for the MESP problem.
+    }
+    \label{algo:2ApproxDSP}
+
+\KwIn
+{%
+    A graph~$G = (V, E)$.
+}
+
+\KwOut
+{%
+    A shortest path with eccentricity at most~$2k$, where $k$ is the minimum eccentricity of all paths in~$G$.
+}
+
+Calculate the distances $d(u,v)$ for all vertex pairs $u$ and~$v$, including $L_i^{(u)}=\{ \, v \in V \mid d(u,v) = i \, \}$ with $0 \leq i \leq \ecc(u)$ for each $u$.
+\label{line:Distances}
+
+\ForEach
+{%
+    $s \in V$
+    \label{line:forLoop}
+}
+{%
+    Set $\phi(s) := 0$.
+
+    \For{$i := 1$ \KwTo $\ecc(s)$}
+    {
+        \label{line:LayerLoop}
+
+        \ForEach{$v \in L_i^{(s)}$}
+        {
+            \label{line:VertexInLayerLoop}
+
+            Set $\phi(v) := \max_{u \in L_i^{(s)}}d(u,v)$.
+            \label{line:LayerDistance}
+
+            Let $N^-(v) = L_{i-1}^{(s)}\cap N(v)$ denote the neighbours of~$v$ in the previous layer.
+            Set $\phi(v) := \max \Big \{ \! \min_{u \in N^-(v)}\phi(u), \phi(v) \Big \}$.
+            \label{line:prevLayerDistance}
+
+            Set $\phi^+(v) := \max \big \{ \, d(u,v) \mid d(s,u) \geq i \, \big \}$.
+            \label{line:laterLayerDistance}
+        }
+    }
+
+    Calculate a BFS-tree~$T(s)$ starting from $s$.
+    If multiple vertices~$u$ are possible as parent for a vertex~$v$, select one with the smallest $\phi(u)$.
+    \label{line:BFSTree}
+
+
+    Let $t$ be the vertex for which $\phi'(t) := \max \big \{ \phi(t), \phi^+(t) \big \}$ is minimal.
+    Set $k(s) := \phi'(t)$
+    \label{line:SelectMinT}
+
+}
+
+Among all computed pairs $s$ and~$t$, select a pair (and corresponding path in~$T(s)$) for which $k(s)$ is minimal.
+\label{line:SelectMinK}
+
+\end{algorithm}
+
+\begin{theorem}
+Algorithm~\ref{algo:2ApproxDSP} calculates a 2-approximation for the MESP problem in \( \calO \big( n^3 \big) \) time.
+\end{theorem}
+
+\begin{proof}
+    [Correctness]
+Assume a given graph~$G$ has a shortest path~$P$ from $s$ to~$t$ with $\ecc(P) = k$ and $s$ is the vertex selected by the loop starting in line~\ref{line:forLoop}.
+Let $Q$ be a shortest path from $s$ to $v$.
+
+We show that lines~\ref{line:LayerLoop} to~\ref{line:laterLayerDistance} calculate, for each $v$, the minimal $\phi(v)$ such that there is a shortest path~$Q$ from $s$ to~$v$ with a layer-wise eccentricity~$\phi(v)$.
+
+By induction, assume this is true for all vertices~$u \in L_j^{(s)}$ with $j \leq i -1$.
+Now let $v$ be an arbitrary vertex in~$L_i^{(s)}$.
+Line~\ref{line:LayerDistance} calculates the maximal distance~$\phi(v)$ from $v$ to all other vertices in~$L_i^{(s)}$.
+Since $v$ is the only vertex in~$Q \cap L_i^{(s)}$ for every shortest path $Q$ from $s$ to~$v$, the layer-wise eccentricity of each~$Q$ is at least~$\phi(v)$.
+Let $u$ be a neighbour of~$v$ in the previous layer.
+By induction hypothesis, $\phi(u)$ is optimal.
+Therefore, $\phi(v) := \max \Big \{ \min_{u \in N^-[v]}\phi(u), \phi(v) \Big \}$ (line~\ref{line:prevLayerDistance}) is optimal for~$v$.
+
+Since line~\ref{line:BFSTree} selects the vertex~$u$ with the smallest $\phi(u)$ as parent for~$v$, each path~$Q$ from $s$ to~$v$ in~$T(s)$ has an optimal layer-wise eccentricity of~$\phi(v)$.
+Line~\ref{line:laterLayerDistance} calculates the maximal distance from $v$ to all vertices in $\big \{ \, u \mid d(s,u) \geq d(s,v) \, \big \}$.
+Thus, $\ecc(Q) \leq \phi'(v)$ and line~\ref{line:SelectMinT} and line~\ref{line:SelectMinK} select a shortest path which has an eccentricity at most~$\phi'(v)$.
+
+By Lemma~\ref{lem:LayerRadius}, we know that $P$ has a layer-wise eccentricity of at most~$2k$.
+Thus, the path~$Q$ from $s$ to~$t$ in~$T(s)$ has a layer-wise eccentricity of at most~$2k$.
+Additionally, Lemma~\ref{lem:LayerRadius} says that $t$ has distance at most~$2k$ to all vertices in $\{ \, v \mid d(s,v) \geq d(s,t) \, \}$.
+Therefore, $\ecc(Q) \leq 2k$.
+Thus, the path selected in line~\ref{line:SelectMinK} is a shortest path with eccentricity at most~$2k$.
+\end{proof}
+
+\begin{proof}
+    [Complexity]
+Line~\ref{line:Distances} runs in $\calO(nm)$ time.
+If the distances are stored in an array, they can be later accessed in constant time.
+Therefore, line~\ref{line:LayerDistance} and line~\ref{line:laterLayerDistance} run in $\calO(n)$ time for a given $s$ and~$v$ or in $\calO \big( n^3 \big)$ time overall.
+For a given $s$, line~\ref{line:prevLayerDistance} runs in $\calO(m)$ time and, therefore, has an overall runtime of $\calO(nm)$.
+Line~\ref{line:BFSTree} has an overall runtime of $\calO(nm)$, line~\ref{line:SelectMinK} takes $\calO \big( n^2 \big)$ time, and line~\ref{line:SelectMinT} runs in $\calO(n)$ time.
+Adding all together, the total runtime is $\calO \big( n^3 \big)$.
+\end{proof}
+
+For the case that a start vertex~$s$ for a shortest path is given, Algorithm~\ref{algo:2ApproxDSP} can be simplified by having only one iteration of the loop starting in line~\ref{line:forLoop}.
+Then, the runtime is $\calO(nm)$.
+
+\begin{corollary}
+A 2-approximation for the \( (s,t) \)-MESP problem can be computed in \( \calO(nm) \) time.
+\end{corollary}
+
+
+\subsection{Graphs with Bounded Tree-Length and Bounded Hyperbolicity}
+
+In Section~\ref{sec:mespProjGapApproach}, we show how to find a shortest path with minimum eccentricity~$k$ for several graph classes.
+For graphs with tree-length~$\lambda$, this can require up-to $\calO \big( n^{3\lambda + 3} \big)$ time.
+In this section, we show that, for graphs with tree-length~$\lambda$, we can find a shortest path with eccentricity at most $k + 2.5\lambda$ in at most $\calO(\lambda m)$ time and, for graphs with hyperbolicity~$\delta$, we can find a shortest path with eccentricity at most $k + \calO(\delta \log n)$ in at most $\calO(\delta m)$~time.
+
+\begin{lemma}
+    \label{lem:mutualDistHyper}
+Let \( G \) be a graph with hyperbolicity~\( \delta \).
+Two vertices \( x \) and~\( y \) in \( G \) with \( \ecc(x) = \ecc(y) = d(x, y) \) can be found in \( \calO(\delta m) \) time.
+\end{lemma}
+
+\begin{proof}
+Let $u$ and~$v$ be two vertices in $G$ such that $d(u, v) = \diam(G)$.
+For an arbitrary vertex~$x_0$ and for $i \geq 0$, let $y_i = x_{i+1}$ be vertices in~$G$ such that $d(x_i, y_i) = \ecc(x_i)$ and $d(x_i, y_i) < d(x_{i+1}, y_{i+1})$.
+To prove Lemma~\ref{lem:mutualDistHyper}, we show that there is no vertex~$y_{2\delta + 1}$.
+
+Because $d(x_0, y_0) = \ecc(x_0)$, $d(x_0, y_0) \geq \max \big \{ d(x_0, u), d(x_0 ,v) \big \}$.
+Therefore, by Lemma~\ref{lem:deltaHyper} (page~\pageref{lem:deltaHyper}), $d(u, v) \leq \max \big \{ d(u, y_0), d(v, y_0) \big \} + 2\delta$ and, thus, $\diam(G) \leq \ecc(x_1) + 2\delta$.
+Since $d(x_i, y_i) < d(x_{i+1}, y_{i+1})$, there is no vertex~$y_j$ with $j \geq 2\delta + 1$, otherwise $d(x_j, y_j) > \diam(G)$.
+Therefore, a vertex pair~$x,y$ with $\ecc(x) = \ecc(y) = d(x, y)$ can be found in $\calO(\delta m)$~time as follows:
+Pick an arbitrary vertex~$x_0$ and find a vertex~$x_1$ with $d(x_0, x_1) = \ecc(x_0)$ using a BFS.
+Next, find a vertex~$x_2$ such that $d(x_1, x_2) = \ecc(x_1)$.
+Repeat this (at most $2\delta$ times) until $d(x_i, x_{i+1}) = \ecc(x_i) = \ecc(x_{i+1})$.
+\end{proof}
+
+Recall that, if a graph has tree-length~$\lambda$, its hyperbolicity is at most $\lambda$~(Theorem~\ref{theo:hyperbolicTreeLength}, page~\pageref{theo:hyperbolicTreeLength}).
+Thus, it follows:
+
+\begin{corollary}
+    \label{cor:mutualDistTreeLen}
+Let \( G \) be a graph with tree-length~\( \lambda \).
+Two vertices \( x \) and~\( y \) in \( G \) with \( \ecc(x) = \ecc(y) = d(x, y) \) can be found in \( \calO(\lambda m) \) time.
+\end{corollary}
+
+The next lemma shows that, in a graph with bounded tree-length, a shortest path between two mutually furthest vertices gives an approximation for MESP.
+
+\begin{lemma}
+    \label{lem:ApproxTreeLen}
+Let \( G \) be a graph with tree-length~\( \lambda \) having a shortest path with eccentricity~\( k \).
+Also, let \( x \) and~\( y \) be two mutually furthest vertices, \ie, \( \ecc(x) = \ecc(y) = d(x, y) \).
+Then, each shortest path from \( x \) to~\( y \) has eccentricity less than or equal to \( k + 2.5 \lambda \).
+\end{lemma}
+
+\begin{proof}
+Let $P$ be a shortest path from $s$ to~$t$ with eccentricity~$k$ and $Q$ be a shortest path from $x$ to~$y$.
+Consider a tree-decomposition~$\calT$ for $G$ with length~$\lambda$.
+We distinguish between two cases:
+(1)~There is a bag in~$\calT$ containing a vertex of $P$ and a vertex of $Q$ and (2)~there is no such bag in~$\calT$.
+
+\paragraph{Case 1: There is a bag in~$\calT$ containing a vertex of $P$ and a vertex of~$Q$.}
+We define bags $B_x$ and $B_y$ as follows:
+Both contain a vertex of~$P$ and a vertex of~$Q$, $B_x$ is a bag closest to a bag containing~$x$, $B_y$ is a bag closest to a bag containing~$y$, and the distance between $B_x$ and~$B_y$ in~$\calT$ is maximal.
+Let $\{ B_0, B_1, \ldots, B_l \}$ be a subpath of the shortest path from $B_x$ to~$B_y$ in~$\calT$ such that $B_0$ is a bag closest to a bag containing~$s$, $B_l$ is a bag closest to a bag containing~$t$, $B_i$ is adjacent to~$B_{i+1}$ in $\calT$ ($0 \leq i < l$), and the distance~$l$ between $B_0$ and~$B_l$ is maximal.
+Without loss of generality, let $d_{\calT}(B_x, B_0) \leq d_{\calT}(B_x, B_l)$.
+Let $p_s$ be the vertex in $B_0 \cap P$ which is closest to~$s$ in~$G$ and let $p_t$ be the vertex in $B_l \cap P$ which is closest to~$t$ in~$G$.
+Figure~\ref{fig:TreeDecoEg} gives an illustration.
+
+\begin{figure}
+    [htb]
+    \centering
+    \input{figures/fig_mesp_treeDeco}%
+    \caption
+    {
+        Example for a possible tree-decomposition.
+    }
+    \label{fig:TreeDecoEg}
+\end{figure}
+
+\begin{claim}
+    \label{cla:PQdis15Lambda}
+For each vertex~\( p \in P \) with \( d_G(s, p_s) \leq d_G(s, p) \leq d_G(s, p_t) \), \( d_G(p, Q) \leq 1.5 \lambda \).
+\end{claim}
+
+\begin{proof}
+    [Claim]
+There is a vertex set $\{ p_s = p_0, p_1, \ldots, p_l, p_{l+1} = p_t \} \subseteq P$, where $p_i \in B_{i-1} \cap B_i$ for all positive $i \leq l$.
+Because $p_i, p_{i+1} \in B_i$ for $0 \leq i \leq l$, $d_G(p_i, p_{i+1}) \leq \lambda$.
+Thus, because $P$ is a shortest path, for all $p' \in P$ with $d_G(s, p_s) \leq d_G(s, p') \leq d_G(s, p_t)$ there is a vertex~$p_i$ with $0 \leq i \leq l+1$ such that $d_G(p_i, p') \leq 0.5 \lambda$.
+By definition of $\calT$, each bag~$B_i$ ($0 \leq i \leq l$) contains a vertex~$q \in Q$, \ie, $d_G(p_i, Q) \leq \lambda$ ($0 \leq i \leq l+1$).
+Therefore, for all $p' \in P$ with $d_G(s, p_s) \leq d_G(s, p') \leq d_G(s, p_t)$ there is a vertex~$p_i$ with $0 \leq i \leq l+1$ such that $d_G(p', Q) \leq d_G(p_i, p') + d_G(p_i, Q) \leq 1.5 \lambda$.
+\end{proof}
+
+Consider an arbitrary vertex~$v$ in~$G$.
+Let $v'$ be a vertex in~$P$ closest to~$v$ and let $P_v$ be a shortest path from $v$ to~$v'$.
+If $v'$ is between $p_s$ and $p_t$, \ie, $d_G(s, p_s) \leq d_G(s, v') \leq d_G(s, p_t)$, then, by Claim~\ref{cla:PQdis15Lambda}, $d_G(v, Q) \leq d_G(v, v') + d_G(v', Q) \leq k + 1.5 \lambda$.
+If $P_v$ intersects a bag containing a vertex~$q \in Q$, $d_G(v, Q) \leq k + \lambda$.
+
+Next, consider the case when $P_v$ does not intersect a bag containing a vertex of $Q$ and (without loss of generality) $d_G(s, v') > d_G(s, p_t)$.
+In this case, each path from $x$ to~$v$ intersects~$B_l$.
+
+\begin{claim}
+There is a vertex~\( u \in B_l \) such that \( d_G(u, y) \leq k + 0.5 \lambda \).
+\end{claim}
+
+\begin{proof}
+    [Claim]
+Let $y'$ be a vertex in~$P$ that is closest to~$y$ and let $P_y$ be a shortest path from $y$ to~$y'$.
+If $P_y$ intersects~$B_l$, there is a vertex $u \in P_y \cap B_l$ with $d_G(y, u) \leq k$.
+
+If $P_y$ does not intersect~$B_l$, then there is a subpath of~$P$ starting at~$p_t$, containing~$y'$, and ending in a vertex~$p_l \in B_l$.
+Because $d_G(p_t, p_l) \leq \lambda$, $d_G(y', \{ p_t, p_l \}) \leq 0.5 \lambda$.
+Therefore, $d_G(y, \{ p_t, p_l \}) \leq d_G(y, y') + d_G(y', \{ p_t, p_l \}) \leq k + 0.5 \lambda$.
+\end{proof}
+
+Let $u$, $v'$, and~$z$ be vertices in~$B_l$ such that $d_G(u, y) \leq k + 0.5 \lambda$, $v'$ is on a shortest path from $x$ to~$v$, and $z \in Q$.
+Because $d_G(x, y) = \ecc(x)$, $d_G(x, v') + d_G(v', v) \leq d_G(x, y)$.
+Also, by the triangle inequality, $d_G(x, y) \leq d_G(x, v') + d_G(v', y)$ and $d_G(v', y) \leq d_G(v', u) + d_G(u, y)$.
+Because $\{ u, v', z \} \subseteq B_l$ and $d_G(u, y) \leq k + 0.5 \lambda$, $d_G(v', v) \leq k + 1.5 \lambda$ and therefore $d_G(z, v) \leq k + 2.5 \lambda$.
+
+Thus, if there is a bag in~$\calT$ containing a vertex of~$P$ and a vertex of~$Q$, then $d_G(v, Q) \leq k + 2.5 \lambda$ for all vertices~$v$ in~$G$.
+
+\paragraph{Case 2: There is no bag in~$\calT$ containing vertices of $P$ and~$Q$.}
+Because there is no such bag, $\calT$ contains a bag~$B$ such that each path from $x$ and~$y$ to~$P$ intersects~$B$ and there is a vertex~$z \in B \cap Q$.
+
+Consider an arbitrary vertex~$v$.
+If there is a shortest path~$P_v$ from $v$ to~$P$ which intersects~$B$, then $d_G(z, v) \leq k + \lambda$.
+If there is no such path, each path from $x$ to~$v$ intersects~$B$.
+Let $v' \in B$ be a vertex on a shortest path from $x$ to~$v$ and let $u \in B$ be a vertex on a shortest path from $y$ to~$P$.
+Note that $d_G(u, y) \leq k$.
+
+Because $d_G(x, y) = \ecc(x)$, $d_G(x, v') + d_G(v', v) \leq d_G(x, y)$.
+Also, by the triangle inequality, $d_G(x, y) \leq d_G(x, v') + d_G(v', y)$ and $d_G(v', y) \leq d_G(v', u) + d_G(u, y)$.
+Because $\{ u, v', z \} \subseteq B$ and $d_G(u, y) < k$, $d_G(v', v) < k + \lambda$ and therefore $d_G(z, v) < k + 2 \lambda$.
+
+Thus, if there is no bag in~$\calT$ containing vertices of~$P$ and~$Q$, $d_G(v, Q) < k + 2 \lambda$ for all vertices~$v$ in~$G$.
+\end{proof}
+
+Recall that a $\delta$-hyperbolic graph has tree-length at most~$\calO(\delta \log n)$ (Theorem~\ref{theo:hyperbolicTreeLength}, page~\pageref{theo:hyperbolicTreeLength}).
+
+\begin{corollary}
+    \label{cor:ApproxHyperbolic}
+Let \( G \) be a graph with hyperbolicity~\( \delta \) having a shortest path with eccentricity~\( k \).
+Also, let \( x \) and~\( y \) be two mutually furthest vertices, \ie, \( \ecc(x) = \ecc(y) = d(x, y) \).
+Each shortest path from \( x \) to~\( y \) has eccentricity less than or equal to \( k + \calO(\delta \log n) \).
+\end{corollary}
+
+Lemma~\ref{lem:mutualDistHyper}, Lemma~\ref{lem:ApproxTreeLen}, Corollary~\ref{cor:mutualDistTreeLen}, and Corollary~\ref{cor:ApproxHyperbolic} imply our next result:
+
+\begin{theorem}
+Let \( G \) be a graph having a shortest path with eccentricity~\( k \).
+If \( G \) has tree-length~\( \lambda \), a shortest path with eccentricity at most \( k + 2.5\lambda \) can be found in \( \calO(\lambda m) \)~time.
+If \( G \) has hyperbolicity~\( \delta \), a shortest path with eccentricity at most \( k + \calO(\delta \log n) \) can be found in \( \calO(\delta m) \)~time.
+\end{theorem}
+
+Recall that a graph is chordal if and only if it has tree-length~$1$ (Theorem~\ref{theo:chordalLength}, page~\pageref{theo:chordalLength}).
+
+\begin{corollary}
+    \label{cor:plus2ApproxChordal}
+If \( G \) is a chordal graph and has a shortest path with eccentricity~\( k \), a shortest path in~\( G \) with eccentricity at most \( k + 2 \) can be found in linear time.
+\end{corollary}
+
+Figure~\ref{fig:chordalEg} gives an example that, for chordal graphs, $k + 2$ is a tight upper bound for the eccentricity of the determined shortest path.
+
+\begin{figure}
+    [htb]
+    \centering
+    \input{figures/fig_mesp_chordalEg}%
+    \caption
+    [%
+        Example for Corollary~\ref{cor:plus2ApproxChordal}.
+    ]
+    {
+        Example for Corollary~\ref{cor:plus2ApproxChordal}.
+        For the shown chordal graph~$G$, a shortest path from $s$ to~$v$ passing $v'$ has eccentricity~$2$.
+        This is the minimum for all shortest paths in~$G$.
+        The diametral path from $s$ to~$u$ passing $u'$ has eccentricity~$4$ because of its distance to~$w$.
+    }
+    \label{fig:chordalEg}
+\end{figure}
+
+\subsection{Using Layering Partition}
+In this subsection, we present an algorithm to compute an approximation for MESP using the layering partition of a graph.
+For the remainder of this subsection, let $G$ be a graph, let $T$ be a layering partition of~$G$, and let $\Delta$ be the maximum cluster diameter of~$T$.
+Additionally, let $k_G$ and~$k_T$ be the minimum eccentricities of any shortest path in $G$ and~$T$, respectively.
+
+First, we show that
+\[
+    k_T - \frac{1}{2} \Delta \leq k_G \leq k_T + \Delta.
+\]
+
+\begin{lemma}
+    \label{lem:mespLayPartLowBound}
+\[
+    k_T - \frac{1}{2} \Delta \leq k_G
+\]
+\end{lemma}
+
+\begin{proof}
+Let $P$ be a path in~$G$ with the start vertex~$s$, the end vertex~$t$, and with eccentricity~$k_G$.
+Let $T_P$ be the subtree of~$T$ induced by the clusters of~$T$ which intersect~$P$.
+Let $Q$ be the shortest path in~$T$ from $C_s$ to~$C_t$, where $C_s$ and~$C_t$ are the clusters containing $s$ and~$t$, respectively.
+Clearly, by the properties of a layering partition, each cluster of~$Q$ is also a cluster of~$T_P$.
+
+\begin{claim}
+    \label{cla:PQdistLayPart}
+For all \( p \in P \), \( d_G(p, Q) \leq \frac{1}{2} \Delta \).
+\end{claim}
+
+\begin{proof}[Claim]
+Let $C_P$ be a cluster of~$T_P$ that is not part of~$Q$.
+If no such cluster exists, then $T_P = Q$ and, thus, $d_G(p, Q) = 0$ for all \( p \in P \).
+Additionally, let $C_Q$ be the cluster of~$Q$ which is closest to~$C_P$ in~$T$ and $p$ be a vertex of~$P$ in~$C_P$.
+
+Due to the properties of a layering partition, there are two vertices~$p_s, p_t \in P \cap C_Q$ with $d_G(s, p_s) < d_G(s, p) < d_G(s, p_t)$.
+Because $P$ is a shortest path and the diameter of a cluster is at most~$\Delta$, $d_G(p, \{ p_s, p_t \} ) \leq \frac{1}{2} \Delta$ and, therefore, $d_G(p, Q) \leq \frac{1}{2} \Delta$.
+\end{proof}
+
+Let $v$ be an arbitrary vertex of~$G$ and $v'$ be a vertex in~$P$ with minimal distance to~$v$.
+By definition of~$P$, $d_G(v, v') \leq k_G$.
+Then, by triangle inequality, $d_G(v, Q) \leq d_G(v, v') + d_G(v', Q)$, and, by Claim~\ref{cla:PQdistLayPart}, $d_G(v, Q) \leq k_G + \frac{1}{2} \Delta$.
+Recall that, for any two vertices $u$ and~$v$ of~$G$, $d_T(u, v) \leq d_G(u, v)$ (Lemma~\ref{lem:LayPartVertDist}, page~\pageref{lem:LayPartVertDist}).
+Thus, for any vertex~$v$ of~$G$, $d_T(v, Q) \leq k_G + \frac{1}{2} \Delta$.
+
+Let $v$ be a vertex of~$G$ with maximal distance to~$Q$ in~$T$, \ie, $d_T(v, Q) = \ecc_T(Q)$.
+Therefore, because $k_T \leq \ecc_T(Q)$, $k_T \leq d_T(v, Q) \leq k_G + \frac{1}{2} \Delta$.
+\end{proof}
+
+\begin{lemma}
+    \label{lem:mespLayPartUpBound}
+\[
+    k_G \leq k_T + \Delta
+\]
+\end{lemma}
+
+\begin{proof}
+Let $Q$ be a path in~$T$ with minimum eccentricity, \ie, $\ecc_T(Q) = k_T$, such that $Q$ starts at the cluster~$C_s$ and ends at the cluster~$C_t$.
+Additionally, let $s$ and~$t$ be two vertices of~$G$ with $s \in C_s$ and $t \in C_t$ and let $P$ be a shortest path from $s$ to~$t$ in~$G$.
+
+Consider a vertex~$v$ of~$G$ with maximal distance to~$P$ in~$G$.
+Hence, $k_G \leq \ecc_G(P) = d_G(v, P)$.
+Because $d_G(u, v) \leq d_T(u, v) + \Delta$ for each vertex~$u$ of~$G$ (Lemma~\ref{lem:LayPartVertDist}, page~\pageref{lem:LayPartVertDist}), it follows that $d_G(v, P) \leq d_T(v, P) + \Delta$.
+Note that, by the properties of a layering partition, $P$ intersects all clusters of~$Q$.
+Thus, $d_T(v, P) \leq d_T(v, Q)$.
+Additionally, by definition of~$Q$, $d_T(v, Q) \leq \ecc_T(Q) = k_T$.
+From combining these observation, it follows that
+\[
+    k_G \leq \ecc_G(P) = d_G(v, P) \leq d_T(v, P) + \Delta \leq d_T(v, Q) + \Delta \leq \ecc_T(Q) + \Delta = k_T + \Delta.
+    \qedhere
+\]
+\end{proof}
+
+Based on Lemma~\ref{lem:mespLayPartLowBound} and Lemma~\ref{lem:mespLayPartUpBound}, we can compute an approximation for MESP in linear time.
+
+\begin{theorem}
+For a graph~\( G \) with minimum eccentricity~\( k \), a shortest path~\( P \) with eccentricity at most~\( k + \frac{3}{2} \Delta \) can be computed in linear time.
+\end{theorem}
+
+\begin{proof}
+First, construct a layering partition~$T$ for~$G$, starting at an arbitrary vertex.
+Next, find a path~$Q$ in~$T$ with minimum eccentricity.
+Let $C_s$ and $C_t$ be the start and end clusters of~$Q$.
+Pick two arbitrary vertices $s \in C_s$ and~$t \in C_t$.
+Then, compute a shortest path~$P$ from $s$ to~$t$ in~$G$ and output it.
+Note that each of these steps can be done in linear time, including the construction of~$T$ (Lemma~\ref{lem:LayPartLinearTime}, page~\pageref{lem:LayPartLinearTime}) as well as finding $Q$ in~$T$ (Corollary~\ref{cor:mespTrees}).
+
+Note that the construction of~$P$ is the same as in the proof of Lemma~\ref{lem:mespLayPartUpBound}.
+Therefore, as shown in the proof, $\ecc_G(P) \leq \ecc_T(Q) + \Delta$ and, by Lemma~\ref{lem:mespLayPartLowBound}, $\ecc_G(P) \leq k + \frac{3}{2} \Delta$.
+\end{proof}
+
+
+
+\section{Relation to Other Parameters}
+
+Similar to path-length, one can see the minimum eccentricity~$k$ of all shortest paths of a graph~$G$ as a parameter describing the structure of~$G$.
+In this section, we show how $k$ relates to the path-length of~$G$ and other parameters.
+
+\begin{theorem}
+    \label{theo:PathLengthMinEcc}
+Let \( G \) be a graph with path-length~\( \lambda \) and path-breadth~\( \rho \) and let the minimum eccentricity of all shortest paths be~\( k \).
+Then,
+\[
+    k \leq \lambda \leq 4k + 1 \quad \text{and} \, \quad \frac{1}{2} k \leq \rho \leq 2k + 1.
+\]
+\end{theorem}
+
+\begin{proof}
+As shown in Lemma~\ref{lem:plDomPairRelation} (page~\pageref{lem:plDomPairRelation}), it clearly follows from the definition of path-length that a graph with path-length~$\lambda$ has a shortest path with eccentricity at most~$\lambda$.
+Therefore, $k \leq \lambda$ and, since $\lambda \leq 2 \rho$, $\frac{1}{2} k \leq \rho$.
+
+Next, let $P$ be a shortest path in $G$ with the start vertex~$s$ and $\ecc(P) = k$.
+As shown in Lemma~\ref{lem:LayerRadius}, the radius of $L_i^{(s)}$ is at most~$2k$.
+Thus, its diameter is not larger than~$4k$.
+One can now create a path decomposition $\calX = \{X_1, \ldots, X_n\}$ by creating a set $X_i$ including layer~$L_i^{(s)}$ and all vertices from $L_{i-1}^{(s)}$ which are adjacent to vertices in $L_i^{(s)}$, \ie, $X_i = L_i^{(s)} \cup \left \{ \, u \Bigm| uv \in E, u \in L_{i-1}^{(s)}, v \in L_i^{(s)} \right \}$.
+It is easy to see that the radius of~$X_i$ is at most~$2k +1$, the diameter of~$X_i$ is at most~$4k +1$, and that $\calX$ is a valid path decomposition for $G$, \ie, $\rho \leq 2k + 1$ and $\lambda \leq 4k + 1$.
+\end{proof}
+
+Recently, \name{Völkel} et al.\,\cite{VolBapHabLop2016} defined a closely related problem called \emph{\( k \)-Laminarity} problem.
+It asks if a given graph contains a diametral path with eccentricity at most~$k$.
+If a graph contains such a path, it is called \emph{\( k \)-laminar}.
+Similar, if every diametral path of a graph has eccentricity at most~$k$, it is called \emph{\( k \)-strongly laminar}.
+
+\begin{theorem}
+    [\name{Birmelé} et al.\,\cite{BirmDeMoPlan2016}]
+Let \( G \) be a graph where the minimum eccentricity of all shortest paths is~\( k \).
+Additionally, let $l$ and~$s$ be the minimal values such that $G$ is \( l \)-laminar and \( s \)-strongly laminar.
+Then,
+\[
+    k \leq l \leq 4k - 2 \quad \text{and} \, \quad k \leq s \leq 4k.
+\]
+These bounds are tight.
+\end{theorem}
+
+
+\section{Solving $k$-Domination using a MESP}
+    \label{sec:kDom}
+
+In~\cite{Kratsch2000}, an $\calO \big( n^7 \big)$ time algorithm is presented which finds a minimum dominating set for graphs containing a shortest path with eccentricity~$1$.
+Using a similar approach, we generalise this result to find a minimum $k$-dominating set for graphs containing a shortest path with eccentricity~$k$.
+
+Recall that, for a graph~$G = (V, E)$, a vertex set~$D$ is a \emph{\( k \)-dominating set} if $N^k[D] = V$.
+Additionally, $D$ is a \emph{minimum} $k$-dominating set if there is no $k$-dominating set~$D'$ for~$G$ with $|D'| < |D|$.
+
+\begin{lemma}
+    \label{lem:domCardinality}
+Let \( D \) be a minimum \( k \)-dominating set of a graph~\( G \) and let \( G \) have a shortest path of eccentricity at most~\( k \) starting at a vertex~\( s \).
+Then, for all non-negative integers \( i \leq \ecc(s) \),
+\[
+    \left| D \cap \bigcup_{l=i-k}^{i+k} L_l^{(s)} \right| \leq 6k + 1.
+\]
+\end{lemma}
+
+\begin{proof}
+Let $P = \{ s = v_0, v_1, \ldots, v_j \}$ be a shortest path with $j \leq \ecc(s)$  and $\ecc(P) \leq k$.
+Also, let $D_{i} = D \cap \bigcup_{l=i-k}^{i+k} L_l^{(s)}$ be a set of $k$-dominating vertices in the layers $L_{i-k}^{(s)}$ to~$L_{i+k}^{(s)}$.
+Because $D$ is $k$-dominating, $D_{i}$ can only $k$-dominate vertices in the layers $L_{i-2k}^{(s)}$ to ~$L_{i+2k}^{(s)}$.
+By Lemma~\ref{lem:localLayerDom}, these layers are also $k$-dominated by $P_{i} = \{ v_{i-3k}, \ldots, v_{i+3k} \}$.
+Thus,
+\[
+    N^k[D_{i}] \subseteq \bigcup_{l=i-2k}^{i+2k} L_l^{(s)} \subseteq N^k[P_{i}].
+\]
+Assume that $|D_{i}| > |P_{i}|$.
+Note that $|P_{i}| \leq 6k + 1$.
+Then, there is a $k$-dominating set $D' = (D \setminus D_{i}) \cup P_{i}$ such that $|D| > |D'|$.
+Thus, $D$ is not a minimum $k$-dominating set.
+\end{proof}
+
+Based on Lemma~\ref{lem:domCardinality}, Algorithm~\ref{algo:kDomSet} below computes a minimum $k$-dominating set for a given graph~$G = (V, E)$ with a shortest path of eccentricity~$k$ starting at a vertex~$s$ as follows.
+In the $i$-th iteration, the algorithm knows all vertex sets~$S$ for which there is a vertex set~$S'$ such that
+\begin{enumerate*}[(i),mode=unboxed]
+    \item
+        $S = S' \cap \left ( L_{i-k}^{(s)} \cup \cdots \cup L_{i-1+k}^{(s)} \right )$,
+    \item
+        the set~$S^* = S \cup \left ( S' \cap L_{i-1-k}^{(s)} \right )$ $k$-dominates $L_{i-1}^{(s)}$ and has cardinality at most~$6k + 1$, and
+    \item
+        $S'$ $k$-dominates the layers $L_0^{(s)}$ to~$L_{i-1}^{(s)}$.
+\end{enumerate*}
+Due to Lemma~\ref{lem:domCardinality}, a set $S^*$ with a larger cardinality cannot be a subset of a minimum dominating set of~$G$ and, hence, neither can be $S$ or~$S'$.
+Each such set~$S$ is stored as a pair~$(S, S')$ in a set~$X_{i-1}$ where $S'$ is a corresponding set with minimum cardinality, \ie, $X_{i-1}$ does not contain two pairs $(S, S')$ and~$(T, T')$ with $S = T$.
+Note that, since $S'$ has minimum cardinality, it does not contain any vertices from any layer~$L_j^{(s)}$ with $j > i - 1 + k$.
+We show later that, this way, $X_{i-1}$ always contains a pair~$(S, S')$ such that $S'$ is subset of some minimum $k$-dominating set.
+
+Then, for each pair~$(S, S') \in X_{i-1}$, the algorithm computes all sets~$S \cup U$ which $k$-dominate the layer~$L_{i}^{(s)}$ and have cardinality at most~$6k + 1$.
+For such a set, the sets~$R = (S \cup U) \setminus L_{i-k}^{(s)}$ and~$R' = S' \cup U$ are created and, if the set~$X_i$ does not contain a pair~$(P, P')$ with $P = R$, stored as the pair~$(R, R')$ in~$X_i$.
+In the case that $X_i$ already contains such a pair~$(P, P')$, either, if $|R'| < |P'|$, $(P, P')$ is replaced by~$(R, R')$ or, if $|R'| \geq |P'|$, $(R, R')$ is not added to~$X_i$.
+
+Note that $L_{i+k}^{(s)} = \emptyset$ for $i > \ecc(s) - k$.
+Therefore, the algorithm can stop after $\ecc(s) - k$ iterations.
+
+\begin{algorithm}
+    [htb]
+    \caption
+    {%
+        Determines a minimum $k$-dominating set in a given graph~$G$ containing a shortest path of eccentricity~$k$ starting at~$s$.
+    }
+    \label{algo:kDomSet}
+%
+
+\KwIn
+{%
+    A graph~$G$, an integer~$k$, and a vertex~$s$ which is start vertex of a shortest path with eccentricity~$k$.
+}
+
+\KwOut
+{%
+    A minimum $k$-dominating set.
+}
+
+Compute the layers~$L_0^{(s)}, L_1^{(s)}, \ldots, L_{\ecc(s)}^{(s)}$.
+
+Create the set $X_0 := \Big \{ \, (S, S) \Bigm | S \subseteq N^k[s]; 0 < |S| \leq 6k + 1 \, \Big \}$.
+\label{line:CreateX0}
+
+\For
+{%
+    $i := 1$ \KwTo $\ecc(s) - k$%
+    \label{line:layerLoop}%
+}
+{%
+    Create $X_i := \emptyset$.
+
+    \ForEach
+    {%
+        $(S, S') \in X_{i-1}$
+    }
+    {%
+        \ForEach
+        {%
+            $U \subseteq L_{i+k}^{(s)}$ with $|S \cup U| \leq 6k + 1$%
+            \label{line:Uloop}
+        }
+        {%
+            \If
+            {%
+                $N^k[S \cup U] \supseteq L_{i}^{(s)}$%
+                \label{line:kDomCheck}
+            }
+            {%
+                $R := (S \cup U) \setminus L_{i-k}^{(s)}$
+
+                $R' := S' \cup U$
+                \label{line:setRprime}
+
+                \If
+                {%
+                    There is no pair $(P, P') \in X_i$ with $P = R$
+                    \label{line:checkEqualPair}
+                }
+                {%
+                    Insert $(R, R')$ into~$X_i$.
+                }
+
+                \If
+                {%
+                    There is a pair $(P, P') \in X_i$ with $P = R$ and $|R'| < |P'|$
+                }
+                {%
+                    Replace $(P, P')$ in~$X_i$ by $(R, R')$.
+                    \label{line:replacePair}
+                }
+            }
+        }
+    }
+}
+
+Among all pairs~$(S, S') \in X_{\ecc(s) - k}$ for which $S'$ $k$-dominates $G$, determine one with minimum $|S'|$, say $(D, D')$.
+
+Output $D'$.
+\end{algorithm}
+
+\begin{theorem}
+    \label{theo:kDomFromkESP}
+For a given graph~\( G \) and a vertex~\( s \) which is start vertex of a shortest path with eccentricity~\( k \), Algorithm~\ref{algo:kDomSet} determines a minimum \( k \)-dominating set in \( n^{\calO(k)} \) time.
+\end{theorem}
+
+\begin{proof}
+    [Correctness]
+%
+To prove the correctness, we show by induction that, for each $i$ with $0 \leq i \leq \ecc(s) - k$, there is a minimum $k$-dominating set~$D$ and a pair~$(S, S') \in X_i$ such that $S' = D \cap \bigcup_{l=0}^{i+k} L_l^{(s)}$.
+If this is true for $i = \ecc(s) - k$, then $S' = D$.
+Hence, if $(S, S')$ is a pair in $X_{\ecc(s) - k}$ such that $S'$ $k$-dominates $G$ and has minimum cardinality, then $S'$ is a minimum $k$-dominating set of~$G$.
+
+By construction in line~\ref{line:CreateX0}, $X_0$ contains all pairs $(S, S')$ such that $S'$ is a vertex set with cardinality at most~$6k + 1$ which $k$-dominates $L_0^{(s)}$.
+Thus, the base case is true.
+Next, by induction hypothesis and by definition of the pairs~$(S, S')$, there is a minimum dominating set~$D$ and a pair~$(S, S') \in X_{i-1}$ such that $S = S' \cap \bigcup_{l=i-k}^{i+k-1} L_l^{(s)} = D \cap \bigcup_{l=i-k}^{i+k-1} L_l^{(s)}$.
+Let $M = D \cap L_{i+k}^{(s)}$.
+By Lemma~\ref{lem:domCardinality}, $\left | D \cap \bigcup_{l=i-k}^{i+k} L_l^{(s)} \right | = |S \cup M| \leq 6k + 1$.
+Therefore, there is an iteration of the loop starting in line~\ref{line:Uloop} with $U = M$.
+Because $S \cup M = D \cap \bigcup_{l=i-k}^{i+k} L_l^{(s)}$, $S \cup M$ $k$-dominates $L_i^{(s)}$, \ie, $N^k[S \cup M] \supseteq L_{i}^{(s)}$.
+Thus, the algorithm creates a pair~$(R, R')$ with $R' = D \cap \bigcup_{l=0}^{i+k} L_l^{(s)}$ (see line~\ref{line:kDomCheck} to line~\ref{line:setRprime}).
+
+Assume that there is a pair~$(P, P') \neq (R, R')$ with $P = R$ and $|P'| \leq |R'|$, \ie, $(R, R')$ will not be stored in~$X_i$ or replaced by $(P, P')$ (see line~\ref{line:checkEqualPair} to line~\ref{line:replacePair}).
+Because $P = R$, $P' \cap \bigcup_{l=i-k+1}^{i+k} L_l^{(s)} = D \cap \bigcup_{l=i-k}^{i+k} L_l^{(s)}$.
+Let $D' = P' \cup \left ( D \cap \bigcup_{l=i-k+1}^{\ecc(s)-k} L_l^{(s)} \right )$.
+By definition, $P'$ $k$-dominates $\bigcup_{l=0}^{i} L_l^{(s)}$.
+Thus, $D'$ $k$-dominates $\bigcup_{l=0}^{i} L_l^{(s)}$.
+Note that $D' \supseteq D \cap \left ( \bigcup_{l=i-k+1}^{\ecc(s)} L_l^{(s)} \right )$.
+Thus, $D'$ also $k$-dominates $\bigcup_{l=i+1}^{\ecc(s)} L_l^{(s)}$.
+Therefore, $D'$ is a minimum $k$-dominating set and there is a pair~$(P, P') \in X_i$ such that $P' = D' \cap \bigcup_{l=0}^{i+k} L_l^{(s)}$.
+\end{proof}
+
+\begin{proof}
+    [Complexity]
+%
+For a given $i$, there are no two pairs $(S, S')$ and $(T, T')$ in~$X_i$ with $S = T$ (see line~\ref{line:checkEqualPair} to line~\ref{line:replacePair}).
+Thus, for each set $U \subseteq L_{i+k}^{(s)}$, $S \cup U \neq T \cup U$.
+Additionally, since $S$ and~$T$ intersect at most~$2k$ consecutive layers, $S \neq T$ for all pairs $(S, S') \in X_i$ and~$(T, T') \in X_j$ with $|i - j| \geq 2k$.
+Therefore, a set~$S \cup U$ is processed at most $\calO(k)$ times by the loop starting in line~\ref{line:Uloop}.
+Hence, because there are at most $n^{6k+1}$ sets~$S \cup U$ with $|S \cup U| \leq 6k + 1$, the loop starting in line~\ref{line:Uloop} has at most $\calO \big( n^{6k+1} k \big)$ iterations.
+
+Next, we show that a single iteration of the loop starting in line~\ref{line:Uloop} requires at most $\calO(m)$ time.
+It takes at most $\calO(m)$ time to check if $N^k[S \cup U] \supseteq L_{i}^{(s)}$ (line~\ref{line:kDomCheck}) and at most $\calO(n)$ time to construct $(R, R')$.
+Determining if $X_i$ contains a pair~$(P, P')$ with $P = R$ and (if necessary) replacing it can be achieved in $\calO(n)$ time as follows.
+One way is to use a tree-structure similar to the one we used for Algorithm~\ref{algo:kDSP}.
+An other (less memory efficient) option is to use an array~$A_i$ of size~$n^{6k + 1}$ where each element can store a pair~$(S, S')$.
+To determine the index of a pair, assume that each vertex of~$G$ has a unique identifier in the range from $0$ to~$n-1$.
+Additionally, assume that the vertices in a set~$S$ are ordered by their identifier.
+Therefore, each set~$S$ can be represented by a unique $(6k+1)$-digit number with base~$n$.
+This number is the index of a pair~$(S, S')$ in~$A_i$.
+Hence, it takes at most $\calO(n)$ time to add $(R, R')$ to~$X_i$ and (if necessary) replace a pair~$(P, P')$.
+
+Therefore, the total runtime of the algorithm is $\calO \big( n^{6k+1} km \big)$.
+\end{proof}
+
+If the start vertex~$s$ is unknown, one can use Algorithm~\ref{algo:kDSP} to, first, find a shortest path with eccentricity~$k$ and, then, use Algorithm~\ref{algo:kDomSet} to find a minimum $k$-dominating set.
+
+\section{Open Questions}
+
+\subsubsection{Finding Start and End Vertex.}
+The Minimum Eccentricity Shortest Path problem can be naturally split into two subproblems.
+First, find the start and end vertices of an optimal path.
+Second, for a given vertex pair, find a shortest path between them with the minimum eccentricity.
+We know that the second subproblem remains NP-hard (Corollary~\ref{cor:stMespNPc}).
+However, is it possible to determine the start and end vertices of an optimal path efficiently?
+
+\subsubsection{APX-Complete?}
+In Section~\ref{sec:mespGeneralAppr}, we show multiple algorithms which compute a constant factor approximation in linear or polynomial time.
+Therefore, MESP is in APX.
+It remains an open question if the problem is APX-complete.
+
+\subsubsection{Complexity for Planar Graphs.}
+We show that MESP is NP-complete for planar graphs (Corollary~\ref{cor:mespNPc_planarBipMaxDeg}) and remains W[2]-hard for sparse graphs (Corollary~\ref{cor:mespW2Sparse}).
+Additionally, we show that the problem is Fixed Parameter Tractable for graphs with bounded degree (Corollary~\ref{cor:FPTBoundDegree}).
+Since every induced subgraph of a planar graphs has an average degree less than~$6$, we conjecture that there is a Fixed Parameter Tractable algorithm to solve MESP on planar graphs.
+
+\subsubsection{Computing Projection Gap.}
+In Section~\ref{sec:mespProjGapApproach}, we show that we can solve MESP in polynomial time, if the projection gap of a given graph bounded by a constant.
+Additionally, we determine an upper bound for the projection gap of some graph classes.
+It would be interesting to know how to compute the projection gap for a given graph.

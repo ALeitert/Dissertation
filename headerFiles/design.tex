@@ -1,0 +1,401 @@
+% -------------------------------------------
+%  Header file.
+%
+%  Contains the design definitions.
+% -------------------------------------------
+
+\makeatletter
+
+% Set colours for certain use.
+\colorlet{clPart}{black}
+\colorlet{clChapter}{black}
+\colorlet{clSection}{black}
+\colorlet{clTocPart}{black}
+\colorlet{clTocChapter}{black}
+\colorlet{clHeadFoot}{black}
+
+
+%------------------------------
+% - - - Header and Footer - - -
+
+% TikZ style for chapter and page nodes.
+\tikzstyle{chapNodeOdd}=[inner sep=0pt, anchor=base east]
+\tikzstyle{chapNodeEven}=[inner sep=0pt, anchor=base west]
+
+\tikzstyle{pageNodeOdd}=[inner sep=0pt, anchor=base east]
+\tikzstyle{pageNodeEven}=[inner sep=0pt, anchor=base west]
+
+\def\ps@headings%
+{%
+    \def\@oddfoot%
+    {%
+        \tikzset{external/export=false}%
+        \tikz[baseline]
+        {
+            \path[use as bounding box](0,0) rectangle (\textwidth,1.2em-4pt);
+            \node[pageNodeOdd] (pageNode) at (\textwidth,0) {\thepage};
+            \draw[semithick] (0,1.2em) -- (\textwidth,1.2em);
+        }%
+    }
+    \def\@evenfoot%
+    {%
+        \tikzset{external/export=false}%
+        \tikz[baseline]
+        {
+            \path[use as bounding box](0,0) rectangle (\textwidth,1.2em-4pt);
+            \node[pageNodeEven] (pageNode) at (0,0) {\textcolor{black}\thepage};
+            \draw[semithick] (0,1.2em) -- (\textwidth,1.2em);
+        }%
+    }
+    \def\@oddhead%
+    {%
+        \tikzset{external/export=false}%
+        \tikz[baseline]
+        {
+            \path[use as bounding box](0,0) rectangle (\textwidth,\headheight);
+            \node[chapNodeOdd] (chapNode) at (\textwidth,0) {\rightmark};
+            \draw[semithick] (0,-4pt) -- (\textwidth,-4pt);
+        }%
+    }%
+    \def\@evenhead%
+    {%
+        \tikzset{external/export=false}%
+        \tikz[baseline]
+        {
+            \path[use as bounding box](0,0) rectangle (\textwidth,\headheight);
+            \node[chapNodeEven] (chapNode) at (0,0) {\rightmark};
+            \draw[semithick,line cap=rect] (0.3pt,-4pt) -- (\textwidth-0.3pt,-4pt);
+        }%
+    }%
+    \let\@mkboth\markboth
+    \def\chaptermark##1%
+    {%
+        \markright%
+        {{%
+            \ifnum \c@secnumdepth >\m@ne
+                \@chapapp\ \thechapter. \ %
+            \fi
+            ##1%
+        }}%
+    }%
+}
+
+\def\ps@plain%
+{%
+    \def\@oddfoot%
+    {%
+        \tikzset{external/export=false}%
+        \tikz[baseline]
+        {
+            \path[use as bounding box](0,0) rectangle (\textwidth,1.2em-4pt);
+            \node[pageNodeOdd] (pageNode) at (\textwidth,0) {\thepage};
+            \draw[semithick] (0,1.2em) -- (\textwidth,1.2em);
+        }%
+    }
+    \def\@oddhead%
+    {%
+        \tikzset{external/export=false}%
+        \tikz[baseline]
+        {
+            \path[use as bounding box](0,0) rectangle (\textwidth,\headheight);
+            \node[chapNodeOdd] (chapNode) at (\textwidth,0) {};
+            \draw[semithick] (0,-4pt) -- (\textwidth,-4pt);
+        }%
+    }%
+}
+
+% Show chapter names in head line.
+\pagestyle{headings}
+
+
+%---------------------------
+% - - - Chapter design - - -
+
+% Adds name of cahpter to heading.
+\renewcommand{\@schapter}[1]
+{
+    \@mkboth{#1}{#1}
+    \phantomsection
+    \addcontentsline{toc}{chapter}{#1}
+    \if@twocolumn
+        \@topnewpage[\@makeschapterhead{#1}]%
+    \else
+        \@makeschapterhead{#1}%
+        \@afterheading
+    \fi
+}
+
+% Command which contains the design for chapter headlines.
+% Allows to change the design at a central place.
+\newcommand{\setChapterStyle}
+{
+    \parindent \z@
+    \setlength{\parskip}{1em}
+    \interlinepenalty\@M
+
+    \raggedright
+    \rmfamily
+    \bfseries\boldmath
+
+    \huge
+    \color{clChapter}
+    \linenumbers*
+
+    \newcommand{\chapterNote}[1]
+    {%
+        \renewcommand{\thefootnote}{\raisebox{0.3ex}{\normalsize$\star$}}%
+        \footnotemark%
+        \renewcommand{\thefootnote}{$\star$}%
+        \footnotetext{##1}%
+        \setcounter{footnote}{0}%
+    }
+}
+
+% Chapter headlines with nuber.
+\def\@makechapterhead#1%
+{{%
+    \setChapterStyle
+    \parbox[t][25\p@]{\linewidth}%
+    {
+        \ifnum \c@secnumdepth >\m@ne \vspace{\fill}
+            \normalsize \normalfont \@chapapp\space \thechapter
+        \fi
+    }
+    \par\nobreak  \vskip 5\p@
+    #1 \par\nobreak
+    \vskip 40\p@
+}}
+
+% Chapter headlines without number.
+\def\@makeschapterhead#1%
+{{%
+    \setChapterStyle
+    \parbox[t][25\p@]{\linewidth}{}
+    \par\nobreak  \vskip 5\p@
+     #1 \par\nobreak
+    \vskip 40\p@
+}}
+
+% Change special chapter definitions to fix bug and text of headings
+\renewcommand{\tableofcontents}
+{%
+    \if@twocolumn
+        \@restonecoltrue\onecolumn
+    \else
+        \@restonecolfalse
+    \fi
+    \chapter*{\contentsname}%
+    \@starttoc{toc}%
+    \if@restonecol\twocolumn\fi
+}
+\renewcommand{\listoffigures}
+{%
+    \if@twocolumn
+        \@restonecoltrue\onecolumn
+    \else
+        \@restonecolfalse
+    \fi
+    \chapter*{\listfigurename}%
+    \@starttoc{lof}%
+    \if@restonecol\twocolumn\fi
+}
+\renewcommand{\listoftables}
+{%
+    \if@twocolumn
+        \@restonecoltrue\onecolumn
+    \else
+        \@restonecolfalse
+    \fi
+    \chapter*{\listtablename}%
+    \@starttoc{lot}%
+    \if@restonecol\twocolumn\fi
+}
+
+
+%---------------------------
+% - - - Section design - - -
+
+% Based on LNCS format.
+
+\renewcommand{\section}
+{%
+    \@startsection{section}{1}{\z@}%
+        {%
+            -18\p@ \@plus -4\p@ \@minus -4\p@%
+        }%
+        {%
+            12\p@ \@plus 4\p@ \@minus 4\p@%
+        }%
+        {%
+            \normalfont%
+            \Large%
+            \bfseries%
+            \boldmath%
+            \color{clSection}%
+            \rightskip=\z@ \@plus 8em%
+            \pretolerance=10000%
+        }%
+}
+
+\renewcommand{\subsection}
+{%
+    \@startsection{subsection}{2}{\z@}%
+        {%
+            -18\p@ \@plus -4\p@ \@minus -4\p@%
+        }%
+        {%
+            8\p@ \@plus 4\p@ \@minus 4\p@%
+        }%
+        {%
+            \normalfont%
+            \large%
+            \bfseries%
+            \boldmath%
+            \color{clSection}%
+            \rightskip=\z@ \@plus 8em%
+            \pretolerance=10000%
+        }%
+}
+
+\renewcommand{\subsubsection}
+{%
+    \@startsection{subsubsection}{3}{\z@}%
+        {%
+            -18\p@ \@plus -4\p@ \@minus -4\p@%
+        }%
+        {%
+            -0.75em \@plus -0.25em \@minus -0.2em%
+        }%
+        {%
+            \normalfont%
+            \normalsize%
+            \bfseries%
+            \boldmath%
+        }%
+}
+
+\renewcommand{\paragraph}
+{%
+    \@startsection{paragraph}{4}{\z@}%
+        {%
+            -12\p@ \@plus -4\p@ \@minus -4\p@%
+        }%
+        {%
+            -0.75em \@plus -0.25em \@minus -0.2em%
+        }%
+        {%
+            \normalfont%
+            \normalsize%
+            \itshape%
+        }%
+}
+
+% No sub-paragraph posible.
+\let\subparagraph\undefined
+
+
+% --------------------------
+% - - - Caption design - - -
+%
+
+\usepackage[font={small,sf}]{caption}
+\DeclareCaptionFormat{plain}{\textsb{#1}#2#3}
+\DeclareCaptionLabelSeparator{dot}{. }
+\captionsetup{labelsep=dot}
+
+% Subfigures
+\usepackage{subcaption}
+\captionsetup{subrefformat=parens}
+
+% No indent for entryies in List of Tables/Figures.
+\renewcommand*\l@figure{\@dottedtocline{1}{0em}{2.3em}}
+\renewcommand*\l@table{\@dottedtocline{1}{0em}{2.3em}}
+
+
+%-------------------------------
+% - - - Algorithm keywords - - -
+
+% General design.
+\SetKwSty{keyword}
+
+% Spelling of keywords.
+%Do keyword is removed and keywords start with a capital letter.
+\SetKw{KwTo}{To}
+\SetKw{KwDownTo}{DownTo}
+
+\SetKw{KwRet}{Return}
+
+\SetKw{Return}{Return}
+
+\SetKwBlock{Begin}
+           {Begin}{End}
+
+\SetKwIF{If}{ElseIf}{Else}
+        {If}{Then}{Else If}{Else}{End If}
+
+\SetKwSwitch{Switch}{Case}{Other}
+            {Switch}{}{Case}{Otherwise}{End Case}{End Switch}
+
+\SetKwFor{For}
+         {For}{}{End For}
+
+\SetKwFor{While}
+         {While}{}{End While}
+
+\SetKwFor{ForEach}
+         {For Each}{}{End For}
+
+\SetKwFor{ForAll}
+         {For All}{}{End For}
+
+\SetKwRepeat{Repeat}
+            {Repeat}{Until}
+
+
+%------------------------------
+% - - - Table of Contents - - -
+% Changed in such a way that it shows bold math and writes part headlines larger and draws a line infront of them.
+
+
+\newlength{\tocPartLength}
+\newlength{\tocPartLineLength}
+
+\renewcommand*\l@part[2]{%
+  \ifnum \c@tocdepth >-2\relax
+    \addpenalty{-\@highpenalty}%
+    \addvspace{2.25em \@plus\p@}%
+    \setlength\@tempdima{3em}%
+    \begingroup
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      {\leavevmode
+       \LARGE\bfseries\boldmath\color{clTocPart}%
+       \settowidth{\tocPartLength}{#1}%
+       \addtolength{\tocPartLength}{.5em}%
+       \setlength{\tocPartLineLength}{\linewidth}%
+       \addtolength{\tocPartLineLength}{-\tocPartLength}%
+       #1\hspace*{\fill}\rule[.5ex]{\tocPartLineLength}{2pt}%
+       }\par
+       \nobreak
+         \global\@nobreaktrue
+         \everypar{\global\@nobreakfalse\everypar{}}%
+    \endgroup
+  \fi}
+\renewcommand*\l@chapter[2]{%
+  \ifnum \c@tocdepth >\m@ne
+    \addpenalty{-\@highpenalty}%
+    \vskip 1.0em \@plus\p@
+    \setlength\@tempdima{1.5em}%
+    \begingroup
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      \leavevmode \bfseries\boldmath\color{clTocChapter}
+      \advance\leftskip\@tempdima
+      \hskip -\leftskip
+      #1\nobreak\hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+      \penalty\@highpenalty
+    \endgroup
+  \fi}
+%---------------------------------------------
+
+\makeatother

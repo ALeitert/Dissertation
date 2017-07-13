@@ -1,0 +1,59 @@
+\tikzsetnextfilename{fig_bwld_plLdRelation}
+\begin{tikzpicture}
+
+\coordinate (co0) at (5mm,0);
+\coordinate (co1) at (15mm,0);
+\coordinate (co2) at (20mm,0);
+\coordinate (co3) at (30mm,0);
+\coordinate (co4) at (35mm,0);
+\coordinate (co5) at (40mm,0);
+\coordinate (co6) at (60mm,0);
+\coordinate (co7) at (65mm,0);
+\coordinate (co8) at (75mm,0);
+\coordinate (co9) at (95mm,0);
+\coordinate (co10) at (85mm,0);
+\coordinate (co11) at (100mm,0);
+
+\draw (0,0) -- (10.5,0);
+
+\node[sN] (n0)  at (co0) {};
+\node[sN] (n1)  at (co1) {};
+\node[sN] (n2)  at (co2) {};
+\node[sN] (n3)  at (co3) {};
+\node[sN] (n5)  at (co5) {};
+\node[sN] (n6)  at (co6) {};
+\node[sN] (n7)  at (co7) {};
+\node[sN] (n8)  at (co8) {};
+\node[sN] (n9)  at (co9) {};
+\node[sN] (n10) at (co10) {};
+\node[sN] (n11) at (co11) {};
+
+\node[blbl] at ($(co2)+(0,-0.125)$) {$f(v)$};
+\node[blbl] at ($(co5)+(0,-0.125)$) {$f(x)$};
+\node[blbl] at ($(co6)+(0,-0.125)$) {$f(y)$};
+
+\draw[thick] (8,-0.115) -- ++(0,0.23);
+\draw[thick] (5,-0.115) -- ++(0,0.23);
+\node[blbl] at (5,-0.15) {$p_v$};
+\node[blbl] at (8,-0.15) {$f(v)+k$};
+
+\draw
+    [
+        decorate,
+        decoration=
+        {
+            brace,
+            amplitude=5pt,
+            raise=0.25cm,
+        },
+    ]
+    (co2) -- (8,0)
+    node
+        [
+            midway,
+            tlbl,
+            yshift=0.375cm,
+        ]
+        {$B_v$};
+
+\end{tikzpicture}

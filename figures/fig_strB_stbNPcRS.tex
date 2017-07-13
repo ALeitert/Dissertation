@@ -1,0 +1,56 @@
+\tikzsetnextfilename{fig_strB_stbNPcRS}
+\begin{tikzpicture}
+    [scale=1.33]
+
+\node [sN] (pi) at (0,0) {};
+\node [sN] (pj) at (0:1) {};
+\node [sN] (pk) at (60:1) {};
+
+\node [sN] (r_ijk) at (-90:1) {};
+\node [sN] (r_jki) at ($(pj.center)+(30:1)$) {};
+\node [sN] (r_kij) at ($(pk.center)+(150:1)$) {};
+
+
+\node [sN] (s_ijk) at ($(pj.center)+(-90:1)$) {};
+\node [sN] (s_jki) at ($(pk.center)+(30:1)$) {};
+\node [sN] (s_kij) at (150:1) {};
+
+
+\begin{pgfonlayer}{background}
+
+\draw (pi.center) -- (pj.center);
+\draw (pi.center) -- (pk.center);
+\draw (pj.center) -- (pk.center);
+
+
+\draw (pi.center) -- (r_ijk.center);
+\draw (pj.center) -- (r_jki.center);
+\draw (pk.center) -- (r_kij.center);
+
+\draw (pj.center) -- (s_ijk.center);
+\draw (pk.center) -- (s_jki.center);
+\draw (pi.center) -- (s_kij.center);
+
+\draw (pk.center) to[out=-90,in=135] (s_ijk.center);
+\draw (pi.center) to[out=30,in=-105] (s_jki.center);
+\draw (pj.center) to[out=150,in=15] (s_kij.center);
+
+\draw (r_ijk.center) -- (s_ijk.center);
+\draw (r_jki.center) -- (s_jki.center);
+\draw (r_kij.center) -- (s_kij.center);
+
+\end{pgfonlayer}
+
+\node [lbl,anchor=north east] at (pi.south west) {$p_i$};
+\node [lbl,anchor=north west] at (pj.south east) {$p_j$};
+\node [tlbl] at (pk.north) {$p_k$};
+
+\node [blbl] at (r_ijk.south) {$r_{(ij|k)}$};
+\node [lbl,anchor=120] at (r_jki.-60) {$r_{(jk|i)}$};
+\node [llbl] at (r_kij.west) {$r_{(ki|j)}$};
+
+\node [blbl] at (s_ijk.south) {$s_{(ij|k)}$};
+\node [rlbl] at (s_jki.east) {$s_{(jk|i)}$};
+\node [lbl,anchor=60] at (s_kij.-120) {$s_{(ki|j)}$};
+
+\end{tikzpicture}

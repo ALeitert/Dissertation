@@ -1,0 +1,34 @@
+\tikzsetnextfilename{fig_strB_extC5}
+\begin{tikzpicture}
+
+\coordinate (c0) at (0,0);
+\foreach \i in {1,...,5}
+{
+    \coordinate (c\i) at (162-\i*72:1);
+}
+
+\foreach \i [evaluate=\i as \ii using {int(mod(\i,5)+1)}] in {1,...,5}
+{
+    \draw (c\i) -- (c\ii);
+}
+
+\draw (c0) -- (c1);
+\draw (c0) -- (c3);
+\draw (c0) -- (c4);
+
+
+\foreach \i in {1,...,5}
+{
+    \node[sN] (n\i) at (c\i) {};
+}
+
+\node [sN] (n0) at (c0) {};
+
+\node[rlbl] at (n0.east) {$u$};
+\node[tlbl] at (n1.north) {$v_1$};
+\node[rlbl] at (n2.east) {$v_2$};
+\node[rlbl] at (n3.east) {$v_3$};
+\node[llbl] at (n4.west) {$v_4$};
+\node[llbl] at (n5.west) {$v_5$};
+
+\end{tikzpicture}

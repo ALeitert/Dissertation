@@ -1,0 +1,162 @@
+\tikzsetnextfilename{fig_bwld_mespApprox_embedding}
+\begin{tikzpicture}
+    [scale=1.2]
+
+\pgfmathsetseed{6}
+
+% --- Upper Line ---
+
+\draw (-1.375,0) -- (1.375,0);
+
+\node[llbl] at (-1.375,0) {$P$};
+
+\foreach \x in {2.75,2,1.25}
+{
+    \pgfmathtruncatemacro{\xn}{\x*10}%
+    \node[sN] (n\xn)  at (\x-2,0) {};
+%     \node[sN] (nm\xn) at (-\x,0) {};
+}
+
+\foreach \n in {n}
+{
+    \coordinate (tm\n) at ($(\n20)+(0,0.5)$);
+    \coordinate (tr\n) at ($(\n20)+(45:0.5)$);
+    \coordinate (tl\n) at ($(\n20)+(135:0.5)$);
+
+    \coordinate (tmr\n) at ($(tm\n)+(45:0.5)$);
+    \coordinate (tml\n) at ($(tm\n)+(135:0.5)$);
+
+    \coordinate (tmrr\n) at ($(tmr\n)+(60:0.5)$);
+    \coordinate (tmrl\n) at ($(tmr\n)+(120:0.5)$);
+
+    \coordinate (tmll\n) at ($(tml\n)+(120:0.5)$);
+
+
+    \draw (\n20)--(tm\n);
+    \draw (\n20)--(tr\n);
+    \draw (\n20)--(tl\n);
+
+    \draw (tm\n)--(tmr\n);
+    \draw (tm\n)--(tml\n);
+
+    \draw (tmr\n)--(tmrr\n);
+    \draw (tmr\n)--(tmrl\n);
+
+    \draw (tml\n)--(tmll\n);
+}
+
+\begin{scope}
+    [
+        red,
+        thick,
+        >=latex
+    ]
+
+    \def\rad{1.75pt}
+
+    \draw
+        ($(n20)+(-0.6,\rad)$)--($(n20)+(-0.5,\rad)$);
+
+    \draw[>->]
+        ($(n20)+(-0.5,\rad)$) --
+        ($(n20.center)+(-2.4142*2*\rad,\rad)$)
+        arc[start angle=-90, end angle=45,radius=\rad] --
+        ($(tln)-(45:\rad)$)
+        arc[start angle=180+45, end angle=45,radius=\rad] --
+        ($(n20.center)+(45:\rad)+(135:2.4142*2*\rad)$)
+        arc[start angle=-135, end angle=0,radius=\rad] --
+        ($(tmn)-(\rad,0.4142*2*\rad)$)
+        arc[start angle=0, end angle=45,radius=\rad] --
+        ($(tmln)-(45:\rad)$)
+        arc[start angle=180+45, end angle=180+30,radius=\rad] --
+        ($(tmlln)-(30:\rad)$)
+        arc[start angle=180+30, end angle=30,radius=\rad] --
+        ($(tmln)+(30:\rad)+(120:0.1317*2*\rad)$)
+        arc[start angle=-180+30, end angle=-180+45,radius=\rad] --
+        ($(tmn)+(45:\rad)+(135:1*2*\rad)$)
+        arc[start angle=-135, end angle=-45,radius=\rad] --
+        ($(tmrn)+(135:\rad)-(45:0.7673*2*\rad)$)
+        arc[start angle=-45, end angle=30,radius=\rad] --
+        ($(tmrln)-(30:\rad)$)
+        arc[start angle=180+30, end angle=30,radius=\rad] --
+        ($(tmrn)+(30:\rad)+(120:1.7320*2*\rad)$)
+        arc[start angle=-150, end angle=-30,radius=\rad] --
+        ($(tmrrn)+(150:\rad)$)
+        arc[start angle=150, end angle=-30,radius=\rad] --
+        ($(tmrn)+(-30:\rad)$)
+        arc[start angle=-30, end angle=-45,radius=\rad] --
+        ($(tmn)+(-45:\rad)+(45:0.4142*2*\rad)$)
+        arc[start angle=135, end angle=180,radius=\rad] --
+        ($(n20)+(\rad,2.4142*2*\rad)$)
+        arc[start angle=-180, end angle=-45,radius=\rad] --
+        ($(trn)+(135:\rad)$)
+        arc[start angle=135, end angle=-45,radius=\rad] --
+        ($(n20)+(-45:\rad)+(45:2.4142*2*\rad)$)
+        arc[start angle=-180-45, end angle=-90,radius=\rad] --
+        ($(n20)+(0.6,\rad)$)
+        ;
+\end{scope}
+
+
+% --- Lower Line ---
+
+\begin{scope}
+    [xscale=0.7]
+%
+
+\def\fLineY{-1.25}
+
+\draw (-3.25,\fLineY) -- (3.25,\fLineY);
+
+\node[llbl] at (-3.25,\fLineY) {$\ell$};
+
+\coordinate (ll) at (-3,\fLineY);
+\coordinate (lr) at (3,\fLineY);
+
+% --- Mapping on f ---
+\begin{pgfonlayer}
+    {background}
+66
+\draw
+    ($(ll)+(0,3pt)$) --
+    ($(n20.south)-(0,3pt)$) --
+    ($(lr)+(-0.6666,3pt)$);
+
+\end{pgfonlayer}
+
+\foreach \x in {1,2,4,5,6,9,10,12,16,18}
+{
+    \node[sN] (nl\x) at ($(ll)+(0.3333*\x,0)-(0.1667,0)$) {};
+}
+
+\foreach \x in {3,7,8,11,13,14,15,17}
+{
+    \draw ($(ll)+(0.3333*\x,0.066)-(0.1667,0)$)--($(ll)+(0.3333*\x,-0.066)-(0.1667,0)$) {};
+}
+
+\node[blbl,inner ysep=5pt] at (nl1.south) {$f(x_i)$};
+\node[blbl,inner ysep=5pt] at (nl18.south) {$f(x_{i+1})$};
+
+\begin{scope}
+    [
+        font=
+        {%
+            \sffamily%
+            \sbseries%
+            \small%
+        },
+    ]
+
+% \node[below,inner sep=2pt] at ($(nm27.center)-(0,0.5)$) {(a)};
+% \node[below,inner sep=2pt,fill=white] at ($(n27.center)-(0,0.5)$) {(b)};
+% \node[below,inner sep=0pt] at ($(0,\fLineY)-(0,0.5)$) {(c)};
+
+\end{scope}
+\end{scope}
+
+\def\cbb{current bounding box}
+
+\path [use as bounding box] (\cbb.north west) rectangle ([xscale=-1]\cbb.south west);
+
+\end{tikzpicture}
+

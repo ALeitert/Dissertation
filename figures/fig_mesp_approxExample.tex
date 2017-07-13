@@ -1,0 +1,36 @@
+\tikzsetnextfilename{fig_mesp_approxExample}
+\begin{tikzpicture}
+\foreach \x in {-3,-2,-1,0,1,2,3}
+{
+    \node[sN] (n\x0) at (\x,0) {};
+}
+
+\foreach \x in {-1,0,1}
+{
+    \node[sN] (n\x-1) at (\x,-1) {};
+}
+
+\node [sN] at (0,1){};
+
+\node [llbl] at (n-30.west) {$s$};
+\node [rlbl] at (n30.east) {$t$};
+
+\node [blbl] at (n-1-1.south) {$u$};
+\node [blbl] at (n0-1.south) {$v$};
+\node [blbl] at (n1-1.south) {$w$};
+
+\node [lbl,anchor=-135] at (n00.45) {$x$};
+
+\begin{pgfonlayer}{background}
+
+\draw (-3,0) -- (3,0);
+\draw (-1,-1) -- (1,-1);
+\draw (-2,0) -- (-1,-1);
+\draw (2,0) -- (1,-1);
+\draw (-1,0) -- (-0,-1);
+\draw (1,0) -- (0,-1);
+\draw (0,0) -- (0,1);
+
+\end{pgfonlayer}
+
+\end{tikzpicture}

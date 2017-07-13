@@ -1,0 +1,97 @@
+% -------------------------------------------
+%  Header file.
+%
+%  Contains basic definitions and packages.
+% -------------------------------------------
+
+% UTF-8 input.
+\usepackage[utf8]{inputenc}
+
+% Makes ligatures readable in the pdf.
+\input{glyphtounicode}
+\pdfgentounicode=1
+
+% Font (everything but Times)
+\usepackage[T1]{fontenc}
+\usepackage
+    [
+        rm={lining,tabular},
+        sf={lining,tabular},
+        tt={lining,tabular,monowidth}
+    ]{cfr-lm}
+\usepackage[defaultsans,scale=0.90]{opensans}
+\linespread{1.1}
+
+% Fixes some spacing errors.
+% Requires to use \( \) instead of $ $.
+% See https://tex.stackexchange.com/a/271282
+\usepackage{mathtools}
+\mathtoolsset{mathic=true}
+
+
+% Microtype 
+\usepackage[kerning=true]{microtype}
+
+\SetExtraKerning [ unit = space ]
+{
+    encoding = *
+}
+{
+    - = {135,0},
+    \textendash = {300,300}
+}
+
+
+% Document in English
+\usepackage[english]{babel}
+
+% AMS packages
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+% Allows to include pictures
+\usepackage{graphicx}
+
+% Adds line-numbers.
+\usepackage{lineno}
+\modulolinenumbers[5]
+
+% Links and metadata for pdf-file
+\usepackage
+    [
+        pdfusetitle,
+    ]
+    {hyperref}
+
+\hypersetup
+{
+    unicode,
+    pdfborder = 0 0 0,
+}
+
+
+% More if-clauses
+\usepackage[]{xifthen}
+
+% Easy way to change borders
+\usepackage
+    [
+        % Works with A4 and US-letter paper.
+        paperwidth=170mm,
+        paperheight=259mm,
+        left=1.12cm,
+        right=1.12cm,
+        top=2.0cm,
+        bottom=2.0cm
+    ]
+    {geometry}
+
+% Bibliography
+\usepackage[numbers]{natbib}
+\bibliographystyle{splncs03}
+\renewcommand\bibsection
+{%
+    \chapter*{\bibname}
+}
+

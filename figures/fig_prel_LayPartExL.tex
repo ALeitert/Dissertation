@@ -1,0 +1,73 @@
+% -----------------------------
+% Example for layering partition.
+
+\tikzsetnextfilename{fig_prel_LayPartExL}
+\begin{tikzpicture}
+    [
+        x=1.2cm,
+        y=1.2cm,
+    ]
+
+\def\hei{-0.8660}
+
+\node[nN] (s) at (0,0) {}; 
+\node[llbl] at ($(s.west)+(-3pt,0)$) {$s$};
+
+\node[nN] (n11) at (-0.5,\hei) {};
+\node[nN] (n12) at (0.5,\hei) {};
+
+\node[nN] (n21) at (-1,2*\hei) {};
+\node[nN] (n22) at (1,2*\hei) {};
+
+\node[nN] (n31) at (-1.5,3*\hei) {};
+\node[nN] (n32) at (-0.5,3*\hei) {};
+\node[nN] (n33) at (1.5,3*\hei) {};
+
+\node[nN] (n41) at (-2,4*\hei) {};
+\node[nN] (n42) at (-1,4*\hei) {};
+\node[nN] (n43) at (0,4*\hei) {};
+\node[nN] (n44) at (1,4*\hei) {};
+\node[nN] (n45) at (2,4*\hei) {};
+
+\node[nN] (n51) at (-1.5,5*\hei) {};
+\node[nN] (n52) at (1.5,5*\hei) {};
+
+
+\begin{pgfonlayer}
+    {lowerBG}
+    
+    \begin{scope}
+        [
+            every node/.style=
+            {
+                fill=clLight60Green!30,
+                draw=clDark25Green,
+            },
+            every fit/.append style=text badly centered
+        ]
+
+        \node[fit=(s)] {};
+        \node[fit=(n11)(n12)] {};
+        \node[fit=(n21)(n22)] {};
+        \node[fit=(n31)(n32)(n33)] {};
+        \node[fit=(n41)(n42)] {};
+        \node[fit=(n43)(n44)(n45)] {};
+        \node[fit=(n51)] {};
+        \node[fit=(n52)] {};
+
+    \end{scope}
+\end{pgfonlayer}
+
+\begin{pgfonlayer}
+    {background}
+
+    \draw
+        (s.center) -- (2,4*\hei) -- (1.5,5*\hei) -- (1,4*\hei) -- (0,4*\hei) -- (-0.5,3*\hei)
+        (s.center) -- (-2,4*\hei) -- (-1.5,5*\hei) -- (-1,4*\hei) -- (-0.5,3*\hei)
+        (1,4*\hei) -- (1.5,3*\hei)
+        (-1,2*\hei) -- (-0.5,3*\hei)
+        (-0.5,\hei) -- (0.5,\hei);
+\end{pgfonlayer}
+
+\end{tikzpicture}
+

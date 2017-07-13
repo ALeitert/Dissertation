@@ -1,0 +1,108 @@
+\tikzsetnextfilename{fig_strB_Gplus}
+\begin{tikzpicture}
+    [scale=1.33]
+%
+
+\node [sN] (v) at (0.5,0) {};
+
+\node [sN] (q0) at (1,2) {};
+\node [sN] (q1) at (0,1) {};
+\node [sN] (q2) at (0,2) {};
+\node [sN] (q3) at (1,1) {};
+
+\node [sN] (x) at (0,3) {};
+\node [sN] (y) at (1,3) {};
+\node [sN] (c) at (2.15,1) {};
+
+
+\def\len{0.66}
+
+\coordinate (c5) at ($(c)+(\len,0)$);
+\foreach \i in {1,...,5}
+{
+    \coordinate (c5\i) at ($(c5)+(-108-72*\i:\len)$);
+}
+
+\begin{pgfonlayer}{background}
+
+\path
+    (v.center) --
+    coordinate[pos=0.4] (l1)
+    coordinate[pos=0.3] (p_v1_1)
+    coordinate[pos=0.7] (p_v1_2)
+    (q1.center);
+
+\path
+    (v.center) --
+    coordinate[pos=0.4] (l2)
+    coordinate[pos=0.3] (p_v3_1)
+    coordinate[pos=0.7] (p_v3_2)
+    (q3.center);
+
+\path
+    (x.center) --
+    coordinate[pos=0.3] (p_x2_1)
+    coordinate[pos=0.7] (p_x2_2)
+    (q2.center);
+
+\path
+    (y.center) --
+    coordinate[pos=0.3] (p_y0_1)
+    coordinate[pos=0.7] (p_y0_2)
+    (q0.center);
+
+\path
+    (c.center) --
+    coordinate[pos=0.5] (l3)
+    coordinate[pos=0.3] (p_c3_1)
+    coordinate[pos=0.7] (p_c3_2)
+    (q3.center);
+
+\foreach \p/\q/\a in {x/2/0,y/0/0,c/3/-90,v/1/210,v/3/150}
+{
+\draw
+    (\p.center)
+    .. controls +(90+\a:-0.15) and +(90+\a:0.15) .. ($(p_\p\q_1)+(\a:-0.06)$)
+    .. controls +(90+\a:-0.15) and +(90+\a:0.15) .. ($(p_\p\q_2)+(\a:0.06)$)
+    .. controls +(90+\a:-0.15) and +(90+\a:0.15) .. (q\q.center);
+    -- (q\q.center);
+}
+
+\draw (q0.center) -- (q1.center);
+\draw (q0.center) -- (q2.center);
+\draw (q0.center) -- (q3.center);
+\draw (q1.center) -- (q2.center);
+\draw (q1.center) -- (q3.center);
+
+\draw (c5) -- (c51);
+\draw (c5) -- (c53);
+\draw (c5) -- (c54);
+
+\draw (c51)
+\foreach \i in {2,...,5}
+{
+    -- (c5\i)
+}
+-- cycle;
+
+\end{pgfonlayer}
+
+\node [llbl] at (v.west) {$v_i$};
+\node [llbl] at (x.west) {$x_i$};
+\node [rlbl] at (y.east) {$y_i$};
+\node [blbl] at (c.south) {$z_i$};
+
+\node [llbl] at (q2.west) {$u_{i,1}$};
+\node [rlbl] at (q0.east) {$u_{i,2}$};
+\node [llbl] at (q1.west) {$u_{i,3}$};
+\node [lbl,anchor=135] at (q3.south east) {$u_{i,4}$};
+
+
+\node [llbl] at (0,2.5) {$\lfloor \frac{\rho}{2} \rfloor - 1$};
+\node [rlbl] at (1,2.5) {$\lfloor \frac{\rho}{2} \rfloor$};
+\node [tlbl] at (l3) {$\lceil \frac{\rho}{2} \rceil - 1$};
+
+\node [rlbl] at (l2) {$\lfloor \frac{\rho}{2} \rfloor$};
+\node [llbl] at (l1) {$\lceil \frac{\rho}{2} \rceil - 1$};
+
+\end{tikzpicture}

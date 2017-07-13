@@ -1,0 +1,154 @@
+% -------------------------------------------
+%  Header file.
+%
+%  Contains makros which allow easier writing.
+% -------------------------------------------
+
+% ----------------------
+% ---  Basic Makros  ---
+
+\makeatletter
+
+% Proper i.e. writing.
+\newcommand{\ie}{i.\,e.\@ifnextchar{,}{}{~}}
+\newcommand{\Ie}{I.\,e.\@ifnextchar{,}{}{~}}
+
+% Proper e.g. writing.
+\newcommand{\eg}{e.\,g.\@ifnextchar{,}{}{~}}
+\newcommand{\Eg}{E.\,g.\@ifnextchar{,}{}{~}}
+
+\makeatother
+
+% Double line capital letters
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\calC}{\mathcal{C}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calE}{\mathcal{E}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calG}{\mathcal{G}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\calI}{\mathcal{I}}
+\newcommand{\calJ}{\mathcal{J}}
+\newcommand{\calK}{\mathcal{K}}
+\newcommand{\calL}{\mathcal{L}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\calN}{\mathcal{N}}
+\newcommand{\calO}{\mathcal{O}}
+\newcommand{\calP}{\mathcal{P}}
+\newcommand{\calQ}{\mathcal{Q}}
+\newcommand{\calR}{\mathcal{R}}
+\newcommand{\calS}{\mathcal{S}}
+\newcommand{\calT}{\mathcal{T}}
+\newcommand{\calU}{\mathcal{U}}
+\newcommand{\calV}{\mathcal{V}}
+\newcommand{\calW}{\mathcal{W}}
+\newcommand{\calX}{\mathcal{X}}
+\newcommand{\calY}{\mathcal{Y}}
+\newcommand{\calZ}{\mathcal{Z}}
+
+\newcommand{\bbA}{\mathbb{A}}
+\newcommand{\bbB}{\mathbb{B}}
+\newcommand{\bbC}{\mathbb{C}}
+\newcommand{\bbD}{\mathbb{D}}
+\newcommand{\bbE}{\mathbb{E}}
+\newcommand{\bbF}{\mathbb{F}}
+\newcommand{\bbG}{\mathbb{G}}
+\newcommand{\bbH}{\mathbb{H}}
+\newcommand{\bbI}{\mathbb{I}}
+\newcommand{\bbJ}{\mathbb{J}}
+\newcommand{\bbK}{\mathbb{K}}
+\newcommand{\bbL}{\mathbb{L}}
+\newcommand{\bbM}{\mathbb{M}}
+\newcommand{\bbN}{\mathbb{N}}
+\newcommand{\bbO}{\mathbb{O}}
+\newcommand{\bbP}{\mathbb{P}}
+\newcommand{\bbQ}{\mathbb{Q}}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbS}{\mathbb{S}}
+\newcommand{\bbT}{\mathbb{T}}
+\newcommand{\bbU}{\mathbb{U}}
+\newcommand{\bbV}{\mathbb{V}}
+\newcommand{\bbW}{\mathbb{W}}
+\newcommand{\bbX}{\mathbb{X}}
+\newcommand{\bbY}{\mathbb{Y}}
+\newcommand{\bbZ}{\mathbb{Z}}
+
+% QED symbol
+\DeclareRobustCommand{\qed}
+{%
+    \def\qedChar{\square}%
+    \ifnum 1 < \value{proofLevel}%
+        \def\qedChar{\lozenge}%
+    \fi%
+    \ifmmode%
+        \qedChar%
+    \else%
+        \leavevmode\unskip\penalty9999 \hbox{}\nobreak\hfill%
+        \quad\hbox{$\qedChar$}%
+    \fi%
+}%
+
+% ---------------------
+% ---  Font styles  ---
+
+\DeclareRobustCommand\ebseries{\fontseries{eb}\selectfont}
+\DeclareRobustCommand\sbseries{\fontseries{sb}\selectfont}
+\DeclareRobustCommand\meseries{\fontseries{m}\selectfont}
+\DeclareRobustCommand\ltseries{\fontseries{l}\selectfont}
+\DeclareRobustCommand\clseries{\fontseries{cl}\selectfont}
+
+\DeclareTextFontCommand{\texteb}{\ebseries}
+\DeclareTextFontCommand{\textsb}{\sbseries}
+\DeclareTextFontCommand{\textme}{\meseries}
+\DeclareTextFontCommand{\textlt}{\ltseries}
+\DeclareTextFontCommand{\textcl}{\clseries}
+
+% ---------------------------
+% ---  Special functions  ---
+
+% (Lex)BFS
+\DeclareMathOperator{\BFS}{BFS}
+\DeclareMathOperator{\Lex}{LexBFS}
+
+% Tree- and path-decompositions
+\DeclareMathOperator{\tb}{tb}
+\DeclareMathOperator{\pb}{pb}
+
+\DeclareMathOperator{\stb}{stb}
+\DeclareMathOperator{\spb}{spb}
+
+\DeclareMathOperator{\tl}{tl}
+\DeclareMathOperator{\pl}{pl}
+
+\DeclareMathOperator{\tw}{tw}
+\DeclareMathOperator{\pw}{pw}
+
+% Eccentricity + Diameter
+\DeclareMathOperator{\ecc}{ecc}
+\DeclareMathOperator{\diam}{diam}
+
+% Bandwidth and Line-Distortion
+\DeclareMathOperator{\bw}{bw}
+\DeclareMathOperator{\ld}{ld}
+
+% Projection Gap
+\DeclareMathOperator{\pg}{pg}
+
+
+% Keyword
+\newcommand{\keyword}[1]
+{{%
+    \sffamily%
+    \sbseries%
+    #1%
+}}
+
+% Name of a person.
+\newcommand{\name}[1]{\textsc{#1}}
+
+% Up- and Down-Separators
+\newcommand{\Sup}{S^{\raisebox{0.1ex}{$\scriptscriptstyle \uparrow$}}}
+\newcommand{\Sdown}{S^{\scriptscriptstyle\downarrow}}
+\newcommand{\calSdown}{\calS^{\scriptscriptstyle\downarrow}}
+

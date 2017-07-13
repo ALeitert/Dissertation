@@ -1,0 +1,167 @@
+\tikzsetnextfilename{fig_LayPartPaths}
+\begin{tikzpicture}
+    [
+        xscale=1.2,
+        yscale=-0.8660,
+    ]
+%
+
+\node[nN] (n01) at (3,0) {};
+\node[nN] (n02) at (4,0) {};
+\node[nN] (n03) at (5,0) {};
+
+\node[nN] (n11) at (2.5,1) {};
+\node[nN] (n12) at (3.5,1) {};
+\node[nN] (n13) at (4.5,1) {};
+\node[nN] (n14) at (5.5,1) {};
+
+\node[nN] (n21) at (1.5,2) {};
+\node[nN] (n22) at (2.5,2) {};
+\node[nN] (n23) at (3.5,2) {};
+\node[nN] (n24) at (4.5,2) {};
+\node[nN] (n25) at (5.5,2) {};
+\node[nN] (n26) at (6.5,2) {};
+
+\node[nN] (n31) at (1,3) {};
+\node[nN] (n32) at (2,3) {};
+\node[nN] (n33) at (3,3) {};
+\node[nN] (n34) at (4,3) {};
+\node[nN] (n35) at (5,3) {};
+\node[nN] (n36) at (6,3) {};
+\node[nN] (n37) at (7,3) {};
+
+\begin{pgfonlayer}
+    {background}
+
+    \begin{scope}
+        [
+            every node/.style=
+            {
+                fill=clLight60Green!30,
+                draw=clDark25Green,
+                minimum width=0.75cm,
+            },
+            every fit/.append style=text badly centered
+        ]
+
+        \node[fit=(n01)(n02)(n03)] (c01) {};
+
+        \node[fit=(n11)(n12)] (c11) {};
+        \node[fit=(n13)(n14)] (c12) {};
+
+        \node[fit=(n21)(n22)] (c21) {};
+        \node[fit=(n23)(n24)] (c22) {};
+        \node[fit=(n25)(n26)] (c23) {};
+
+        \node[fit=(n31)(n32)] (c31) {};
+        \node[fit=(n33)] (c32) {};
+        \node[fit=(n34)] (c33) {};
+        \node[fit=(n35)(n36)] (c34) {};
+        \node[fit=(n37)] (c35) {};
+
+    \end{scope}
+
+    \draw (n01.center) -- (n02.center);
+    \draw (n01.center) -- (n11.center);
+
+    \draw (n02.center) -- (n03.center);
+    \draw (n02.center) -- (n12.center);
+    \draw (n02.center) -- (n13.center);
+
+    \draw (n03.center) -- (n14.center);
+
+    \draw (n11.center) -- (n21.center);
+    \draw (n11.center) -- (n22.center);
+
+    \draw (n12.center) -- (n22.center);
+
+    \draw (n13.center) -- (n14.center);
+    \draw (n13.center) -- (n23.center);
+    \draw (n13.center) -- (n24.center);
+
+    \draw (n14.center) -- (n25.center);
+    \draw (n14.center) -- (n26.center);
+
+    \draw (n21.center) -- (n31.center);
+    \draw (n21.center) -- (n32.center);
+
+    \draw (n22.center) -- (n32.center);
+    \draw (n22.center) -- (n33.center);
+
+    \draw (n23.center) -- (n34.center);
+
+    \draw (n24.center) -- (n34.center);
+
+    \draw (n25.center) -- (n35.center);
+
+    \draw (n26.center) -- (n36.center);
+    \draw (n26.center) -- (n37.center);
+
+    \draw (n31.center) -- (n32.center);
+
+    \draw (n35.center) -- (n36.center);
+
+\end{pgfonlayer}
+
+\def\pathCol{red!85!black}
+\draw[very thick,\pathCol]
+    (n31.center) --
+    (n21.center) --
+    (n11.center) --
+    (n01.center);
+
+\draw[very thick,\pathCol]
+    (n34.center) --
+    (n23.center) --
+    (n13.center);
+
+\draw[very thick,\pathCol]
+    (n35.center) --
+    (n25.center);
+
+\begin{scope}
+    [
+        every node/.style=
+        {
+            nN,
+            very thick,
+            fill=\pathCol!30,
+            draw=\pathCol,
+        },
+    ]
+%
+
+\node[] at (n01) {};
+
+\node[] at (n11) {};
+\node[] at (n13) {};
+
+\node[] at (n21) {};
+\node[] at (n23) {};
+\node[] at (n25) {};
+
+\node[] at (n31) {};
+\node[] at (n33) {};
+\node[] at (n34) {};
+\node[] at (n35) {};
+\node[] at (n37) {};
+
+\end{scope}
+
+\begin{pgfonlayer}
+    {lowerBG}
+
+\end{pgfonlayer}
+
+\node [blbl] at (c31.south) {$C_1$};
+\node [blbl] at (c32.south) {$C_2 = C_2'$};
+\node [blbl] at (c33.south) {$C_3$};
+\node [blbl] at (c34.south) {$C_4$};
+\node [blbl] at (c35.south) {$C_5 = C_5'$};
+
+\node [rlbl] at (c01.east) {$C_1'$};
+\node [rlbl] at (c12.east) {$C_3'$};
+\node [rlbl] at (c23.east) {$C_4'$};
+
+\end{tikzpicture}
+

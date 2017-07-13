@@ -1,0 +1,190 @@
+\tikzsetnextfilename{fig_bwld_bwApprox}
+\begin{tikzpicture}[scale=1.2]
+
+\pgfmathsetseed{6}
+
+% --- Upper Line ---
+
+\draw (-3.25,0) -- (-0.5,0);
+\draw (3.25,0) -- (0.5,0);
+
+\node[llbl] at (-3.25,0) {$P$};
+
+\node[lbl] at (0,0) {$\hbox{.}\,\hbox{.}\,\hbox{.}$};
+
+\foreach \x in {3,2.5,2,1.5,1}
+{
+    \pgfmathtruncatemacro{\xn}{\x*10}%
+    \node[sN] (n\xn)  at (\x,0) {};
+    \node[sN] (nm\xn) at (-\x,0) {};
+}
+
+
+\foreach \n in {n,nm}
+{
+    \coordinate (tm\n) at ($(\n20)+(0,0.5)$);
+    \coordinate (tr\n) at ($(\n20)+(45:0.5)$);
+    \coordinate (tl\n) at ($(\n20)+(135:0.5)$);
+
+    \coordinate (tmr\n) at ($(tm\n)+(45:0.5)$);
+    \coordinate (tml\n) at ($(tm\n)+(135:0.5)$);
+
+    \coordinate (tmrr\n) at ($(tmr\n)+(60:0.5)$);
+    \coordinate (tmrl\n) at ($(tmr\n)+(120:0.5)$);
+
+    \coordinate (tmll\n) at ($(tml\n)+(120:0.5)$);
+
+
+    \draw (\n20)--(tm\n);
+    \draw (\n20)--(tr\n);
+    \draw (\n20)--(tl\n);
+
+    \draw (tm\n)--(tmr\n);
+    \draw (tm\n)--(tml\n);
+
+    \draw (tmr\n)--(tmrr\n);
+    \draw (tmr\n)--(tmrl\n);
+
+    \draw (tml\n)--(tmll\n);
+}
+
+
+% --- Lower Line ---
+
+\def\fLineY{-2.25}
+
+\draw (-3.25,\fLineY) -- (-0.5,\fLineY);
+\draw (0.5,\fLineY) -- (3.25,\fLineY);
+
+\node[llbl] at (-3.25,\fLineY) {$[1,n]$};
+
+\node[lbl] at (0,\fLineY) {$\hbox{.}\,\hbox{.}\,\hbox{.}$};
+
+
+% --- Special Vertices ---
+
+\node[blbl,fill=white,inner sep=3pt,yshift=-2pt] at (nm20.south) {$x_i$};
+\node[blbl,fill=white,inner sep=3pt,yshift=-2pt] at (n20.south) {$x_j$};
+
+\coordinate (cu) at (-2.75,\fLineY);
+\coordinate (cv) at (2.75,\fLineY);
+
+\node[sN] (u) at (cu) {};
+\node[sN] (v) at (cv) {};
+
+\node[tlbl] at (u.60) {$u$};
+\node[tlbl] at (v.120) {$v$};
+
+% --- BFS Partition ---
+
+\foreach \x
+    [
+        evaluate=\x as \xx using 0.125*\x,
+        evaluate=\x as \xxSq using 0.25*0.125*\x*\x,
+        evaluate=\x as \jFact using 0.02*abs(\x),
+    ]
+    in {-8,-7,...,7,8}
+{
+    \pgfmathtruncatemacro{\absX}{abs(\x)};
+    \pgfmathtruncatemacro{\xCor}{8+\x};
+
+    \ifnum\absX>3
+        \coordinate (vec_\xCor) at ($(\xx,\xxSq)-(0,2pt)+(90+random*90:rand*\jFact+0.1)$);
+
+        \coordinate (xi_\xCor) at ($(nm20.south)+(vec_\xCor)$);
+        \coordinate (xj_\xCor) at ($(n20.south)+(vec_\xCor)$);
+    \else
+        \coordinate (xi_\xCor) at ($(nm20.south)+(\xx,\xxSq)-(0,2pt)$);
+        \coordinate (xj_\xCor) at ($(n20.south)+(\xx,\xxSq)-(0,2pt)$);
+    \fi
+}
+
+\draw
+    [
+        rounded corners=2pt,
+    ]
+    ($(nm20.south)+(-1,2)-(0,2pt)$)
+    \foreach \x in {1,...,15}
+    {
+        --(xi_\x)
+    }
+    -- ($(nm20.south)+(1,2)-(0,2pt)$);
+
+\draw
+    [
+        rounded corners=2pt,
+    ]
+    ($(n20.south)+(-1,2)-(0,2pt)$)
+    \foreach \x in {1,...,15}
+    {
+        --(xj_\x)
+    }
+    -- ($(n20.south)+(1,2)-(0,2pt)$);
+
+
+\node[blbl] at ($(nm20.south)+(0,2)-(0,2pt)$) {$X_i$};
+\node[blbl] at ($(n20.south)+(0,2)-(0,2pt)$) {$X_j$};
+
+
+% --- Mapping on f ---
+
+\begin{pgfonlayer}{background}
+
+\draw ($(cu)+(-0.25,3pt)$) -- ($(nm20.south)-(0,4pt)$) -- ($(cu)+(1.75,3pt)$);
+\draw ($(cv)+(0.25,3pt)$) -- ($(n20.south)-(0,3pt)$) -- ($(cv)+(-1.75,3pt)$);
+
+\draw
+    [
+        decorate,
+        decoration=
+        {
+            brace,
+            amplitude=5pt,
+            raise=3pt,
+        },
+    ]
+    ($(cv)+(0.25,0)$) --
+    ($(cv)-(1.75,0)$)
+    node
+        [
+            midway,
+            blbl,
+            yshift=-10pt,
+        ]
+        {$X_j$};
+
+\draw
+    [
+        decorate,
+        decoration=
+        {
+            brace,
+            amplitude=5pt,
+            raise=3pt,
+        }
+    ]
+    ($(cu)+(1.75,0)$) --
+    ($(cu)-(0.25,0)$)
+    node
+        [
+            midway,
+            blbl,
+            yshift=-10pt,
+        ]
+        {$X_i$};
+
+\draw
+    [
+        white,
+        ultra thick,
+        double=black,
+        double distance=0.4pt,
+    ]
+    (cu) to[out=30,in=150] (cv);
+\end{pgfonlayer}
+
+\def\cbb{current bounding box}
+
+\path [use as bounding box] (\cbb.north west) rectangle ([xscale=-1]\cbb.south west);
+
+\end{tikzpicture}

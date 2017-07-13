@@ -1,0 +1,94 @@
+\chapter{Introduction}
+    \label{cha:intro}
+%
+
+Decomposing a graph into a tree is an old concept.
+It is introduced already by \textsc{Halin}~\cite{Halin1976}.
+However, a more popular introduction is given by \name{Robertson} and \name{Seymour}~\cite{RobertSeymou1983,RobertSeymou1984}.
+The idea is to decompose a graph into multiple induced subgraphs, usually called \emph{bags}, where each vertex can be in multiple bags.
+These bags are combined to a tree or path in such a way that the following requirements are fulfilled:
+Each vertex is in at least one bag, each edge is in at least one bag, and, for each vertex, the bags containing it induce a subtree.
+We give formal definitions in Section~\ref{sec:treeDecoDef} (page~\pageref{sec:treeDecoDef}).
+
+For a given graph, there can be up-to exponentially many different tree- or path-decompositions.
+The easiest is to have only one bag containing the whole graph.
+To make the concept more interesting, it is necessary to add additional restrictions.
+The most known is called \emph{tree-width}.
+A decomposition has \emph{width}~$\omega$ if each bag contains at most~$\omega + 1$ vertices.
+Then, a graph~$G$ has tree-width~$\omega$ (written as $\tw(G) = \omega$) if there is a tree-decomposition for~$G$ which has width~$\omega$ and there is no tree-decomposition with smaller width.
+
+Tree-width is well studied.
+Determining the minimal width~$\omega$ for a given graph~$G$ is NP-complete~\cite{ArnbCornPros1987}.
+However, if $\omega$ is fixed, it can be checked in linear time if $\tw(G) \leq \omega$~\cite{Bodlae1996}.
+The algorithm in~\cite{Bodlae1996} also creates a tree decomposition for~$G$.
+For a graph class with bounded tree-with, many NP-complete problems can be solved in polynomial or even linear time.
+
+In the last years, a new perspective on tree-decompositions was invested.
+Instead of limiting the number of vertices in each bag, the distance between vertices inside a bag is limited.
+There are two major variants: \emph{breadth} and \emph{length}.
+
+The \emph{breadth} of a decomposition is~$\rho$, if, for each bag~$B$, there is a vertex~$v$ such that each vertex in~$B$ has distance at most~$\rho$ to~$v$.
+Accordingly, we say the \emph{tree-breadth} of a graph~$G$ is $\rho$ (written as $\tb(G) = \rho$) if there is a tree-decomposition for~$G$ with breadth~$\rho$ and there is no tree-decomposition with smaller breadth.
+
+The \emph{length} of a decomposition is $\lambda$, if the maximal distance of two vertices in each bag is at most~$\lambda$.
+Accordingly, we say the \emph{tree-length} of a graph~$G$ is $\lambda$ (written as $\tl(G) = \lambda$) if there is a tree-decomposition for~$G$ with length~$\lambda$ and there is no tree-decomposition with smaller length.
+
+\section{Existing and Recent Results}
+
+The first results on tree-breadth and -length were motivated by tree spanners.
+A \emph{tree spanner}~$T$ of a graph~$G$ is a spanning tree for~$G$ such that the distance of two vertices in~$T$ approximates their distance in~$G$.
+A natural applications for tree spanners is routing in networks.
+Routing messages directly over a tree can be done very efficiently~\cite{ThorupZwick2001}.
+Another option is to use the tree as orientation as shown in~\cite{DraganMatama2011}.
+Next to routing, tree spanners are used for a protocol locating mobile objects in networks~\cite{PelegReshef2001}.
+Other applications can be found for example in biology~\cite{BandelDress1986} and in approximating bandwidth~\cite{VenRotMadMak1997}.
+
+To approximate tree spanners for general graphs, \name{Dragan} and \name{Köhler} introduce tree-breadth in~\cite{DraganKohler2014}.
+As additional result, they show a simple algorithm for approximating tree-breadth.
+Later, \name{Abu-Ata} and \name{Dragan}~\cite{DraganAbuAta2014} use tree-breadth to construct collective tree spanners for general graphs.
+In~\cite{AbuAtaDragan2016}, they also analyse the tree-breadth of real world graph showing that many real world graphs have a small tree-breadth.
+The hardness of computing the tree-breadth of a graph is investigated by \name{Ducoffe} et al.\,\cite{DucoLegaNiss2016}.
+They show that it is NP-complete to determine, for a given graph~$G$ and any given integer~$\rho \geq 1$, if $\tb(G) \leq \rho$.
+Additionally, they present a polynomial-time algorithms to decide if $\tb(G) = 1$ for the case that $G$ is a bipartite or a planar graph.
+
+Tree-length is first introduced by \name{Dourisboure} and \name{Gavoille}~\cite{DourisGavoil2007}.
+They investigate the connection to $k$-chordal graphs and present first approximation results.
+Later, \name{Dourisboure}~et~al.\,\cite{DouDraGavYan2007} use tree-length to investigate additive spanners.
+Additionally, \name{Dourisboure}~\cite{Dourisboure2005} shows how to compute efficient routing schemes for graphs with bounded tree-length.
+An other application of tree-length is the Metric Dimension problem.
+It asks for the smallest set of vertices such that each vertex in a given graph can be identified by its distances to the vertices in such a set.
+\name{Belmonte} et al.\,\cite{BelFomGolRam2016} show that the Metric Dimension problem is Fixed Parameter Tractable for graphs with bounded tree-length.
+In~\cite{Lokshtanov2010}, \name{Lokshtanov} investigates the hardness of computing the tree-length of a given graph and shows that it is NP-complete to do so, even for length~$2$.
+A connection between tree-width and tree-length is presented by \name{Coudert} et al.\,\cite{CoudDucoNiss2016}.
+They show that, for a given graph~$G$, $\tl(G) \leq \lfloor \ell(G) / 2 \rfloor \cdot (\tw(G) - 1)$ where $\ell(G)$ is the length of a longest isometric cycle in~$G$.
+
+\section{Outline}
+
+In this dissertation, we further investigate tree-breadth.
+In Chapter~\ref{cha:compDeco}, we present approaches to compute a tree-decomposition with small breadth for a given graph.
+This includes approximation algorithms for general graphs as well as optimal solutions for special graph classes.
+We also introduce a variant of tree-breadth called \emph{strong tree-breadth}.
+Next, in Chapter~\ref{cha:conDomination}, we present algorithms to approach the (Connected) $r$-Domination problem for graphs with bounded tree-breadth.
+Our results include (almost) linear time algorithms for the case that no tree-decomposition is given and polynomial time algorithms (with a better solution quality) for the case that a tree-decomposition is given.
+In Chapter~\ref{cha:bandwidthLineDist}, we use graphs with bounded path-breadth and -length to construct efficient constant-factor approximation algorithms for the bandwidth and line-distortion problems.
+Motivated by these results, we introduce and investigate the new Minimum Eccentricity Shortest Path problem in Chapter~\ref{cha:mesp}.
+We analyse the hardness of the problem, show algorithms to compute an optimal solution, and present various approximation algorithms differing in quality and runtime.
+This is done for general graphs as well as for special graph classes.
+
+\subsubsection{Note.}
+Some of the results in this dissertation were obtained in collaborative work with \name{Feodor F.\ Dragan}\footnote{Kent State University, USA} and \name{Ekkehard Köhler}\footnote{Brandenburgische Technische Universität Cottbus, Germany}.
+Results have been published partially
+\begin{itemize*}[label={},afterlabel={},mode=unboxed]
+    \item
+        at~\emph{SWAT}~2014, Copenhagen, Denmark~\cite{DragKoehLeit2014},
+    \item
+        at~\emph{WADS}~2015, Victoria, Canada~\cite{DraganLeiter2015},
+    \item
+        at~\emph{WG}~2015, Munich, Germany~\cite{DraganLeiter2015a},
+    \item
+        at~\emph{COCOA}~2016, Hong Kong, China~\cite{LeiterDragan2016},
+    \item
+        in the \emph{Journal of Graph Algorithms and Applications}~\cite{DraganLeiter2016}, and
+    \item
+        in~\emph{Algorithmica}~\cite{DragKoehLeit2017}.
+\end{itemize*}

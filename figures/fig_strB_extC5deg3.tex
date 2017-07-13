@@ -1,0 +1,61 @@
+\tikzsetnextfilename{fig_strB_extC5deg3}
+\begin{tikzpicture}
+    [scale=1.3]
+
+\coordinate (c0) at (0,0);
+\foreach \i in {1,...,5}
+{
+    \coordinate (c\i) at (162-\i*72:1);
+}
+
+\foreach \i [evaluate=\i as \ii using {int(mod(\i,5)+1)}] in {1,...,5}
+{
+    \path
+        (c\i) -- (c\ii)
+        coordinate [pos=0.333] (c\i_1)
+        coordinate [pos=0.6666] (c\i_2);
+}
+
+\foreach \i in {1,3,3_1,3_2,4}
+{
+    \path
+        (c0) -- (c\i)
+        coordinate [pos=0.3333] (c0\i_1)
+        coordinate [pos=0.6666] (c0\i_2);
+}
+
+
+\foreach \i [evaluate=\i as \ii using {int(mod(\i,5)+1)}] in {1,...,5}
+{
+    \draw (c\i) -- (c\ii);
+}
+
+
+\foreach \i in {1,3,3_1,3_2,4}
+{
+    \draw (c0) -- (c\i);
+}
+
+\foreach \i in {1,...,5}
+{
+    \node[sN] (n\i) at (c\i) {};
+    \node[tN] (n\i_1) at (c\i_1) {};
+    \node[tN] (n\i_2) at (c\i_2) {};
+}
+
+\foreach \i in {1,3,3_1,3_2,4}
+{
+    \node [tN] at (c0\i_1) {};
+    \node [tN] at (c0\i_2) {};
+}
+
+\node [sN] (n0) at (c0) {};
+
+\node[rlbl] at (n0.east) {$u$};
+\node[tlbl] at (n1.north) {$v_1$};
+\node[rlbl] at (n2.east) {$v_2$};
+\node[rlbl] at (n3.east) {$v_3$};
+\node[llbl] at (n4.west) {$v_4$};
+\node[llbl] at (n5.west) {$v_5$};
+
+\end{tikzpicture}

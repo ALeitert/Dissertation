@@ -1,0 +1,547 @@
+
+By definition, a tree-decomposition has breadth~$\rho$ if each bag~$B$ is the subset of the $\rho$-neighbourhood of some vertex~$v$, \ie, the set of bags is the set of \emph{subsets} of the $\rho$-neighbourhoods of \emph{some} vertices.
+Recall that tree-breadth~$1$ graphs contain the class of dually chordal graphs which can be defined as follows:
+A graph~$G$ is dually chordal if it admits a tree-decomposition~$T$ such that, for each vertex~$v$ in~$G$, $T$~contains a bag~$B = N_G[v]$ (see Theorem~\ref{theo:duallyChordDeco}, page~\pageref{theo:duallyChordDeco}).
+That is, the set of bags in~$T$ is the set of \emph{complete} neighbourhoods of \emph{all} vertices.
+
+In this chapter, we investigate the case which lays between dually chordal graphs and general tree-breadth~$\rho$ graphs.
+In particular, tree-decompositions are considered where the set of bags are the \emph{complete} $\rho$-neighbourhoods of \emph{some} vertices.
+We call this \emph{strong tree-breadth}.
+The \emph{strong breadth} of a tree-decomposition is~$\rho$, if, for each bag~$B$, there is a vertex~$v$ such that $B = N_G^\rho[v]$.
+Accordingly, a graph~$G$ has strong tree-breadth smaller than or equal to~$\rho$ (written as $\stb(G) \leq \rho$) if there is a tree-decomposition for~$G$ with strong breadth at most~$\rho$.
+
+
+\subsection{NP-Completeness}
+
+In this section, we show that it is NP-complete to determine if a given graph has strong tree-breadth~$\rho$ even if $\rho = 1$.
+To do so, we show first that, for some small graphs, the choice of possible centers is restricted.
+Then, we use these small graphs to construct a reduction.
+
+\begin{lemma}
+    \label{lem:C4AdjVert}
+Let \( C = \{ v_1, v_2, v_3, v_4 \} \) be an induced \( C_4 \) in a graph~\( G \) with the edge set \( \{ v_1v_2, v_2v_3, v_3v_4, v_4v_1 \} \).
+If there is no vertex~\( w \notin C \) with \( N_G[w] \supseteq C \), then \( N_G[v_1] \) and~\( N_G[v_2] \) cannot both be bags in the same tree-decomposition with strong breadth~\( 1 \).
+\end{lemma}
+
+\begin{proof}
+Assume that there is a decomposition~$T$ with strong breadth~$1$ containing the bags $B_1 = N_G[v_1]$ and $B_2 = N_G[v_2]$.
+Because $v_3$ and~$v_4$ are adjacent, there is a bag~$B_3 \supseteq \{ v_3, v_4 \}$.
+Consider the subtrees $T_1$, $T_2$, $T_3$, and~$T_4$ of~$T$ induced by $v_1$, $v_2$, $v_3$, and~$v_4$, respectively.
+These subtrees pairwise intersect in the bags $B_1$, $B_2$, and~$B_3$.
+Because pairwise intersecting subtrees of a tree have a common vertex, $T$ contains a bag~$N_G[w] \supseteq C$.
+Note that there is no $v_i \in C$ with $N_G[v_i] \supseteq C$.
+Thus, $w \notin C$.
+This contradicts with the condition that there is no vertex~$w \notin C$ with $N_G[w] \supseteq C$.
+\end{proof}
+
+Let $C = \{ v_1, \ldots, v_5 \}$ be a $C_5$ with the edges $E_5 = \{ v_1v_2, v_2v_3, \ldots, v_5v_1 \}$.
+We call the graph $H = \big( C \cup \{ u \}, E_5 \cup \{ uv_1, uv_3, uv_4 \} \big)$, with $u \notin C$, an \emph{extended~\( C_5 \) of degree~\( 1 \)} and refer to the vertices $u$, $v_1$, $v_2$, and $v_5$ as \emph{middle}, \emph{top}, \emph{right}, and \emph{left} vertex of~$H$, respectively.
+Based on $H = (V_H, E_H)$, we construct an \emph{extended~\( C_5 \) of degree~\( \rho \)} (with $\rho > 1$) as follows.
+First, replace each edge~$xy \in E_H$ by a path of length~$\rho$.
+Second, for each vertex~$w$ on the shortest path from $v_3$ to~$v_4$, connect $u$ with~$w$ using a path of length~$\rho$.
+Figure~\ref{fig:extC5} gives an illustration.
+
+\begin{figure}
+    [htb]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{figures/fig_strB_extC5}
+        \caption
+        {%
+            Degree 1.
+        }
+        \label{fig:extC5deg1}
+    \end{subfigure}
+    \hfil
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{figures/fig_strB_extC5deg3}
+        \caption
+        {%
+            Degree 3.
+        }
+        \label{fig:extC5deg3}
+    \end{subfigure}
+
+    \caption
+    [%
+        Two extended $C_5$ of degree~1 and degree~3.
+    ]
+    {%
+        Two \emph{extended~\( C_5 \)} of \protect\subref{fig:extC5deg1} degree~1 and \protect\subref{fig:extC5deg3} degree~3.
+        We refer to the vertices $u$, $v_1$, $v_2$, and $v_5$ as middle, top, right, and left vertex, respectively.
+    }
+    \label{fig:extC5}
+\end{figure}
+
+\begin{lemma}
+    \label{lem:C5centers}
+Let \( H \) be an extended \( C_5 \) of degree~\( \rho \) in a graph~\( G \) as defined above.
+Additionally, let \( H \) be a block of~\( G \) and its top vertex~\( v_1 \) be the only articulation point of~\( G \) in~\( H \).
+Then, there is no vertex~\( w \) in~\( G \) with \( d_G(w, v_1) < \rho \) which is the center of a bag in a tree-decomposition for~\( G \) with strong breadth~\( \rho \).
+\end{lemma}
+
+\begin{proof}
+Let $T$ be a tree-decomposition for~$G$ with strong breadth~$\rho$.
+Assume that $T$ contains a bag~$B_w = N_G^\rho[w]$ with $d_G(w, v_1) < \rho$.
+Note that the distance from $v_1$ to any vertex on the shortest path from $v_3$ to~$v_4$ is $2\rho$.
+Hence, $G - B_w$ has a connected component~$C$ containing the vertices $v_3$ and~$v_4$.
+Then, by Lemma~\ref{lem:decoBorderBags} (page~\pageref{lem:decoBorderBags}), there has to be a vertex~$w' \neq w$ in~$G$ and a bag~$B_w' = N_G^\rho[w']$ in~$T$ such that
+\begin{enumerate*}[(i),mode=unboxed]
+    \item
+        \label{item:BsubsetNC}
+        $B_w' \supseteq N_G(C)$ and
+    \item
+        \label{item:BintC}
+        $B_w' \cap C \neq \emptyset$.
+\end{enumerate*}
+Thus, if we can show, for a given~$w$, that there is no such~$w'$, then $w$ cannot be center of a bag.
+
+First, consider the case that $w$ is in~$H$.
+We construct a set~$X =\{ x, y \} \subseteq N_G(C)$ such that there is a unique shortest path from $x$ to~$y$ in~$G$ passing~$w$.
+If $w = v_1$, let $x = v_2$ and $y = v_5$.
+If $w$ is on the shortest path from $v_1$ to~$u$, let $x$ and~$y$ be on the shortest path from $v_1$ to~$v_2$ and from $v_4$ to~$u$, respectively.
+If $w$ is on the shortest path from $v_1$ to~$v_2$, let $x$ and~$y$ be on the shortest path from $v_1$ to~$v_5$ and from $v_2$ to~$v_3$, respectively.
+In each case, there is a unique shortest path from $x$ to~$y$ passing~$w$.
+Note that, for all three cases, $d_G(v_1, y) \geq \rho$.
+Thus, each $w'$  with $d_G(w', y) \leq \rho$ is in~$H$.
+Therefore, $w$ is the only vertex in~$G$ with $X \subseteq N_G^\rho[w]$, \ie, there is no vertex~$w' \neq w$ satisfying condition~\ref{item:BsubsetNC}.
+This implies that $w$ cannot be center of a bag in~$T$.
+
+Next, consider the case that $w$ is not in~$H$.
+Without loss of generality, let $w$ be a center for which $d_G(v_1, w)$ is minimal.
+As shown above, there is no vertex~$w'$ in~$H$ with $d_G(v_1, w') < \rho$ which is center of a bag.
+Hence, $w'$ is not in~$H$ either.
+However, because $v_1$ is an articulation point, $w'$ has to be closer to~$v_1$ than $w$ to satisfy condition~\ref{item:BintC}.
+This contradicts with $d_G(v_1, w)$ being minimal.
+Therefore, there is no vertex~$w'$ satisfying condition~\ref{item:BintC} and $w$ cannot be center of a bag in~$T$.
+\end{proof}
+
+
+\begin{theorem}
+    \label{theo:stbNPc}
+It is NP-complete to decide, for a given graph~\( G \), if \( \stb(G) = 1 \).
+\end{theorem}
+
+\begin{proof}
+Clearly, the problem is in NP:
+Select non-deterministically a set~$S$ of vertices such that their neighbourhoods cover each vertex and each edge.
+Then, check deterministically if the neighbourhoods of the vertices in~$S$ give a valid tree-decomposition.
+This can be done in linear time (see Lemma~\ref{lem:decoValidation}, page~\ref{lem:decoValidation}).
+
+To show that the problem is NP-hard, we make a reduction from 1-in-3-SAT~\cite{Schaefer1978}.
+That is, you are given a boolean formula in CNF with at most three literals per clause; find a satisfying assignment such that, in each clause, only one literal becomes true.
+
+Let $\calI$ be an instance of 1-in-3-SAT with the literals~$\calL = \{ p_1, \ldots, p_n \}$, the clauses~$\calC = \{ c_1, \ldots, c_m \}$, and, for each $c \in \calC$, $c \subseteq \calL$.
+We create a graph~$G = (V, E)$ as follows.
+Create a vertex for each literal~$p \in \calL$ and, for all literals $p_i$ and~$p_j$ with $p_i \equiv \neg p_j$, create an induced $C_4 = \{ p_i, p_j, q_i, q_j \}$ with the edges $p_ip_j$, $q_iq_j$, $p_iq_i$, and $p_jq_j$.
+For each clause $c \in \calC$ with $c = \{ p_i, p_j, p_k \}$, create an extended $C_5$ with $c$ as top vertex, connect $c$ with an edge to all literals it contains, and make all literals in $c$ pairwise adjacent, \ie, the vertex set $\{ c, p_i, p_j, p_k \}$ induces a maximal clique in~$G$.
+Additionally, create a vertex~$v$ and make $v$ adjacent to all literals.
+Figure~\ref{fig:stbNPc} gives an illustration for the construction so far.
+
+\begin{figure}
+    [htb]
+    \centering
+
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{figures/fig_strB_stbNPc}
+        \caption{}
+        \label{fig:stbNPc}
+    \end{subfigure}
+    \hfil
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{figures/fig_strB_stbNPcRS}
+        \caption{}
+        \label{fig:stbNPcRS}
+    \end{subfigure}
+
+    \caption
+    [%
+        Illustration to the proof of Theorem~\ref{theo:stbNPc}.
+    ]
+    {%
+        Illustration to the proof of Theorem~\ref{theo:stbNPc}.
+        The graphs shown are subgraphs of~$G$ as created by a clause~$c = \{ p_i, p_j, p_k \}$ and a literal~$p_l$ with $p_i \equiv \neg p_l$.
+    }
+    \label{fig:stbNPc_full}
+\end{figure}
+
+Next, for each clause $\{ p_i, p_j, p_k \}$ and for each $(xy|z) \in \big \{ (ij|k), (jk|i), (ki|j) \big \}$, create the vertices $r_{(xy|z)}$ and~$s_{(xy|z)}$, make $r_{(xy|z)}$ adjacent to $s_{(xy|z)}$ and~$p_x$, and make $s_{(xy|z)}$ adjacent to $p_y$ and $p_z$.
+See Figure~\ref{fig:stbNPcRS} for an illustration.
+Note that $r_{(ij|k)}$ and~$s_{(ij|k)}$ are specific for the clause $\{ p_i, p_j, p_k \}$.
+Thus, if $p_i$ and~$p_j$ are additionally in a clause with~$p_l$, then we also create the vertices $r_{(ij|l)}$ and~$s_{(ij|l)}$.
+For the case that a clause only contains two literals $p_i$ and~$p_j$, create the vertices $r_{(ij)}$ and~$s_{(ij)}$, make $r_{(ij)}$ adjacent to $p_i$ and~$s_{(ij)}$, and make $s_{(ij)}$ adjacent to $p_j$, \ie, $\{ p_i, p_j, r_{(ij)}, s_{(ij)} \}$ induces a~$C_4$ in~$G$.
+
+
+For the reduction, first, consider the case that $\calI$ is a \emph{yes}-instance for 1-in-3-SAT.
+Let $f \colon \calP \rightarrow \{ T, F \}$ be a satisfying assignment such that each clause contains only one literal~$p_i$ with $f(p_i) = T$.
+Select the following vertices as centers of bags: $v$, the middle, left and right vertex of each extended $C_5$, $p_i$ if $f(p_i) = T$, and $q_j$ if $f(p_j) = F$.
+Additionally, for each clause $\{ p_i, p_j, p_k \}$ with $f(p_i) = T$, select the vertices $s_{(ij|k)}$, $r_{(jk|i)}$, and $r_{(ki|j)}$.
+The neighbourhoods of the selected vertices give a valid tree-decomposition for~$G$.
+Therefore, $\stb(G) = 1$.
+
+
+Next, assume that $\stb(G) = 1$.
+Recall that, for a clause $c = \{ p_i, p_j, p_k \}$, the vertex set $\{ c, p_i, p_j, p_k \}$ induces a maximal clique~$K_c$ in~$G$.
+Because each maximal clique is contained completely in some bag (Lemma~\ref{lem:cliqueBag}, page~\pageref{lem:cliqueBag}), some vertex in~$K_c$ is center of such a bag.
+By Lemma~\ref{lem:C5centers}, $c$ cannot be center of a bag because it is top of an extended $C_5$.
+Therefore, at least one vertex in $\{ p_i, p_j, p_k \}$ must be center of a bag.
+Without loss of generality, let $p_i$ be a center of a bag.
+By construction, $p_i$ is adjacent to all $p \in \{ p_j, p_k, p_l \}$, where $p_l \equiv \neg p_i$.
+Additionally, $p$ and~$p_i$ are vertices in an induced $C_4$, say $C$, and there is no vertex~$w$ in~$G$ with $N_G[w] \supseteq C$.
+Thus, by Lemma~\ref{lem:C4AdjVert}, at most one vertex in $\{ p_i, p_j, p_k \}$ can be center of a bag.
+Therefore, the function $f \colon \calL \rightarrow \{ T, F \}$ defined as
+\[
+    f(p_i) =
+        \begin{cases}
+            T & \text{if $p_i$ is center of a bag,} \\
+            F & \text{else} \\
+        \end{cases}
+\]
+is a satisfying assignment for~$\calI$.
+\end{proof}
+
+In \cite{DucoLegaNiss2016}, \name{Ducoffe} et al.\ show how to construct a graph~$G'_\rho$ based on a given graph~$G$ such that $\tb(G'_\rho) = 1$ if and only if $\tb(G) \leq \rho$.
+We slightly extend their construction to achieve a similar result for strong tree-breadth.
+
+Consider a given graph~$G = (V, E)$ with $\stb(G) = \rho$.
+We construct $G'_\rho$ as follows.
+Let $V = \{ v_1, v_2, \ldots, v_n \}$.
+Add the vertices $U = \{ u_1, u_2, \ldots, u_n \}$ and make them pairwise adjacent.
+Additionally, make each vertex~$u_i$, with $1 \leq i \leq n$, adjacent to all vertices in~$N_G^\rho[v_i]$.
+Last, for each $v_i \in V$, add an extended $C_5$ of degree~$1$ with $v_i$ as top vertex.
+
+\begin{lemma}
+    \label{lem:Gprime}
+\( \stb(G) \leq \rho \) if and only if \( \stb(G'_\rho) = 1 \).
+\end{lemma}
+
+\begin{proof}
+First, consider a tree-decomposition~$T$ for~$G$ with strong breadth~$\rho$.
+Let $T'_\rho$ be a tree-decomposition for~$G'_\rho$ created from $T$ by adding all vertices in~$U$ into each bag of~$T$ and by making the center, left, and right vertices of each extended $C_5$ centers of bags.
+Because the set~$U$ induces a clique in~$G'_\rho$ and $N_G^\rho[v_i] = N_{G'_\rho}[u_i] \cap V$, each bag of $T'_\rho$ is the complete neighbourhood of some vertex.
+
+Next, consider a tree-decomposition~$T'_\rho$ for~$G'_\rho$ with strong breadth~$1$.
+Note that each vertex~$v_i$ is top vertex of some extended $C_5$.
+Thus, $v_i$ cannot be center of a bag.
+Therefore, each edge $v_iv_j$ is in a bag~$B_k = N_{G'_\rho}[u_k]$.
+By construction of~$G'_\rho$, $B_k \cap V = N_G^\rho[v_k]$.
+Thus, we can construct a tree-decomposition~$T$ for~$G$ with strong breadth~$\rho$ by creating a bag~$B_i = N_G^\rho[v_i]$ for each bag~$N_{G'_\rho}[u_i]$ of~$T'_\rho$.
+\end{proof}
+
+
+Next, consider a given graph~$G = (V, E)$ with $V = \{ v_1, v_2, \ldots, v_n \}$ and $\stb(G) = 1$.
+For a given $\rho > 1$, we obtain the graph~$G_\rho^+$ by doing the following for each $v_i \in V$:
+\begin{itemize}
+    \item
+        Add the vertices $u_{i,1}$, \ldots, $u_{i,5}$, $x_i$, and $y_i$.
+    \item
+        Add an extended $C_5$ of degree~$\rho$ with the top vertex~$z_i$.
+    \item
+        Connect
+        \begin{itemize}
+            \item
+                $u_{i,1}$ and $x_i$ with a path of length $\lfloor \rho / 2 \rfloor - 1$,
+            \item
+                $u_{i,2}$ and $y_i$ with a path of length $\lfloor \rho / 2 \rfloor$,
+            \item
+                $u_{i,3}$ and $v_i$ with a path of length $\lceil \rho / 2 \rceil - 1$,
+            \item
+                $u_{i,4}$ and $v_i$ with a path of length $\lfloor \rho / 2 \rfloor$, and
+            \item
+                $u_{i,4}$ and $z_i$ with a path of length $\lceil \rho / 2 \rceil - 1$.
+        \end{itemize}
+    \item
+        Add the edges $u_{i,1}u_{i,2}$, $u_{i,1}u_{i,3}$, $u_{i,2}u_{i,3}$, $u_{i,2}u_{i,4}$, and $u_{i,3}u_{i,4}$.
+\end{itemize}
+Note that, for small $\rho$, it can happen that $v_i = u_{i,4}$, $x_i = u_{i,1}$, $y_i = u_{i,2}$, or $z_i = u_{i,5}$.
+Figure~\ref{fig:Gplus} gives an illustration.
+
+\begin{figure}
+    [htb]
+    \centering
+    \input{figures/fig_strB_Gplus}
+    \caption
+    [%
+        Illustration for the graph~$G^+_\rho$.
+    ]
+    {%
+        Illustration for the graph~$G^+_\rho$.
+        The graph shown is a subgraph of~$G^+_\rho$ as constructed for each $v_i$ in~$G$.
+    }
+    \label{fig:Gplus}
+\end{figure}
+
+
+\begin{lemma}
+    \label{lem:Gplus}
+\( \stb(G) = 1 \) if and only if \( \stb(G_\rho^+) = \rho \).
+\end{lemma}
+
+\begin{proof}
+First, assume that $\stb(G) = 1$.
+Then, there is a tree-decomposition~$T$ for~$G$ with strong breadth~$1$.
+We construct a tree-decomposition~$T_\rho^+$ for~$G_\rho^+$ with strong breadth~$\rho$.
+Make the middle, left, and right vertex of each extended $C_5$ center of a bag.
+For each $v_i \in V$, if $v_i$ is center of a bag of~$T$, make $x_i$ a center of a bag of~$T_\rho^+$.
+Otherwise, make $y_i$ center of a bag of~$T_\rho^+$.
+%
+The distance in~$G_\rho^+$ from $v_i$ to~$x_i$ is $\rho - 1$.
+The distances from $v_i$ to~$y_i$, from $x_i$ to~$z_i$, and from $y_i$ to~$z_i$ are $\rho$.
+Thus, $N_{G_\rho^+}^{\rho}[x_i] \cap V = N_G[v_i]$, $N_{G_\rho^+}^{\rho}[y_i] \cap V = \{ v_i \}$, and there is no conflict with Lemma~\ref{lem:C5centers}.
+Therefore, the constructed $T_\rho^+$ is a valid tree-decomposition with strong breadth~$\rho$ for~$G_\rho^+$.
+
+Next, assume that $\stb(G_\rho^+) = \rho$ and there is a tree-decomposition~$T_\rho^+$ with strong breadth~$\rho$ for~$G_\rho^+$.
+By Lemma~\ref{lem:C5centers}, no vertex in distance less than $\rho$ to any $z_i$ can be a center of a bag in~$T_\rho^+$.
+Therefore, because the distance from $v_i$ to~$z_i$ in~$G_\rho^+$ is $\rho - 1$, no $v_i \in V$ can be a center of a bag in~$T_\rho^+$.
+The only vertices with a large enough distance to~$z_i$  to be a center of a bag are $x_i$ and~$y_i$.
+Therefore, either $x_i$ or~$y_i$ is selected as center.
+To construct a tree-decomposition~$T$ with strong breadth~$1$ for~$G$, select $v_i$ as center if and only if $x_i$ is a center of a bag in~$T_\rho^+$.
+Because $N_{G_\rho^+}^{\rho}[x_i] \cap V = N_G[v_i]$ and $N_{G_\rho^+}^{\rho}[y_i] \cap V = \{ v_i \}$, the constructed $T$ is a valid tree-decomposition with strong breadth~$1$ for~$G$.
+\end{proof}
+
+Constructing $G'_\rho$ can be done in $\calO \big( n^2 \big)$ time and constructing $G_\rho^+$ can be done in $\calO(\rho \cdot n + m)$ time.
+Thus, combining Lemma~\ref{lem:Gprime} and Lemma~\ref{lem:Gplus} allows us, for a given graph~$G$, some given $\rho$, and some given~$\rho'$, to construct a graph~$H$ in $\calO \big( \rho \cdot n^2 \big)$ time such that $\stb(G) \leq \rho$ if and only if $\stb(H) \leq \rho'$.
+Additionally, by combining Theorem~\ref{theo:stbNPc} and Lemma~\ref{fig:Gplus}, we get:
+
+\begin{theorem}
+It is NP-complete to decide, for a graph~\( G \) and a given~\( \rho \), if \( \stb(G) = \rho \).
+\end{theorem}
+
+
+\subsection{Polynomial Time Cases}
+
+In the previous section, we have shown that, in general, it is NP-complete to determine the strong tree-breadth of a graph.
+In this section, we investigate cases for which a decomposition can be found in polynomial time.
+
+Let $G$ be a graph with strong tree-breadth~$\rho$ and let $T$ be a corresponding tree-decomposition.
+For a given vertex~$u$ in~$G$, we denote the set of connected components in $G - N_G^\rho[u]$ as $\calC_G[u]$.
+We say that a vertex~$v$ is a \emph{potential partner} of~$u$ for some $C \in \calC_G[u]$ if $N_G^\rho[v] \supseteq N_G(C)$ and $N_G^\rho[v] \cap C \neq \emptyset$.
+
+\begin{lemma}
+    \label{lem:potPartProp}
+Let \( C \) be a connected component in \( G - B_u \) for some \( B_u \subseteq N_G^\rho[u] \).
+Also, let \( C \in \calC_G[u] \) and \( v \) be a potential partner of~\( u \) for~\( C \).
+Then, for all connected components~\( C_v \) in \( G[C] - N_G^\rho[v] \), \( C_v \in \calC_G[v] \).
+\end{lemma}
+
+\begin{proof}
+Consider a connected component~$C_v$ in $G[C] - N_G^\rho[v]$.
+Clearly, $C_v \subseteq C$ and there is a connected component~$C' \in \calC_G[v]$ such that $C' \supseteq C_v$.
+
+Let $x$ be an arbitrary vertex in~$C'$.
+Then, there is a path~$P \subseteq C'$ from $x$ to~$C_v$.
+Because $N_G(C) \subseteq B_u$ and $v$ is a potential partner of~$u$ for~$C$, $N_G(C) \subseteq B_u \cap N_G^\rho[v]$.
+Also, $N_G(C)$ separates all vertices in~$C$ from all other vertices in~$G$.
+Therefore, $x \in C$ and $C' \subseteq C$; otherwise, $P$ would intersect $N_G^\rho[v]$.
+It follows that each vertex in~$P$ is in the same connected component of~$G[C] - N_G^\rho[v]$ and, thus, $C_v = C'$.
+\end{proof}
+
+From Lemma~\ref{lem:decoBorderBags} (page~\pageref{lem:decoBorderBags}), it directly follows:
+
+\begin{corollary}
+    \label{cor:potPartners}
+If \( N_G^\rho[u] \) is a bag in~\( T \), then \( T \) contains a bag~\( N_G^\rho[v] \) for each \( C \in \calC_G[u] \) such that \( v \) is a potential partner of~\( u \) for~\( C \).
+\end{corollary}
+
+Because of Corollary~\ref{cor:potPartners}, there is a vertex set~$U$ such that each $u \in U$ has a potential partner~$v \in U$ for each connected component~$C \in \calC_G[u]$.
+With such a set, we can construct a tree-decomposition for~$G$ with the following approach:
+Pick a vertex~$u \in U$ and make it center of a bag~$B_u$.
+For each connected component~$C \in \calC_G[u]$, $u$ has a potential partner~$v$.
+$N_G^\rho[v]$ splits $C$ in more connected components and, because $v \in U$, $v$ has a potential partner~$w \in U$ for each of these components.
+Hence, create a bag~$B_v = N_G^\rho[v] \cap (B_u \cup C)$ and continue this until the whole graph is covered.
+Algorithm~\ref{algo:weakTB} below determines such a set of vertices with their potential partners (represented as a graph~$H$) and then constructs a decomposition as described above.
+
+\begin{algorithm}
+    [!htb]
+    \caption
+    {%
+        Constructs, for a given graph~$G = (V, E)$ with strong tree-breadth~$\rho$, a tree-decomposition~$T$ with breadth~$\rho$.
+    }
+    \label{algo:weakTB}
+
+Create an empty directed graph~$H = (V_H, E_H)$.
+Let $\phi$ be a function that maps each edge~$(u, v) \in E_H$ to a connected component~$C \in \calC_G[u]$.
+\label{line:weakTB_initH}
+
+\ForEach
+{%
+    \( u, v \in V \) and all \( C \in \calC_G[u] \)
+}
+{%
+    \If
+    {%
+        \( v \) is a potential parter of~\( u \) for~\( C \)%
+        \label{line:weakTB_CheckUV}
+    }
+    {%
+        Add the directed edge~$(u, v)$ to~$H$ and set $\phi(u, v) := C$.
+        (Add $u$ and~$v$ to $H$ if necessary.)
+        \label{line:weakTB_AddUV}
+    }
+}
+
+\While
+{%
+    there is a vertex~\( u \in V_H \) and some \( C \in \calC_G[u] \) such that there is no \( (u, v) \in E_H \) with \( \phi(u, v) = C \)
+    \label{line:weakTB_RemoveUloop}
+}
+{
+    Remove $u$ from~$H$.
+    \label{line:weakTB_RemoveU}
+}
+
+\If
+{%
+    \( H \) is empty
+}
+{%
+    \keyword{Stop}.
+    $\stb(G) > \rho$.
+}
+
+Create an empty tree-decomposition~$T$.
+\label{line:weakTB_initT}
+
+Let $G - T$ be the subgraph of~$G$ that is not covered by~$T$ and let $\psi$ be a function that maps each connected component in $G - T$ to a bag~$B_u \subseteq N_G^\rho[u]$.
+
+Pick an arbitrary vertex~$u \in V_H$, add $B_u = N_G^\rho[u]$ as bag to~$T$, and set $\psi(C) := B_u$ for each connect component~$C$ in~$G - T$.
+\label{line:weakTB_addFirstBag}
+
+\While
+{%
+    \( G - T \) is non-empty
+    \label{line:weakTB_Tloop}
+}
+{%
+    Pick a connected component~$C$ in~$G - T$, determine the bag~$B_v := \psi(C)$ and find an edge~$(v, w) \in E_H$ with $\phi(v, w) = C$.
+    \label{line:weakTB_PickNextBag}
+
+    Add $B_w = N_G^\rho[w] \cap (B_v \cup C)$ to~$T$, and make $B_v$ and~$B_w$ adjacent in~$T$.
+    \label{line:weakTB_AddBag}
+
+    For each new connected component~$C'$ in~$G - T$ with $C' \subseteq C$, set $\psi(C_w) := B_w$.
+    \label{line:weakTB_UpdateF}
+}
+
+Output~$T$.
+\end{algorithm}
+
+\begin{theorem}
+Algorithm~\ref{algo:weakTB} constructs, for a given graph~\( G \) with strong tree-breadth~\( \rho \), a tree-decomposition~\( T \) with breadth~\( \rho \) in \( \calO(n^2m) \) time.
+\end{theorem}
+
+\begin{proof}
+    [Correctness]
+Algorithm~\ref{algo:weakTB} works in two parts.
+First, it creates a graph~$H$ with potential centers (line~\ref{line:weakTB_initH} to line~\ref{line:weakTB_RemoveU}).
+Second, it uses $H$ to create a tree-decomposition for~$G$ (line~\ref{line:weakTB_initT} to line~\ref{line:weakTB_UpdateF}).
+To show the correctness of the algorithm, we show first that the centers of a tree-decomposition for~$G$ are vertices in~$H$ and, then, show that a tree-decomposition created based on~$H$ is a valid tree-decomposition for~$G$.
+
+A vertex~$u$ is added to~$H$ (line~\ref{line:weakTB_AddUV}) if, for \emph{at least one} connected component~$C \in \calC_G[u]$, $u$ has a potential partner~$v$.
+Later, $u$ is kept in~$H$ (line~\ref{line:weakTB_RemoveUloop} and line~\ref{line:weakTB_RemoveU}) if it has a potential partner~$v$ \emph{for all} connected components in~$C \in \calC_G[u]$.
+By Corollary~\ref{cor:potPartners}, each center of a bag in a tree-decomposition~$T$ with strong breadth~$\rho$ satisfies these conditions.
+Therefore, after line~\ref{line:weakTB_RemoveU}, $H$ contains all centers of bags in~$T$, \ie, if $G$ has strong tree-breadth~$\rho$, $H$ is non-empty.
+
+Next, we show that $T$ created in the second part of the algorithm (line~\ref{line:weakTB_initT} to line~\ref{line:weakTB_UpdateF}) is a valid tree-decomposition for~$G$ with breadth~$\rho$.
+To do so, we show the following invariant for the loop starting in line~\ref{line:weakTB_Tloop}:
+\begin{enumerate*}[(i),mode=unboxed]
+    \item
+        \label{item:TvalidTB}
+        $T$ is a valid tree-decomposition with breadth~$\rho$ for the subgraph covered by~$T$ and
+    \item
+        \label{item:conCompCcond}
+        for each connected component~$C$ in~$G - T$, the bag~$B_v = \psi(C)$ is in~$T$, $N_G(C) \subseteq B_v$, and $C \in \calC_G[v]$.
+\end{enumerate*}
+After line~\ref{line:weakTB_addFirstBag}, the invariant clearly holds.
+Assume by induction that the invariant holds each time line~\ref{line:weakTB_Tloop} is checked.
+If $T$ covers the whole graph, the check fails and the algorithm outputs~$T$.
+If $T$ does not cover $G$ completely, there is a connected component~$C$ in~$G - T$.
+By condition~\ref{item:conCompCcond}, the bag~$B_v = \psi(C)$ is in~$T$, $N_G(C) \subseteq B_v$, and $C \in \calC_G[v]$.
+Because of the way $H$ is constructed and $C \in \calC_G[v]$, there is an edge~$(v, w) \in E_H$ with $\phi(v, w) = C$, \ie, $w$ is a potential partner of~$v$ for~$C$.
+Thus, line~\ref{line:weakTB_PickNextBag} is successful and the algorithm adds a new bag~$B_w = N_G^\rho[w] \cap (B_v \cup C)$ (line~\ref{line:weakTB_AddBag}).
+Because $w$ is a potential partner of~$v$ for~$C$, \ie, $N_G(C) \subseteq N_G^\rho[w]$, and $N_G(C) \subseteq B_v$, $B_w \supseteq N_G(C)$.
+Therefore, after adding $B_w$ to~$T$, $T$ still satisfies condition~\ref{item:TvalidTB}.
+Additionally, $B_w$ splits $C$ in a set~$\calC'$ of connected components such that, for each $C' \in \calC'$, $N_G(C') \subseteq B_w$ and, by Lemma~\ref{lem:potPartProp}, $C' \in \calC_G[w]$.
+Thus, condition~\ref{item:conCompCcond} is also satisfied.
+\end{proof}
+
+\begin{proof}
+    [Complexity]
+First, determine the pairwise distance of all vertices.
+This can be done in $\calO(nm)$ time and allows to check the distance between vertices in constant time.
+
+For a vertex~$u$, let $\calN[u] = \{ \, N_G(C) \mid C \in \calC_G[u] \, \}$.
+Note that, for some $C \in \calC_G[u]$ and each vertex~$x \in N_G(C)$, there is an edge~$xy$ with $y \in C$.
+Therefore, $|\calN[u]| := \sum_{C \in \calC_G[u]} |N_G(C)| \leq m$.
+To determine, for some vertex~$u$, all its potential partners~$v$, first, compute $\calN[u]$.
+This can be done in $\calO(m)$ time.
+Then, check, for each vertex~$v$ and each $N_G(C) \in \calN[u]$, if $N_G(C) \subseteq N_G^\rho[v]$ and add the edge~$(u, v)$ to~$H$ if successful.
+For a single vertex~$v$ this requires $\calO(m)$ time because $|\calN[u]| \leq m$ and distances can be determined in constant time.
+Therefore, the total runtime for creating~$H$ (line~\ref{line:weakTB_initH} to line~\ref{line:weakTB_AddUV}) is $\calO \big( n (m + nm) \big) = \calO \big( n^2m \big)$.
+
+Assume that, for each $\phi(u, v) = C$, $C$ is represented buy two values:
+\begin{enumerate*}[(i),mode=unboxed]
+    \item
+        \label{item:charVert}
+        a characteristic vertex~$x \in C$ (for example the vertex with the lowest index) and
+    \item
+        \label{item:indexC}
+        the index of~$C$ in $\calC_G[u]$.
+\end{enumerate*}
+While creating~$H$, count and store, for each vertex~$u$ and each connected component~$C \in \calC_G[u]$, the number of edges~$(u, v) \in E_H$ with $\phi(u, v) = C$.
+Note that there is a different counter for each $C \in \calC_G[u]$.
+With this information, we can implement line~\ref{line:weakTB_RemoveUloop} and line~\ref{line:weakTB_RemoveU} as follows.
+First check, for every vertex~$v$ in~$H$, if one of its counters is~$0$.
+In this case, remove $v$ from~$H$ and update the counters for all vertices~$u$ with $(u, v) \in E_H$ using value~\ref{item:indexC} of~$\phi(u, v)$.
+If this sets a counter for~$u$ to~$0$, add $u$ to a queue~$Q$ of vertices to process.
+Continue this until each vertex is checked.
+Then, for each vertex~$u$ in~$Q$, remove~$u$ form~$H$ and add its neighbours into~$Q$ if necessary until $Q$ is empty.
+This way, a vertex is processed at most twice.
+A single iteration runs in at most $\calO(n)$ time.
+Therefore, line~\ref{line:weakTB_RemoveUloop} and line~\ref{line:weakTB_RemoveU} can be implemented in $\calO \big( n^2 \big)$ time.
+
+Assume that $\psi$ uses the characteristic vertex~$x$ to represent a connected component, \ie, value~\ref{item:charVert} of $\phi$.
+Then, finding an edge $(v, w) \in E_H$ (line~\ref{line:weakTB_PickNextBag}) can be done in $\calO(m)$~time.
+Creating $B_w$ (line~\ref{line:weakTB_AddBag}), splitting $C$ into new connected components~$C'$, finding their characteristic vertex, and setting $\psi(C')$ (line~\ref{line:weakTB_UpdateF}) takes $\calO(m)$ time, too.
+In each iteration, at least one more vertex of~$G$ is covered by~$T$.
+Hence, there are at most $n$ iterations and, thus, the loop starting in line~\ref{line:weakTB_Tloop} runs in $\calO(mn)$ time.
+
+Therefore, Algorithm~\ref{algo:weakTB} runs in total $\calO \big( n^2m \big)$ time.
+\end{proof}
+
+Algorithm~\ref{algo:weakTB} creates, for each graph~$G$ with $\stb(G) \leq \rho$, a tree-decomposition~$T$ with breadth~$\rho$.
+Next, we invest a case where we can construct a tree-decomposition for~$G$ with strong breadth~$\rho$.
+
+We say that two vertices $u$ and~$v$ are \emph{perfect partners} if
+\begin{enumerate*}[(i),mode=unboxed]
+    \item
+        $u$ and~$v$ are potential partners of each other for some $C_u \in \calC_G[u]$ and some $C_v \in \calC_G[v]$,
+    \item
+        $C_u$ is the only connected component in~$\calC_G[u]$ which is intersected by~$N_G^\rho[v]$, and
+    \item
+        $C_v$ is the only connected component in~$\calC_G[v]$ which is intersected by~$N_G^\rho[u]$.
+\end{enumerate*}
+Accordingly, we say that a tree-decomposition~$T$ has \emph{perfect strong breadth~\( \rho \)} if it has strong breadth~$\rho$ and, for each center~$u$ of some bag and each connected component~$C \in \calC_G[u]$, there is a center~$v$ such that $v$ is a perfect partner of~$u$ for~$C$.
+
+\begin{theorem}
+A tree-decomposition with perfect strong breadth~\( \rho \) can be constructed in polynomial time.
+\end{theorem}
+
+\begin{proof}
+To construct such a tree-decomposition, we can modify Algorithm~\ref{algo:weakTB}.
+Instead of checking if $u$ has a potential partner~$v$ (line~\ref{line:weakTB_CheckUV}), check if $u$ and~$v$ are perfect partners.
+
+Assume by induction that, for each bag~$B_v$ in~$T$, $B_v = N_G^\rho[v]$.
+By definition of perfect partners $v$ and~$w$, $N_G^\rho[w]$ intersects only one~$C \in \calC_G[v]$, \ie, $N_G^\rho[w] \subseteq N_G^\rho[v] \cup C$.
+Thus, when creating the bag~$B_w$ (line~\ref{line:weakTB_AddBag}), $B_w = N_G^\rho[w] \cap (B_v \cup C) = N_G^\rho[w] \cap \big( N_G^\rho[v] \cup C \big) = N_G^\rho[w]$.
+Therefore, the created tree-decomposition~$T$ has perfect strong tree-breadth~$\rho$.
+\end{proof}
+
+We conjecture that there are weaker cases than perfect strong breadth which allow to construct a tree-decomposition with strong-breadth~$\rho$.
+For example, if the centers of two adjacent bags are perfect partners, but a center~$u$ does not need to have a perfect partner for each $C \in \calC_G[u]$.
+However, when using a similar approach as in Algorithm~\ref{algo:weakTB}, this would require a more complex way of constructing~$H$.
+

@@ -1,0 +1,123 @@
+\tikzsetnextfilename{fig_mesp_NPc}
+\begin{tikzpicture}
+[xscale=0.8660]
+
+\node[sN] (u0) at (-1.5,0) {};
+\node[sN] (un) at (8.5,0) {};
+
+\node[sN] (v0) at (0,0) {};
+\node[sN] (v1) at (2,0) {};
+\node[sN] (vn1) at (5,0) {};
+\node[sN] (vn) at (7,0) {};
+
+\node[sN] (p1t) at (1,0.5) {};
+\node[sN] (p1b) at (1,-0.5) {};
+\node[sN] (pnt) at (6,0.5) {};
+\node[sN] (pnb) at (6,-0.5) {};
+
+\node[sN] (c1) at (2,1.5) {};
+\node[sN] (ci) at (5,1.5) {};
+\node[sN] (cj) at (2,-1.5) {};
+\node[sN] (cm) at (5,-1.5) {};
+
+
+\node[lbl] at (3.5,0) {$\hbox{.}\,\hbox{.}\,\hbox{.}$};
+
+
+\node[blbl] at (u0.south) {$u_0$};
+\node[blbl] at (un.south) {$u_n$};
+
+\node[blbl] at (v0.south) {$v_0$};
+\node[blbl] at (v1.south) {$v_1$};
+\node[blbl,yshift=-2pt] at (vn1.south) {$v_{n-1}$};
+\node[blbl] at (vn.south) {$v_n$};
+
+\node[blbl] at (p1t.south) {$p_1$};
+\node[blbl,xshift=-5pt] at (p1b.south) {$\neg p_1$};
+\node[blbl] at (pnt.south) {$p_n$};
+\node[blbl,xshift=5pt] at (pnb.south) {$\neg p_n$};
+
+\node[tlbl] at (c1.north) {$c_1$};
+\node[tlbl] at (ci.north) {$c_i$};
+\node[blbl] at (cj.south) {$c_j$};
+\node[blbl] at (cm.south) {$c_m$};
+
+% ---------------------
+
+\draw[decorate,decoration={brace,amplitude=3pt,raise=2pt}] (u0.north) -- (v0.north) node[midway,tlbl,yshift=4pt]{$k$};
+\draw[decorate,decoration={brace,amplitude=3pt,raise=2pt}] (vn.north) -- (un.north) node[midway,tlbl,yshift=4pt]{$k$};
+
+\begin{pgfonlayer}{background}
+
+\draw (u0.center) -- ++(0.4,0);
+\draw (v0.center) -- ++(-0.4,0);
+\draw[dashed] (u0) -- (v0);
+
+\draw (v0.center) -- (p1t.center);
+\draw (v0.center) -- (p1b.center);
+
+\draw (v1.center) -- (p1t.center);
+\draw (v1.center) -- (p1b.center);
+
+\draw (v1.center) -- ++(30:1);
+\draw (v1.center) -- ++(-30:1);
+
+\draw (vn1.center) -- ++(150:1);
+\draw (vn1.center) -- ++(-150:1);
+
+\draw (vn1.center) -- (pnt.center);
+\draw (vn1.center) -- (pnb.center);
+
+\draw (vn.center) -- (pnt.center);
+\draw (vn.center) -- (pnb.center);
+
+\draw (vn.center) -- ++(0.4,0);
+\draw (un.center) -- ++(-0.4,0);
+\draw[dashed] (vn) -- (un);
+
+
+
+% \draw[thin,dashed] ($(current bounding box.center)+(1.5pt,1)$) -- (-1.5,1);
+% \draw[thin,dashed] ($(current bounding box.center)+(-1.5pt,1)$) -- (8.5,1);
+%\draw[thin,grey] (-1.75,0) -- (8.75,0);
+
+% \node[lbl,anchor=south west] at ($(current bounding box.west)+(0,1.5)$) {positive clauses};
+% \node[lbl,anchor=north west] at ($(current bounding box.west)+(0,-1.5)$) {negative clauses};
+
+% \node[tlbl] at (current bounding box.north) {positive clauses};
+% \node[blbl] at (current bounding box.south) {negative clauses};
+
+
+\foreach \c/\p in {1/1t,i/nt,j/1b,m/nb}
+{
+    \draw[white,line width=4pt] (p\p.center) -- (c\c.center);
+    \draw[dashed] (p\p.center) -- (c\c.center);
+    \draw[] (p\p.center) -- ($(p\p.center)!0.3cm!(c\c.center)$);
+    \draw[] (c\c.center) -- ($(c\c.center)!0.3cm!(p\p.center)$);
+}
+
+
+\draw[] (c1.center) -- ++(-30:0.5);
+\draw[dashed] (c1.center) -- ++(-30:1);
+\draw[] (c1.center) -- ++(-45:0.5);
+\draw[dashed] (c1.center) -- ++(-45:1.025);
+
+\draw[] (ci.center) -- ++(210:0.5);
+\draw[dashed] (ci.center) -- ++(210:1);
+\draw[] (ci.center) -- ++(225:0.5);
+\draw[dashed] (ci.center) -- ++(225:1.025);
+
+\draw[] (cj.center) -- ++(30:0.5);
+\draw[dashed] (cj.center) -- ++(30:1);
+\draw[] (cj.center) -- ++(45:0.5);
+\draw[dashed] (cj.center) -- ++(45:1.025);
+
+\draw[] (cm.center) -- ++(-210:0.5);
+\draw[dashed] (cm.center) -- ++(-210:1);
+\draw[] (cm.center) -- ++(-225:0.5);
+\draw[dashed] (cm.center) -- ++(-225:1.025);
+
+
+\end{pgfonlayer}
+
+\end{tikzpicture}

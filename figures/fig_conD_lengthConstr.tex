@@ -1,0 +1,43 @@
+\tikzsetnextfilename{fig_conD_lengthConstr}
+\begin{tikzpicture}
+
+\draw (0,0) circle (1cm);
+
+\foreach \rot/\lbl in {90/Top,225/Left,-45/Right}
+{
+    \begin{scope}[rotate=\rot]
+        \coordinate (c\lbl) at (1.4,0);
+        \draw (1.4,0.9) -- ++(0,-1.8);
+        \node[sN] (n\lbl) at (c\lbl) {};
+    \end{scope}
+}
+
+\node [rlbl] at (0.9,1.4) {$\Sup$};
+\node [lbl,anchor=45] at (nLeft.225) {$\Sdown_i$};
+\node [lbl,anchor=135] at (nRight.-45) {$\Sdown_j$};
+
+\begin{pgfonlayer}{background}
+
+\draw
+    [
+        -latex,
+        shorten >=1pt,
+    ]
+    (cLeft)
+    .. controls (225:0.0) and (90:0.2) ..
+    node [midway,llbl] {$\lambda$}
+    (nTop.south);
+
+\draw
+    [
+        -latex,
+        shorten >=1pt,
+    ]
+    (cRight)
+    .. controls (-45:0.0) and (90:0.2) ..
+    node [midway,rlbl] {$\lambda$}
+    (nTop.south);
+
+\end{pgfonlayer}
+
+\end{tikzpicture}

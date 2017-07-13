@@ -1,0 +1,70 @@
+\tikzsetnextfilename{fig_strB_stbNPc}
+\begin{tikzpicture}
+    [scale=1.75]
+
+\node [sN] (v) at (0,0) {};
+\node [sN] (pi) at (120:1) {};
+\node [sN] (pj) at (90:1) {};
+\node [sN] (pk) at (60:1) {};
+\node [sN] (c) at (90:1.3) {};
+
+\node [sN] (pl) at (150:1) {};
+
+\node [sN] (qi) at ($(pi)+(135:0.5176)$) {};
+\node [sN] (ql) at ($(pl)+(135:0.5176)$) {};
+
+\def\len{0.33}
+
+\coordinate (c5) at ($(c)+(0,\len)$);
+\foreach \i in {1,...,5}
+{
+    \coordinate (c5\i) at ($(c5)+(-18-72*\i:\len)$);
+}
+
+\begin{pgfonlayer}{background}
+
+\draw (v.center) -- (pi.center);
+\draw (v.center) -- (pl.center);
+\draw (v.center) -- (pj.center);
+\draw (v.center) -- (pk.center);
+
+\draw (pi.center) -- (pj.center);
+\draw (pi.center) to[out=-30,in=210] (pk.center);
+\draw (pj.center) -- (pk.center);
+
+\draw (pi.center) -- (pl.center);
+\draw (pi.center) -- (qi.center);
+\draw (ql.center) -- (qi.center);
+\draw (ql.center) -- (pl.center);
+
+
+\draw (c.center) -- (pi.center);
+\draw (c.center) -- (pj.center);
+\draw (c.center) -- (pk.center);
+
+\draw (c5) -- (c51);
+\draw (c5) -- (c53);
+\draw (c5) -- (c54);
+
+\draw (c51)
+\foreach \i in {2,...,5}
+{
+    -- (c5\i)
+}
+-- cycle;
+
+\end{pgfonlayer}
+
+\node [blbl] at (v.south) {$v$};
+\node [rlbl] at (c.east) {$c$};
+
+\node [llbl] at (pi.west) {$p_i$};
+\node [lbl,anchor=north west] at (pj.south east) {$p_j$};
+\node [rlbl] at (pk.east) {$p_k$};
+
+\node [tlbl] at (qi.north) {$q_i$};
+\node [llbl] at (ql.west) {$q_l$};
+\node [blbl] at (pl.south) {$p_l$};
+
+
+\end{tikzpicture}

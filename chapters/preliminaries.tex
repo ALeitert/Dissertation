@@ -1,0 +1,335 @@
+\chapter{Preliminaries}
+    \label{cha:prelim}
+%
+
+\section{General Definitions}
+If not stated or constructed otherwise, all graphs occurring in this dissertation are connected, finite, unweighted, undirected, without loops, and without multiple edges.
+For a graph~$G = (V, E)$, we use $n = |V|$ and $m = |E|$ to denote the cardinality of the vertex set and the edge set of~$G$.
+
+The \emph{length} of a path from a vertex~$v$ to a vertex~$u$ is the number of edges in the path.
+The \emph{distance}~$d_G(u, v)$ in a graph~$G$ of two vertices $u$ and~$v$ is the length of a shortest path connecting $u$ and~$v$.
+The distance between a vertex~$v$ and a set~$S \subseteq V$ is defined as $d_G(v, S) = \min_{u \in S}  d_G(u, v)$.
+Let $x$ and~$y$ be two vertices in a graph~$G$ such that $x$ is most distant from some arbitrary vertex and $y$ is most distant from~$x$.
+Such a vertex pair~$x, y$ is called \emph{spread pair} and a shortest path from $x$ to~$y$ is called \emph{spread path}.
+
+The \emph{eccentricity}~$\ecc_G(v)$ of a vertex~$v$ is $\max_{u \in V} d_G(u, v)$.
+For a set~$S \subseteq V$, its eccentricity is $\ecc_G(S) = \max_{u \in V} d_G(u, S)$.
+For a vertex pair $s,t$, a shortest $(s, t)$-path~$P$ has \emph{minimal eccentricity}, if there is no shortest $(s,t)$-path~$Q$ with $\ecc_G(Q) < \ecc_G(P)$.
+Two vertices $x$ and $y$ are called \emph{mutually furthest} if $d_G(x,y) = \ecc_G(x) = \ecc_G(y)$.
+A vertex~$u$ is \emph{$k$-dominated} by a vertex~$v$ (by a set~$S \subseteq V$), if $d_G(u, v) \leq k$ ($d_G(u, S) \leq k$, respectively).
+
+The \emph{diameter} of a graph~$G$ is $\diam(G) = \max_{u,v \in V} d_G(u, v)$.
+The diameter~$\diam_G(S)$ of a set~$S \subseteq V$ is defined as $\max_{u,v \in S} d_G(u, v)$.
+The \emph{radius} of a set~$S \subseteq V$ is defined as $\min_{u \in V} \max_{v \in S} d_G(u, v)$.
+A pair of vertices $x,y$ of $G$ is called a \emph{diametral  pair} if $d_G(x, y) = \diam(G)$.
+In this case, every shortest path connecting $x$ and~$y$ is called a \emph{diametral path}.
+
+For a vertex~$v$ of~$G$, $N_G(v) = \{ \, u \in V \mid uv \in E \, \}$ is called the \emph{open neighbourhood} of~$v$ and $N_G[v] = N_G(v) \cap \{ v \}$ is called the \emph{closed neighbourhood} of~$v$.
+Similarly, for a set~$S \subseteq V$, we define $N_G(S) = \big \{ \, u \in V \mid d_G(u, S) = 1 \, \big \}$.
+The \emph{\( l \)-neighbourhood} of a vertex~$v$ in~$G$ is $N_G^l[v] = \big \{ \, u \mid d_G(u, v) \leq l \, \big \}$.
+The $l$-neighbourhood of a vertex~$v$ is also called \emph{\( l \)-disk} of~$v$.
+Two vertices $u$ and~$v$ are \emph{true twins} if $N_G[u] = N_G[v]$ and are \emph{false twins} if they are non-adjacent and $N_G(u) = N_G(v)$.
+
+The \emph{degree} of a vertex~$v$ is the number of vertices adjacent to it.
+If a vertex has degree~$1$, it is called a \emph{pendant} vertex.
+A graph~$G$ is called \emph{sparse}, if the sum of all vertex degrees is in~$\calO(n)$.
+
+For some vertex~$v$, $L_i^{(v)} = \big \{ \, u \in V \mid d_G(u,v) = i \, \big \}$ denotes the vertices with distance~$i$ from~$v$.
+We will also refer to $L_i^{(v)}$ as the \emph{\( i \)-th layer}.
+For two vertices $u$ and~$v$, $I_G(u,v) = \{ \, w \mid d_G(u,v) = d_G(u,w) + d_G(w,v) \, \}$ is the \emph{interval} between $u$ and~$v$.
+The set~$S_i(s,t) = L_i^{(s)} \cap I_G(u,v)$ is called a \emph{slice} of the interval from $u$ to~$v$.
+For any set~$S \subseteq V$ and a vertex~$v$, $\Pr_G(v, S) = \big \{ \, u \in S \mid d_G(u, v) = d_G(v, S) \, \big \}$ denotes the \emph{projection} of $v$ on~$S$ in~$G$.
+
+For a vertex set~$S$, let $G[S]$ denote the subgraph of~$G$ induced by~$S$.
+With $G - S$, we denote the graph $G[V \setminus S]$.
+A vertex set~$S$ is a \emph{separator} for two vertices $u$ and~$v$ in~$G$ if each path from $u$ to~$v$ contains a vertex~$s \in S$; in this case we say $S$ \emph{separates} $u$ from~$v$.
+If a separator~$S$ contains only one vertex~$s$, \ie, $S = \{ s \}$, then $s$ is an \emph{articulation point}.
+A \emph{block} is a maximal subgraph without articulation points.
+
+A \emph{chord} in a cycle is an edge connecting two non-consecutive vertices of the cycle.
+A cycle is called \emph{induced} if it has no chords.
+For each $k \geq 3$, an induced cycle of length~$k$ is called as~$C_k$.
+A subgraph is called \emph{clique} if all its vertices are pairwise adjacent.
+A \emph{maximal clique} is a clique that cannot be extended by including any additional vertex.
+
+If clear from context, graph identifying indices of notations may be omitted.
+For example, we may write $N[v]$ instead of~$N_G[v]$.
+
+
+\subsubsection{One-Sided Binary Search.}
+Consider a sorted sequence~$\langle x_1, x_2, \ldots, x_{n} \rangle$ in which we search for a value~$x_p$.
+We say the value~$x_i$ is at position~$i$.
+For a one-sided binary search, instead of starting in the middle at position~$n/2$, we start at position~$1$.
+We then processes position~$2$, then position~$4$, then position~$8$, and so on until we reach position~$j = 2^i$ and, next, position~$k = 2^{i+1}$ with $x_j < x_p \leq x_k$.
+Then, we perform a classical binary search on the sequence~$\langle x_{j + 1}, \ldots, x_k \rangle$.
+Note that, because $x_j < x_p \leq x_k$, $2^i < p \leq 2^{i+1}$ and, hence, $j < p \leq k < 2p$.
+Therefore, a one-sided binary search requires at most $\calO(\log p)$ iterations to find~$x_p$.
+
+\section{Tree-Decompositions}
+    \label{sec:treeDecoDef}
+
+A \emph{tree-decomposition} for a graph~$G = (V, E)$ is a family~$\calT = \{ B_1, B_2, \ldots \}$ of subsets of~$V$, called \emph{bags}, such that $\calT$ forms a tree with the bags in~$\calT$ as nodes which satisfies the following conditions:
+\begin{enumerate}[(i),mode=unboxed]
+    \item
+        Each vertex is contained in a bag, \ie, $V = \bigcup_{B \in \calB} B$,
+    \item
+        for each edge~$uv \in E$, $\calT$ contains a bag~$B$ with $u, v \in B$, and
+    \item
+        for each vertex~$v \in V$, the bags containing $v$ induce a subtree of~$\calT$.
+\end{enumerate}
+A \emph{path-decomposition} of graph is a tree-decomposition with the restriction that the bags form a path instead of a tree with multiple branches.
+
+\begin{lemma}
+    [\name{Tarjan} and \name{Yannakakis}~\cite{TarjanYannak1984}]
+    \label{lem:decoValidation}
+Let \( \calF \) be a set of bags for some graph~\( G \).
+Determining if \( \calF \) forms a tree-decomposition for~\( G \) and, if this is the case, computing the corresponding tree can be done in linear time.
+\end{lemma}
+
+It follows from Lemma~\ref{lem:decoValidation} that we can consider a tree-decomposition interchangeably either as family of bags or as structured tree of bags with defined edges and neighbourhoods. 
+
+\begin{lemma}
+    [\name{Diestel}~\cite{Diestel1997}]
+    \label{lem:cliqueBag}
+Let \( K \) be a maximal clique in some graph~\( G \).
+Then, each tree-decomposition for~\( G \) contains a bag~\( B \) such that \( K \subseteq B \).
+\end{lemma}
+
+\begin{lemma}
+    \label{lem:decoBorderBags}
+Let \( B \) be a bag of a tree-decomposition~\( T \) for a graph~\( G \) and let \( C \) be a connected component in~\( G - B \).
+Then, \( T \) contains a bag~\( B_C \) with \( B_C \supseteq N_G(C) \) and \( B_C \cap C \neq \emptyset \).
+\end{lemma}
+
+\begin{proof}
+Let $B_C$ be the bag in~$T$ for which $B_C \cap C \neq \emptyset$ and the distance between $B$ and~$B_C$ in~$T$ is minimal.
+Additionally, let $B'$ be the bag in~$T$ adjacent to~$B_C$ which is closest to~$B$ and let $S = B_C \cap B'$.
+Note that $S \cap C = \emptyset$ and, by properties of tree-decompositions, $S$ separates $C$ from all vertices in~$B \setminus S$.
+Assume that there is a vertex~$u \in N_G(C) \setminus S$.
+Because $u \in N_G(C)$, there is a vertex~$v \in C$ which is adjacent to~$u$.
+This contradicts with $S$ being a separator for $u$ and~$v$.
+Therefore, $N_G(C) \subseteq S \subseteq B_C$.
+\end{proof}
+
+A tree-decomposition~$T$ of~$G$ has \emph{breadth~\( \rho \)} if, for each bag~$B$ of~$T$, there is a vertex~$v$ in~$G$ with $B \subseteq N_G^\rho[v]$.
+The \emph{tree-breadth} of a graph~$G$ is $\rho$, written as $\tb(G) = \rho$, if $\rho$ is the minimal breadth of all tree-decomposition for~$G$.
+Similarly, \emph{path-breadth} of a graph~$G$ is $\rho$, written as $\pb(G) = \rho$, if $\rho$ is the minimal breadth of all path-decomposition for~$G$.
+
+A tree-decomposition~$T$ of~$G$ has \emph{length~\( \lambda \)} if, for each bag~$B$ of~$T$, the diameter of~$B$ is at most~$\lambda$, \ie, for all vertices $u, v \in B$, $d_G(u, v) \leq \lambda$.
+Accordingly, the \emph{tree-length} of a graph~$G$ is $\lambda$, written as $\tl(G) = \lambda$, if $\lambda$ is the minimal breadth of all tree-decomposition for~$G$.
+Similarly, \emph{path-length} of a graph~$G$ is $\lambda$, written as $\pl(G) = \lambda$, if $\lambda$ is the minimal breadth of all path-decomposition for~$G$.
+
+Clearly, it follows from their definitions that, for any graph~$G$, $\tb(G) \leq \tl(G) \leq 2 \tb(G)$, $\pb(G) \leq \pl(G) \leq 2 \pb(G)$, $\tb(G) \leq \pb(G)$, and $\tl(G) \leq \pl(G)$.
+Additionally, as shown in Lemma~\ref{lem:contractingEdge} below, non of these parameter increases when an edge of a graph is contracted.
+
+\begin{lemma}
+    [\name{Dragan} and \name{Köhler}~\cite{DraganKohler2014}]
+    \label{lem:contractingEdge}
+Let \( G \) be a graph and \( H \) be a graph created by contracting an edge of~\( G \).
+Then, for each~\( \phi \in \{ \tb, \tl, \pb, \pl \} \), \( \phi(H) \leq \phi(G) \).
+\end{lemma}
+
+
+\section{Layering Partitions}
+
+\name{Brandstädt} et al.\,\cite{BranChepDrag1999} and \name{Chepoi}, \name{Dragan} \cite{ChepoiDragan2000} introduced a method called \emph{layering partition}.
+The idea is the following.
+First, partition the vertices of a given graph~$G$ in distance layers for a given vertex~$s$.
+Second, partition each layer~$L_i^{(s)}$ into \emph{clusters} in such a way that two vertices $u$ and~$v$ are in the same cluster if and only if they are connected by a path only using vertices in the same or upper layers.
+That is, $u$ and~$v$ are in the same cluster if and only if, for some~$i$, $\{ u, v \} \subseteq L_i^{(s)}$ and there is a path~$P$ from~$u$ to~$v$ in~$G$ such that, for all $j < i$, $P \cap L_j^{(s)} = \emptyset$.
+Note that each cluster~$C$ is a set of vertices of~$G$, \ie, $C \subseteq V$, and all clusters are pairwise disjoint.
+The created clusters form a rooted tree~$\calT$ with the cluster~$\{ s \}$ as root where each cluster is a node of~$\calT$ and two clusters $C$ and~$C'$ are adjacent in~$\calT$ if and only if $G$ contains an edge~$uv$ with $u \in C$ and~$v \in C'$.
+Figure~\ref{fig:LayPartEx} gives an example for such a partition.
+
+\begin{figure}
+    [htb]
+    \centering
+
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{figures/fig_prel_LayPartExG}
+        \caption
+        {%
+            A graph $G$.
+        }
+        \label{fig:LayPartExG}
+    \end{subfigure}
+    \hfil
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \input{figures/fig_prel_LayPartExL}
+        \caption
+        {%
+            A layering partition~$\calT$ for~$G$.
+        }
+        \label{fig:LayPartExL}
+    \end{subfigure}%
+
+    \caption
+    [%
+        Example of a layering partition.
+    ]
+    {%
+        Example of a layering partition.
+        A given graph~$G$~\subref{fig:LayPartExG} and the layering partition of~$G$ generated when starting at vertex~$s$~\subref{fig:LayPartExL}.
+        Example taken from~\cite{ChepoiDragan2000}.
+    }
+    \label{fig:LayPartEx}
+\end{figure}
+
+\begin{lemma}
+    [\name{Chepoi} and \name{Dragan}~\cite{ChepoiDragan2000}]
+    \label{lem:LayPartLinearTime}
+A layering partition of a given graph can be computed in linear time.
+\end{lemma}
+
+
+For a given graph~$G = (V, E)$, let $\calT$ be a layering partition of~$G$ and let $\Delta$ be the maximum cluster diameter of~$\calT$.
+For two vertices $u$ and~$v$ of~$G$ contained in the clusters $C_u$ and~$C_v$ of~$\calT$, respectively, we define $d_\calT(u, v) := d_\calT(C_u, C_v)$.
+
+\begin{lemma}
+    \label{lem:LayPartVertDist}
+For all vertices $u$ and~$v$ of~$G$, $d_\calT(u, v) \leq d_G(u, v) \leq d_\calT(u, v) + \Delta$.
+\end{lemma}
+
+\begin{proof}
+Clearly, by construction of a layering partition, $d_{\calT}(u, v) \leq d_G(u, v)$ for all vertices $u$ and~$v$ of~$G$.
+
+Next, let $C_u$ and~$C_v$ be the clusters containing $u$ and~$v$, respectively.
+Note that $\calT$ is a rooted tree.
+Let $C'$ be the lowest common ancestor of $C_u$ and~$C_v$.
+Therefore, $d_\calT(u, v) = d_\calT(u, C') + d_\calT(C', v)$.
+By construction of a layering partition, $C'$ contains a vertex~$u'$ and vertex~$v'$ such that $d_G(u, u') = d_\calT(u, u')$ and $d_G(v, v') = d_\calT(v, v')$.
+Since the diameter of each cluster is at most~$\Delta$, $d_G(u, v) \leq d_\calT(u, u') + \Delta + d_\calT(v, v') = d_{\calT}(u, v) + \Delta$.
+\end{proof}
+
+\section{Special Graph Classes}
+
+\subsubsection{Chordal Graphs.}
+A graph is \emph{chordal} if every cycle with at least four vertices has a chord.
+The class of chordal graphs is a well known class which can be recognised in linear time~\cite{TarjanYannak1984}.
+Due to the strong tree structure of chordal graphs, they have the following property
+known as $m$-convexity:
+
+\begin{lemma}
+     [\name{Faber} and \name{Jamison}~\cite{FaberJamison1986}]
+     \label{lem:ChordalMConvex}
+Let \( G \) be a chordal graph.
+If, for two distinct vertices~\( u,v \) in a disk~\( N^r[x] \), there is a path~\( P \) connecting them with \( P \cap N^r[x] = \{ u, v \} \), then \( u \) and~\( v \) are adjacent.
+\end{lemma}
+
+It is well known~\cite{Gavril1974} that a graph~$G$ is chordal if it admits a so-called \emph{clique tree}.
+That is, $G$ admits a tree-decomposition~$T$ such that each bag of~$T$ induces a clique.
+Such a tree-decomposition can be found in linear time~\cite{Spinrad2003}.
+
+\begin{theorem}
+    [\name{Gavril}~\cite{Gavril1974}]
+    \label{theo:chordalLength}
+A graph~\( G \) is chordal if and only if \( \tl(G) \leq 1 \).
+\end{theorem}
+
+A subclass of chordal graphs are \emph{interval graph}.
+A graph is an interval graph if it is the intersection graphs of intervals on a line.
+It is known~\cite{GilmorHoffma1964} that a graph~$G$ is an interval graph if and only if $G$ admits a path-decomposition~$\calP$ such that each bag of~$\calP$ induces a clique.
+Such a decomposition~$\calP$ can be computed in linear time.
+
+\begin{theorem}
+    [\name{Gilmore} and \name{Hoffman}~\cite{GilmorHoffma1964}]
+    \label{theo:intervalPL}
+A graph~\( G \) is an interval graph if and only if \( \pl(G) \leq 1 \).
+\end{theorem}
+
+
+\subsubsection{Dually Chordal Graphs.}
+A graph is \emph{dually chordal} if it is the intersection graph of maximal cliques of a chordal graph.
+In~\cite{BraDraCheVol1998}, \name{Brandstädt} et al.\ introduce dually chordal graphs and show that they can be recognised in linear time.
+It follows from Theorem~\ref{theo:duallyChordDeco} below that dually chordal graphs have tree-breadth~$1$.
+
+\begin{theorem}
+    [\name{Brandstädt} et al.\,\cite{BraDraCheVol1998}]
+    \label{theo:duallyChordDeco}
+A graph~\( G = (V, E) \) is dually chordal if and only if the set~\( \big \{ \, N[v] \mid v \in V \, \big \} \) forms a valid tree-decomposition for~\( G \).
+\end{theorem}
+
+\subsubsection{Distance-Hereditary Graphs.}
+A graph~$G$ is \emph{distance-hereditary} if the distances in any connected induced subgraph of~$G$ are the same as in~$G$.
+
+\begin{lemma}
+    [\name{Bandelt} and \name{Mulder}~\cite{BandelMulder1986}]
+    \label{lem:prelDistHere}
+Let \( G \) be a distance-hereditary graph, let \( x \) be an arbitrary vertex of~\( G \), and let \( u, v \in L_k^{(x)} \) be in the same connected component of the graph~\( G - L_{k-1}^{(x)} \).
+Then, \( N(v) \cap L_{k-1}^{(x)} = N(u) \cap L_{k-1}^{(x)} \).
+\end{lemma}
+
+Let $\sigma = \langle v_1, v_2, \ldots, v_n \rangle$ be an ordering for the vertices of some graph~$G$, let $V_i = \{ v_1, v_2, \ldots, v_i \}$, and let $G_i$ denote the graph~$G[V_i]$.
+An ordering~$\sigma$ is called a \emph{pruning sequence} for~$G$ if, for $1 \leq j < i \leq n$, each $v_i$ satisfies one of the following conditions in~$G_i$:
+\begin{enumerate}[(i)]
+    \item
+        $v_i$ is a pendant vertex,
+    \item
+        $v_i$ is a true twin of some vertex~$v_j$, or
+    \item
+        $v_i$ is a false twin of some vertex~$v_j$.
+\end{enumerate}
+
+\begin{lemma}
+    [\name{Bandelt} and \name{Mulder}~\cite{BandelMulder1986}]
+    \label{lem:punSeq}
+A graph~\( G \) is distance-hereditary if and only if there is a pruning sequence for~\( G \).
+\end{lemma}
+
+\subsubsection{\texorpdfstring{$\delta$}{δ}-Hyperbolic Graphs.}
+
+A graph has \emph{hyperbolicity~\( \delta \)} if, for any four vertices $u$, $v$, $w$, and~$x$, the two larger of the sums $d(u, v) + d(w, x)$, $d(u, w) + d(v, x)$, and $d(u, x) + d(v, w)$ differ by at most~$2 \delta$.
+
+\begin{lemma}
+    [\name{Chepoi} et al.\,\cite{CheDraEstHab2008}]
+    \label{lem:deltaHyper}
+Let \( u \), \( v \), \( w \), and \( x \) be four vertices in a \( \delta \)-hyperbolic graph.
+If \( d(u, w) > \max \big \{ d(u, v), d(v, w) \big \} + 2 \delta \), then \( d(v, x) < \max \big \{ d(x, u), d(x, w) \big \} \).
+\end{lemma}
+
+\begin{theorem}
+    [\name{Chepoi} et al.\,\cite{CheDraEstHab2008}]
+    \label{theo:hyperbolicTreeLength}
+If a graph~\( G \) has hyperbolicity~\( \delta \), then \( \delta \leq \tl(G) \) and \( \tl(G) \in \calO(\delta \log n) \).
+\end{theorem}
+
+
+\subsubsection{AT-Free Graphs.}
+
+An \emph{asteroidal triple} (AT for short) in a graph is a set of three vertices where every two of them are connected by a path avoiding the neighbourhood of the third.
+A graph is called \emph{AT-free} if it does not contain an asteroidal triple.
+
+A \emph{Lexicographic Breadth-First Search} (LexBFS for short) is a refinement of a standard BFS which produces a vertex ordering~$\sigma \colon V \rightarrow \{ 1, \ldots, n \}$.
+A LexBFS starts at some start vertex~$s$, orders the vertices of a graph~$G$ by assigning numbers from $n$ to~$1$ to the vertices in the order as they are discovered by the following search process.
+Each vertex~$v$ has a label consisting of a (reverse) ordered list of the numbers of those neighbours of~$v$ that were already visited by the LexBFS; initially this label is empty.
+The LexBFS starts with some vertex~$s$, assigns the number~$n$ to~$s$, and adds this number to the end of the label of all unnumbered neighbours of~$s$.
+Then, in each step, the LexBFS selects the unnumbered vertex~$v$ with the lexicographically largest label, assigns the next available number~$k$ to~$v$, and adds this number to the end of the labels of all unnumbered neighbours of~$v$.
+An ordering~$\sigma$ of the vertex set of a graph generated by a LexBFS is called \emph{LexBFS-ordering}.
+Note that the closer a vertex is to the start vertex~$s$ in~$G$, the larger its number is in~$\sigma$.
+It is known that a LexBFS-ordering of an arbitrary graph can be generated in linear time~\cite{RoseTarjLuek1976}.
+
+For the two lemmas below, assume that we are given an AT-free graph~$G = (V, E)$, let $s$ be an arbitrary vertex of~$G$, let $x$ be the vertex last visited (numbered~$1$) by a LexBFS starting at~$s$, and let $\sigma$ be the ordering obtained by a LexBFS starting at~$x$.
+Additionally, for some vertex~$v \in L_i^{(x)}$, let $N_G^\downarrow(v) = N_G(v) \cap L_{i-1}^{(x)}$.
+
+\begin{lemma}
+    [\name{Corneil} et al.\,\cite{CornOlarStew1999}]
+    \label{lem:ATfreeDomPair}
+Let \( y \) be a vertex of~\( G \) and let \( P \) be a shortest path from~\( x \) to~\( y \).
+For each vertex~\( z \) with \( \sigma(y) \leq \sigma(z) \leq \sigma(x) = n \), \( d_G(z, P) \leq 1 \).
+\end{lemma}
+
+\begin{lemma}
+    \label{lem:ATfreeDownNeigh}
+For every integer~\( i \geq 1 \) and every two non-adjacent vertices~\( u, v \in L_i^{(x)} \) of~\( G \), \( \sigma(v) < \sigma(u) \) implies \( N_G^{\downarrow}(v) \subseteq N_G^{\downarrow}(u) \).
+In particular, \( d_G(v, u) \leq 2 \) holds for every \( u, v \in L_i^{(x)} \) and every~\( i \).
+\end{lemma}
+
+\begin{proof}
+Consider an arbitrary neighbour~$w \in L_{i-1}^{(x)}$ of~$v$ and a shortest path~$P$ from $v$ to~$x$ in~$G$ containing~$w$.
+Since $\sigma(v) < \sigma(u)$, by Lemma~\ref{lem:ATfreeDomPair}, path~$P$ must dominate vertex~$u$.
+Since $u$ and~$v$ are not adjacent, $u$ is in $L_i$, and all vertices of~$P \setminus \{ v, w \}$ belong to layers $L_j^{(x)}$ with $j < i - 1$, vertex~$u$ must be adjacent to~$w$.
+Otherwise, $u$, $v$, and~$x$ form an asteroidal triple.
+\end{proof}
+

@@ -1,0 +1,401 @@
+% --------------------------------
+%  Header file.
+%
+%  Adds features to the document.
+% --------------------------------
+
+\makeatletter
+
+% ------------------
+% - - - Lists - - -
+
+\usepackage
+    [
+        inline,
+        shortlabels,
+    ]
+    {enumitem}
+
+\setlist[1,2]
+{
+    topsep=2pt plus 2pt minus 2pt,
+    partopsep=0pt,
+    parsep=0pt,
+    itemsep=2pt plus 2pt minus 2pt,
+}
+
+
+% ------------------
+% - - - Labels - - -
+
+% Global counter for custom labels.
+\newcounter{glLabelCounter}
+\newcommand{\setLabel}[1]
+{%
+    \refstepcounter{glLabelCounter}%
+    \protected@edef\@currentlabel{#1}%
+}
+
+
+% -----------------
+% - - - Boxes - - -
+
+\newenvironment{spaceBox}
+{%
+    \trivlist%
+    \item%
+}
+{%
+    \endtrivlist%
+}
+
+
+\usepackage
+    [
+        framemethod=TikZ,
+    ]
+    {mdframed}
+
+\newenvironment{colourFrame}[2]
+{%
+    \begin{spaceBox}
+        \tikzset{external/export=false}
+        \begin{mdframed}
+            [
+                innerleftmargin = 4pt,
+                innerrightmargin = 4pt,
+                innertopmargin = 4pt,
+                innerbottommargin = 4pt,
+                linecolor = #1,
+                middlelinewidth = 0.5pt,
+                backgroundcolor = #2,
+                splitbottomskip = 4pt,
+                splittopskip = 12pt,
+            ]
+}
+{%
+        \end{mdframed}
+    \end{spaceBox}
+}
+
+
+% --------------------
+% - - - Theorems - - -
+
+\newcommand{\thrmNo}[1]
+{%
+    \thechapter.\the\value{localThrmCounter#1}%
+}
+
+\newcommand{\initThrmCounter}[1]
+{%
+    \newcounter{localThrmCounter#1}[chapter]%
+}
+
+\newcommand{\stepThrmCounter}[1]
+{%
+    \stepcounter{localThrmCounter#1}%
+    \setLabel{\thrmNo{#1}}%
+}
+
+% Creates a plain theorem.
+%   #1: Code name
+%   #2: Display name
+%   #3: Header font
+%   #4: Body font
+\newcommand{\createPlainTheorem}[4]
+{
+     \initThrmCounter{#1}
+     \newenvironment{#1}[1][]
+     {%
+         \ifthenelse{\equal{##1}{\empty}}
+         {%
+            \stepThrmCounter{#1}%
+            {#3#2\unskip~\thrmNo{#1}.}%
+         }
+         {%
+            \stepThrmCounter{#1}%
+            {#3#2\unskip~\thrmNo{#1}~(##1).}%
+         }%
+         #4\unskip \hskip 0.5em%
+     }
+     {}
+}
+
+% Creates a theorem with a line break after the header.
+%   #1: Code name
+%   #2: Display name
+%   #3: Header font
+%   #4: Body font
+\newcommand{\createBreakTheorem}[4]
+{
+     \initThrmCounter{#1}
+     \newenvironment{#1}[1][]
+     {%
+         \ifthenelse{\equal{##1}{\empty}}
+         {%
+            \stepThrmCounter{#1}%
+            {#3#2\unskip~\thrmNo{#1}.}%
+         }
+         {%
+            \stepThrmCounter{#1}%
+            {#3#2\unskip~\thrmNo{#1}~(##1).}%
+         }
+         #4\hfil\par\@afterheading\vspace*{-\parskip}%
+     }
+     {}
+}
+
+
+% Theorem
+\createPlainTheorem{theoremCore}
+    {%
+        Theorem
+    }
+    {%
+        \rmfamily
+        \bfseries
+        \boldmath
+    }
+    {%
+        \itshape
+    }
+
+\newenvironment{theorem}
+{%
+    \begin{spaceBox}%
+        \begin{theoremCore}%
+}
+{%
+        \end{theoremCore}%
+    \end{spaceBox}%
+}
+
+% Lemma
+\createPlainTheorem{lemmaCore}
+    {%
+        Lemma
+    }
+    {%
+        \rmfamily
+        \bfseries
+        \boldmath
+    }
+    {%
+        \itshape
+    }
+
+\newenvironment{lemma}
+{%
+    \begin{spaceBox}%
+        \begin{lemmaCore}%
+}
+{%
+        \end{lemmaCore}%
+    \end{spaceBox}%
+}
+
+% Observation
+\createPlainTheorem{observationCore}
+    {%
+        Observation
+    }
+    {
+        \rmfamily
+        \bfseries
+        \boldmath
+    }
+    {%
+        \itshape
+    }
+
+\newenvironment{observation}
+{%
+    \begin{spaceBox}%
+        \begin{observationCore}%
+}
+{%
+        \end{observationCore}%
+    \end{spaceBox}%
+}
+
+% Corollary
+\createPlainTheorem{corollaryCore}
+    {%
+        Corollary
+    }
+    {
+        \rmfamily
+        \bfseries
+        \boldmath
+    }
+    {%
+        \itshape
+    }
+
+\newenvironment{corollary}
+{%
+    \begin{spaceBox}%
+        \begin{corollaryCore}%
+}
+{%
+        \end{corollaryCore}%
+    \end{spaceBox}%
+}
+
+% Conjecture
+\createPlainTheorem{conjectureCore}
+    {%
+        Conjecture
+    }
+    {
+        \rmfamily
+        \bfseries
+        \boldmath
+    }
+    {%
+        \itshape
+    }
+
+\newenvironment{conjecture}
+{%
+    \begin{spaceBox}%
+        \begin{conjectureCore}%
+}
+{%
+        \end{conjectureCore}%
+    \end{spaceBox}%
+}
+
+% Definition
+\createPlainTheorem{definitionCore}
+    {%
+        Definition
+    }
+    {%
+        \rmfamily
+        \bfseries
+        \boldmath
+    }
+    {%
+        \itshape
+    }
+
+\newenvironment{definition}
+{%
+    \begin{spaceBox}%
+        \begin{definitionCore}%
+}
+{
+        \end{definitionCore}%
+    \end{spaceBox}%
+}
+
+\colorlet{clToDoFrame}{clRed}
+\colorlet{clToDoBack}{clLight80Red}
+
+\newenvironment{todo}
+{%
+    \begin{colourFrame}
+        {clToDoFrame}
+        {clToDoBack}
+%
+    {\bfseries\rmfamily To Do.}%
+    \hfil\par\@afterheading\vspace*{-\parskip}%
+}
+{%
+    \end{colourFrame}%
+}
+
+% ----------------------------
+% - - - Proofs an Claims - - -
+
+% Counter
+\newcounter{proofLevel}
+\newcounter{globalProofCounter}
+\newcounter{localClaimCounter}[globalProofCounter]%
+\newcounter{skipQedCounter}
+
+% QedHere
+\newcommand{\qedhere}
+{%
+    \tag*{\qed}%
+    \addtocounter{skipQedCounter}{1}%
+}
+% Claim
+\newcommand{\claimNo}
+{%
+    \the\value{localClaimCounter}%
+}
+
+\newenvironment{claim*}
+{%
+    \trivlist\item[\hskip\labelsep\textit{Claim.}\;]%
+    \itshape%
+}
+{%
+    \endtrivlist
+}
+
+\newenvironment{claim}
+{%
+    \stepcounter{localClaimCounter}%
+    \setLabel{\claimNo}%
+    \trivlist\item[\hskip\labelsep\textit{Claim~\claimNo.}\;]%
+    \itshape%
+}
+{%
+    \endtrivlist
+}
+
+% Proof
+\newenvironment{proof}[1][]
+{%
+    \addtocounter{proofLevel}{1}%
+    \ifnum \value{proofLevel} = 1%
+        \stepcounter{globalProofCounter}%
+    \fi%
+    \ifthenelse{\equal{#1}{\empty}}
+    {%
+        \trivlist\item[\hskip\labelsep\textit{Proof.}\;]%
+    }
+    {%
+        \trivlist\item[\hskip\labelsep\textit{Proof\enspace(#1).}\;]
+    }%
+}
+{%
+    \ifnum \value{skipQedCounter} > 0%
+        \addtocounter{skipQedCounter}{-1}%
+    \else%
+        \qed%
+    \fi%
+    \endtrivlist%
+    \addtocounter{proofLevel}{-1}%
+}
+
+
+% ----------------------
+% - - - Algorithms - - -
+
+\usepackage
+    [%
+        resetcount,
+        algochapter,
+        ruled,
+        vlined,
+        linesnumbered,
+        algo2e,
+    ]
+    {algorithm2e}
+
+% Define algorithm-environment
+\newenvironment{algorithm}
+{%
+    \begin{algorithm2e}%
+}
+{%
+    \end{algorithm2e}%
+}
+
+
+\makeatother

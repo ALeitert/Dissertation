@@ -1,0 +1,50 @@
+% --------------------
+%  The main document.
+% --------------------
+
+% Cache TikZ-images
+\tikzexternalize
+
+\begin{document}
+
+% Use roman numbers for the first pages.
+\pagenumbering{roman}
+
+% Titelpage
+\input{singlePages/title}
+\input{singlePages/info}
+
+\input{singlePages/abstract}
+
+\tableofcontents
+
+% Use arabic numbers ans start with 1.
+\newpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% - - - Chapters - - -
+
+\input{chapters/introduction}
+
+\input{chapters/preliminaries}
+
+\input{chapters/compDeco}
+
+\input{chapters/conDomination}
+
+\input{chapters/bandwidthLineDist}
+
+\input{chapters/mesp}
+
+\appendix
+
+% - - - Bibliography - - - 
+\bibliography{references}
+
+
+\listoffigures
+
+\listoftables
+
+\end{document}

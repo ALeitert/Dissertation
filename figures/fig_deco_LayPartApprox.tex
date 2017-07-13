@@ -1,0 +1,80 @@
+\tikzsetnextfilename{fig_deco_LayPartApprox}
+\begin{tikzpicture}
+    [yscale=-1]
+
+\foreach \i in {-3,...,3}
+{
+    \node [nN] (n0\i) at (\i,0) {};
+}
+
+\foreach \i in {-2,...,2}
+{
+    \node [nN] (n1\i) at (\i,1) {};
+}
+
+\node [nN] (n2-1) at (-1,2) {};
+\node [nN] (n21) at (1,2) {};
+
+\node [nN] (s) at (0,3) {};
+
+\begin{pgfonlayer}{background}
+
+% fill=clLight60Green!30,
+% draw=clDark25Green
+
+\begin{scope}
+    [
+        every node/.style=
+        {
+            fill=clLight60Green!30,
+            draw=clDark50Green,
+        },
+        every fit/.append style=text badly centered
+    ]
+
+    \node [fit=(n0-3)(n03)] (l0) {};
+    \node [fit=(n1-2)(n12)] (l1) {};
+    \node [fit=(n2-1)(n21)] (l2) {};
+    \node [fit=(s)] (l3) {};
+
+\end{scope}
+
+\node [rlbl] at (l0.east) {$C$};
+
+\draw (0,3) -- (-3,0);
+\draw (0,3) -- (3,0);
+
+\draw (-3,0) -- (3,0);
+
+\foreach \i in {-2,...,2}
+{
+    \draw (\i,1) -- (\i,0);
+}
+
+\draw (-1,2) -- (-2,1);
+\draw (-1,2) -- (-1,1);
+\draw (-1,2) -- (0,1);
+
+\draw (1,2) -- (0,1);
+\draw (1,2) -- (1,1);
+\draw (1,2) -- (2,1);
+
+\draw (-1,1) -- (-2,0);
+\draw (-1,1) -- (0,0);
+
+\draw (1,1) -- (0,0);
+\draw (1,1) -- (2,0);
+
+\draw (-1,1) -- (-2,1);
+\draw (1,1) -- (2,1);
+\end{pgfonlayer}
+
+\node [blbl,yshift=-4pt] at (s.south) {$s$};
+\node [blbl,yshift=-4pt] at (n0-3.south) {$x$};
+\node [blbl,yshift=-4pt] at (n03.south) {$y$};
+
+\node [rlbl] at (n1-1.east) {$a$};
+\node [blbl,yshift=-4pt] at (n10.south) {$b$};
+\node [llbl] at (n11.west) {$c$};
+
+\end{tikzpicture}

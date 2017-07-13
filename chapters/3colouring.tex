@@ -1,0 +1,270 @@
+\chapter{3-Colouring for Graphs with Tree-Breadth One}
+    \label{cha:3colouring}
+%
+
+\newcommand{\Guv}{G \langle uv \rangle}
+
+Colouring a graph is the problem of assigning a minimum number of colours to the vertices of a given graph such that adjacent vertices have distinct colours.
+It is a classic problem in computer science and one of \name{Karp}'s~21 NP-complete problems~\cite{Karp1972}.
+Colouring remains NP-complete for general graphs if limited to three colours~\cite{Stockmeyer1973}.
+However, it is well known that 2-Colourability can be solved in linear time for any graph.
+
+Recall that dually chordal graphs have tree-breadth~$1$.
+As shown in~\cite{LeitertMan}, Colouring remains NP-complete for dually chordal graphs when restricted to four colours and is solvable in linear time when restricted to three colours.
+In this chapter, we show that one can determine a 3-colouring for a given graph with tree-breadth~$1$ in $\calO(n^3m)$ time.
+The presented algorithm works without computing a tree-decomposition or verifying the tree-breadth of the given graph.
+
+For this chapter, assume we are given a graph~$G$ with $\tb(G) = 1$ and a corresponding tree-decomposition~$T = (\calB, \calE)$.
+Additionally, we assume that the number of bags in~$T$ is minimal.
+Thus, there is no pair of distinct bags~$B, B' \in \calB$ with $B \subseteq B'$.
+We say $G$ is \emph{non-trivial} if $T$ contains at least two bags, \ie, $G$ does not contain a universal vertex.
+
+First, we define the idea of a \emph{separating pair} and, then, show that such a pair always exists if $G$ is non-trivial.
+
+\begin{definition}
+    [Separating Pair]
+    \label{def:SeparatingPair}
+Two vertices \( u \) and~\( v \) form a \emph{separating pair} if \( S = N[u] \cap N[v] \) is a separator for~\( G \) which splits \( G \) into two graphs \( G_u = G[S \cup V_u] \) and \( G_v = G[S \cup V_v] \) such that \( u \in V_u \cup S \), \( v \in V_v \cup S \), and \( V_u \), \( V_v \), and~\( S \) are pairwise disjoint.
+\end{definition}
+
+\begin{lemma}
+    \label{lem:centresOfBagsAreSepPair}
+The centres of two adjacent bags in~$T$ form a separating pair.
+\end{lemma}
+
+\begin{proof}
+Let $u$ and~$v$ be the centres of two adjacent bags $B_u$ and~$B_v$ in $T$ with $S = N[u] \cap N[v]$.
+Because $T$ has a minimum number of bags, there are two vertices~$u' \in B_u \setminus N[v]$ and $v' \in B_v \setminus N[u]$.
+Otherwise, $B_u$ and~$B_v$ could be replaced by a bag~$B_{uv} = B_u \cup B_v$ with $u$ or~$v$ as center.
+Therefore, $u', v' \notin S$ and each path from $u'$ to~$v'$ contains a vertex~$w$ with $w \in B_u \cap B_v$, \ie, $S \supseteq B_u \cap B_v$ is a separator for~$G$.
+
+Now, let $S$ split $G$ into two graphs $G_u = G[S \cup V_u]$ and $G_v = G[S \cup V_v]$ such that $u' \in V_u \cup S$, $v' \in V_v \cup S$ and $V_u$, $V_v$ and $S$ are pairwise disjoint.
+
+If $uv \in E$, then $u, v \in S$.
+If $uv \notin E$, then $u \notin B_v$ and $v \notin B_u$.
+Therefore, $S = B_u \cap B_v$ is a separator which also separates $u$ and~$v$.
+Thus, $u \in V_u$ and $v \in V_v$.
+\end{proof}
+
+\begin{corollary}
+    \label{cor:AlwaysSeparatingPair}
+If \( G \) is non-trivial, it has a separating pair.
+\end{corollary}
+
+Assume for the remainder of this chapter that, if $G$ is non-trivial, we are given a separating pair~$(u,v)$ and the corresponding graphs $G_u$ and~$G_v$.
+For the graph~$G_u$, we define the tree-decomposition~$T_u = (\calB_u, \calE_u)$ as follows.
+Let $T_u$ contain the same bags and edges as $T$ and remove all vertices in $V_v$ from these bags.
+That is, $\calB_u = \left \{ \, B^{(u)} \mid B^{(u)} = B \cap (V_u \cup S), B \in \calB \, \right \}$ and $\calE_u = \left \{ \, B^{(u)}_1B^{(u)}_2 \mid B_1B_2 \in \cal E \, \right \}$.
+Clearly, $T_u$ is a valid tree decomposition for~$G_u$:
+All vertices and edges of~$G_u$ are still in a bag and each vertex induces a subtree of~$T_u$ equivalent to the subtree it induces in~$T$.
+$T_v$ is defined equivalently.
+
+The next two lemmas will show that, for a separating pair~$(u, v)$, the resulting graphs $G_u$ and~$G_v$ have tree-breadth~$1$ and that we can always find a pair for which $G_u$ becomes trivial, \ie, $u$ is universal in~$G_u$.
+
+\begin{lemma}
+    \label{lem:splitInTwoTb1}
+\( T_u \) and~\( T_v \) have breadth~\( 1 \), \ie, \( \tb(G_u) = \tb(G_v) = 1 \).
+\end{lemma}
+
+\begin{proof}
+By symmetry, it is sufficient to show that $T_u$ has breadth~$1$.
+To do so, we distinguish the bags of~$T_u$ by their original centres in~$T$.
+Assume we have a bag~$B$ with the center~$c$ in~$T$.
+
+First, let $c \in V_u \cup S$.
+Because no bag got additional vertices, $c$ is still adjacent to all vertices in $B^{(u)}$, \ie, $B^{(u)} \subseteq B \subseteq N[c]$.
+Second, let $c \in V_v$.
+Because $S$ separates all $V_u$ and~$V_v$, there is no edge $xy$ with $x \in V_u$ and $y \in V_v$.
+Therefore, $Nc] \subseteq S \cup V_v$ and, hence, $B^{(u)} \subseteq S$.
+Because $S \subseteq N[u]$, all vertices in~$B^{(u)}$ are adjacent to~$u$, \ie, $B^{(u)} \subseteq N[u]$.
+\end{proof}
+
+\begin{lemma}
+    \label{lem:AlwaysUniversalGu}
+If \( G \) is non-trivial, there is always a separating pair~\( (u, v) \) in~\( G \) such that \( u \) is universal in~\( G_u \).
+\end{lemma}
+
+\begin{proof}
+Let $B_u$ and~$B_v$ be two adjacent bags in~$T$ with the centres $u$ and~$v$ such that $B_u$ is a leaf of~$T$.
+By Lemma~\ref{lem:centresOfBagsAreSepPair}, $u$ and~$v$ form a separating pair.
+Because $B_u$ is a leaf of~$T$, the set of vertices~$V' = B_u \setminus N[v]$ is only in $B_u$ and is separated by~$S = N[u] \cap N[v]$ from the rest of the graph.
+Therefore, let $V_u := V'$ and $V_v = V \setminus (S \cup V')$.
+This fulfils Definition~\ref{def:SeparatingPair}.
+Also, because $V_u \subseteq B_u$ and $u$ is centre of~$B_u$, $u$ is universal for~$V_u$.
+\end{proof}
+
+Next to splitting $G$ into two graphs, we can also contract the vertices $u$ and~$v$ to a single vertex~$w$.
+This creates a graph~$\Guv = (V', E')$ such that $V' = (V \cup \{ w \}) \setminus \{ u, v \}$ and $E' = (E \setminus \{ \, xy \mid x \in \{ u, v \}, y \in V \, \}) \cup \{ \, wx \mid x \in V' \cap (N[u] \cup N[v]) \, \}$.
+
+\begin{lemma}
+    \label{lem:GuvTB1}
+The graph~\( \Guv \) has tree-breadth~\( 1 \).
+\end{lemma}
+
+\begin{proof}
+Let $B_u$ and~$B_v$ be two bags in~$T$ such that $u \in B_u$, $v \in B_v$, and the distance between $B_u$ and~$B_v$ in~$T$ is minimal.
+If $B_u = B_v$ or both bags are adjacent in~$T$, then we can create $T'$ by replacing each bag $B$ with $B'$ as follows:
+\[
+    B' :=
+    \begin{cases}
+        B & \text{if $\{ u, v \} \cap B = \emptyset$} \\
+        (B \cup \{ w \}) \setminus \{ u, v \} & \text{else}
+    \end{cases}
+\]
+
+Next, consider the case that $B_u$ and~$B_v$ are non-adjacent.
+Because $S = N[u] \cap N[v]$, $S$ is also completely in $B_u$ and~$B_v$, \ie, $S \subseteq B_u \cap B_v$.
+Now, create the two trees $T_u$ and~$T_v$ as defined earlier.
+Then, we can create a decomposition~$T'$ by connecting $B^{(u)}_u$ and $B^{(v)}_v$, \ie,
+\[
+    T' = \left ( \calB_u \cup \calB_v, \calE_u \cup \calE_v \cup \left \{ B^{(u)}_uB^{(v)}_v \right \} \right ).
+\]
+Now, we have a tree decomposition where $u$ and~$v$ are in two adjacent bags.
+\end{proof}
+
+With splitting $G$ into $G_u$ and~$G_v$ or contracting it into $\Guv$, we have two operations for~$G$ if it is non-trivial.
+Both operations create smaller graphs and preserve tree-breadth~$1$.
+The next two lemmas will show that these operation also preserve 3-colourabilty.
+
+\begin{lemma}
+    \label{lem:GcolourableIffGuAndGv}
+If \( uv \in E \), then \( G \) is 3-colourable if and only if \( G_u \) and~\( G_v \) are 3-colourable.
+Additionally, if \( G \) is 3-colourable, all vertices in~\( S \setminus \{ u, v \} \) have the same colour.
+\end{lemma}
+
+\begin{proof}
+Clearly, if $G$ is 3-colourable, each of its subgraphs (including $G_u$ and~$G_v$) is 3-colourable.
+
+Next, assume that $G_u$ and~$G_v$ are 3-colourable.
+From $uv \in E$ follows that $u,v \in S$.
+Therefore, for each vertex~$s \in S'$ with $S' = S \setminus \{ u, v \}$, $\{ u, v, s \}$ induces a clique of size~$3$.
+Thus, $S'$ is an independent set.
+Otherwise, $S$ would contain a~$K_4$.
+Additionally, all vertices in $S'$ have the same colour; more than three colours would be required to colour $S'$ otherwise.
+Hence, a valid 3-colouring for~$G$ can be created by rotating the colours in~$G_u$ (or in~$G_v$) such that the colours for $u$, $v$, and all $s \in S'$ are equal in $G_u$ and~$G_v$.
+\end{proof}
+
+\begin{lemma}
+    \label{lem:GcolorableIffGprimeColourable}
+If \( uv \notin E \), then \( G \) is 3-colourable if and only if \( \Guv \) is 3-colourable.
+Additionally, if \( G \) is 3-colourable, it admits a valid 3-colouring such that \( u \) and~\( v \) have the same colour.
+\end{lemma}
+
+\begin{proof}
+First, assume that $c$ is a valid 3-colouring for~$\Guv$ and $w$ is the resulting vertex from contracting $u$ and~$v$.
+Because $N(u) \cup N(v) \subseteq N(w)$, setting $c(u) = c(v) = c(w)$ makes $c$ a valid 3-colouring for~$G$, too.
+
+Next, assume that we are given a valid 3-colouring~$c$ for~$G$ using the colour set $\{ 1, 2, 3 \}$.
+Because $uv \notin E$, $S$ also separates $u$ and~$v$, \ie, $u \in V_u$ and $v \in V_v$.
+Without loss of generality, assume that $c(u) = 1$ and $c(v) = 2$.
+Then, all vertices~$s \in S$ have the same colour, \ie, $c(s) = 3$.
+Therefore, after switching the colours $1$ and~$2$ in~$G_u$ (or in~$G_v$), $c$ is still a valid 3-colouring with $c(u) = c(v)$.
+Hence, contracting $u$ and~$v$ to a vertex~$w$ and setting~$c(w) = c(u)$ makes $c$ a valid 3-colouring for~$\Guv$.
+\end{proof}
+
+Since both operations (splitting~$G$ and contracting $u$ and~$v$) preserve tree-breadth and 3-colourability, we can determine a 3-colouring for~$G$ as follows:
+If $G$ is trivial, \ie, it has a universal vertex~$u$, make a 2-colouring of~$N(u)$ and give $u$ the third colour.
+If $G$ is non-trivial, find a separating pair~$(u, v)$.
+If $u$ and~$v$ are non-adjacent, create~$\Guv$ and recursively find a 3-colouring for it.
+Otherwise, if $u$ and~$v$ are adjacent, recursively determine a 3-colouring for $G_u$ and~$G_v$.
+Algorithm~\ref{algo:TB1_3Colouring} below formalises this idea.
+
+\begin{algorithm}
+    [htb]
+    \caption
+    {%
+        Computes a 3-colouring problem for a given graph~$G$ with $\tb(G) = 1$.
+    }
+    \label{algo:TB1_3Colouring}
+
+\KwIn
+{%
+    A graph $G = (V, E)$ with $\tb(G) = 1$.
+}
+
+\KwOut
+{%
+    A 3-colouring for $G$ if and only if $G$ is 3-colourable.
+}
+
+\If
+{%
+    $G$ has a universal vertex $u$
+}
+{%
+    Give $u$ a colour and make a 2-colouring on $N(u)$.
+    If $N(u)$ is not 2-colourable, $G$ is not 3-colourable.
+    \label{line:3colUnivVert}
+
+    \keyword{Stop}.
+}
+
+Find a separating pair~$(u, v)$ such that $uv \notin E$ or $u$ is universal in $G_u$.
+If such a separating pair does not exist, then \keyword{Stop}: $\tb(G) > 1$.
+\label{line:3colTB_pickUV}
+
+\If
+{%
+    $uv \notin E$
+}
+{%
+    Create $\Guv$, colour it using Algorithm~\ref{algo:TB1_3Colouring}, and colour $G$ like $\Guv$ with $c(u) = c(v) = c(w)$.
+    \label{line:3ColGPrime}
+}
+
+\If
+{%
+    $uv \in E$  (\ie, $u$ is universal in $G_u$)
+}
+{%
+    Create $G_u$ and $G_v$ and colour them using Algorithm~\ref{algo:TB1_3Colouring}.
+    \label{line:3ColGuGv}
+
+    Rotate the colours in $G_u$ such that $S$ has the same colours in $G_u$ and~$G_v$, and colour $G$ like $G_u$ and~$G_v$.
+    \label{line:3ColGuGvToG}
+}
+
+\end{algorithm}
+
+\paragraph{Note}
+To find a separating pair as specified in line~\ref{line:3colTB_pickUV} of the algorithm, keep $G_u$ as small as possible.
+If a subgraph of $G$ can be in $G_u$ and~$G_v$, put it in~$G_v$.
+This guaranties that we always find a pair where $u$ universal in~$G_u$.
+
+\begin{theorem}
+For a given graph~\( G \) with \( \tb(G) = \nobreak 1 \), Algorithm~\ref{algo:TB1_3Colouring} computes a 3-colouring in \( \calO(n^3m) \) time if and only if \( G \) is 3-colourable.
+\end{theorem}
+
+\begin{proof}
+    [Correctness]
+Let $G$ be 3-colourable.
+Assume by induction that the algorithm works correctly for all graphs smaller than~$G$.
+For the base case, let $G$ be trivial, \ie, $G$ has a universal vertex~$u$.
+It is easy to see, that line~\ref{line:3colUnivVert} creates a valid 3-colouring in this case.
+
+Next, assume that $G$ is non-trivial.
+By Corollary~\ref{cor:AlwaysSeparatingPair} and Lemma~\ref{lem:AlwaysUniversalGu}, there is always a separating pair~$(u, v)$ such that $uv \notin E$ or $u$ is universal in~$G_u$.
+Thus, line~\ref{line:3colTB_pickUV} is always successful if $G$ has no universal vertex and $\tb(G) = 1$.
+
+Due to Lemma~\ref{lem:GcolorableIffGprimeColourable}, if $uv \notin E$, colouring $G$ can be reduced on colouring $\Guv$.
+Since $\Guv$ is smaller than $G$ and, by Lemma~\ref{lem:GuvTB1}, has tree-breadth~$1$, the algorithm determines in line~\ref{line:3ColGPrime} a valid 3-colouring for~$\Guv$ and, hence, for~$G$.
+
+Otherwise, if $uv \in E$, colouring $G$ can be reduced, by Lemma~\ref{lem:GcolourableIffGuAndGv}, on colouring $G_u$ and~$G_v$.
+Since both graphs are smaller than $G$ and, by Lemma~\ref{lem:splitInTwoTb1}, have tree-breadth~$1$, line~\ref{line:3ColGuGv} creates a valid 3-colouring for both of them.
+As shown in the proof of Lemma~\ref{lem:GcolourableIffGuAndGv}, all vertices in~$S \setminus \{ u, v \}$ have the same colour because $uv \in E$.
+Therefore, since $G_u$ and~$G_v$ only have $S$ in common, line~\ref{line:3ColGuGvToG} creates a valid 3-colouring for~$G$.
+\end{proof}
+
+\begin{proof}
+    [Complexity]
+If we ignore the recursive calls (lines \ref{line:3ColGPrime} and line~\ref{line:3ColGuGv}) and the search for a separating pair~$(u, v)$ (line~\ref{line:3colTB_pickUV}), a single call of the algorithm runs in linear time.
+Finding a separating pair~$(u, v)$, however, may take up to $\calO(n^2m)$ time because there are up to $\calO(n^2)$ vertex pairs for which it takes $\calO(m)$ time to determine if they form a separating pair.
+
+By construction of~$G_u$, it has a universal vertex.
+Hence, colouring it (in line~\ref{line:3ColGuGv}) takes at most linear time.
+Therefore, since the algorithm runs only line~\ref{line:3ColGPrime} or line~\ref{line:3ColGuGv} but not both, we can assume there is at most one recursive call.
+In both cases, the processed graph has fewer vertices than $G$.
+Thus, Algorithm~\ref{algo:TB1_3Colouring} calls itself at most $\calO(n)$ times.
+
+Therefore, the overall runtime for Algorithm~\ref{algo:TB1_3Colouring} is at most $\calO(n^3m)$.
+\end{proof}

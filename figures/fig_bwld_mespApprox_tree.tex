@@ -1,0 +1,91 @@
+\tikzsetnextfilename{fig_bwld_mespApprox_tree}
+\begin{tikzpicture}
+    [scale=1.2]
+
+\pgfmathsetseed{6}
+
+% --- Upper Line ---
+
+\draw (-3.25,0) -- (-0.5,0);
+
+\node[llbl] at (-3.25,0) {$P$};
+
+\foreach \x in {2.75,2,1.25}
+{
+    \pgfmathtruncatemacro{\xn}{\x*10}%
+    \node[sN] (nm\xn) at (-\x,0) {};
+}
+
+\foreach \n in {nm}
+{
+    \coordinate (tm\n) at ($(\n20)+(0,0.5)$);
+    \coordinate (tr\n) at ($(\n20)+(45:0.5)$);
+    \coordinate (tl\n) at ($(\n20)+(135:0.5)$);
+
+    \coordinate (tmr\n) at ($(tm\n)+(45:0.5)$);
+    \coordinate (tml\n) at ($(tm\n)+(135:0.5)$);
+
+    \coordinate (tmrr\n) at ($(tmr\n)+(60:0.5)$);
+    \coordinate (tmrl\n) at ($(tmr\n)+(120:0.5)$);
+
+    \coordinate (tmll\n) at ($(tml\n)+(120:0.5)$);
+
+
+    \draw (\n20)--(tm\n);
+    \draw (\n20)--(tr\n);
+    \draw (\n20)--(tl\n);
+
+    \draw (tm\n)--(tmr\n);
+    \draw (tm\n)--(tml\n);
+
+    \draw (tmr\n)--(tmrr\n);
+    \draw (tmr\n)--(tmrl\n);
+
+    \draw (tml\n)--(tmll\n);
+}
+
+
+% --- Special Vertices ---
+
+\node[blbl,inner ysep=5pt] at (nm20.south) {$x_i$};
+\node[blbl,inner ysep=5pt] at (nm27.south) {$x_{i-1}$};
+\node[blbl,inner ysep=5pt] at (nm12.south) {$x_{i+1}$};
+
+% --- BFS Partition ---
+
+\foreach \x
+    [
+        evaluate=\x as \xx using 0.125*\x,
+        evaluate=\x as \xxSq using 0.25*0.125*\x*\x,
+        evaluate=\x as \jFact using 0.02*abs(\x)
+    ]
+    in {-8,-7,...,7,8}
+{
+    \pgfmathtruncatemacro{\absX}{abs(\x)};
+    \pgfmathtruncatemacro{\xCor}{8+\x};
+    \ifnum\absX>3
+        \coordinate (xi_\xCor) at ($(nm20.south)+(\xx,\xxSq)-(0,2pt)+(90+random*90:rand*\jFact+0.1)$);
+    \else
+        \coordinate (xi_\xCor) at ($(nm20.south)+(\xx,\xxSq)-(0,2pt)$);
+    \fi
+}
+
+\draw
+    [
+        rounded corners=2pt,
+    ]
+    ($(nm20.south)+(-1,2)-(0,2pt)$)
+    \foreach \x in {1,...,15}
+    {
+        -- (xi_\x)
+    }
+    -- ($(nm20.south)+(1,2)-(0,2pt)$);
+
+\node[blbl] at ($(nm20.south)+(0,2)-(0,2pt)$) {$X_i$};
+
+\def\cbb{current bounding box}
+
+\path [use as bounding box] (\cbb.north west) rectangle ([xscale=-1,xshift=4cm]\cbb.south west);
+
+\end{tikzpicture}
+

@@ -1,0 +1,62 @@
+\tikzsetnextfilename{fig_conD_breadthConstr}
+\begin{tikzpicture}
+
+\draw (0,0) circle (1cm);
+
+\foreach \rot/\lbl in {90/Top,225/Left,-45/Right}
+{
+    \begin{scope}[rotate=\rot]
+        \coordinate (c\lbl) at (1.4,0);
+        \draw (1.4,0.9) -- ++(0,-1.8);
+        \node[sN] (n\lbl) at (c\lbl) {};
+    \end{scope}
+}
+
+\node [rlbl] at (0.9,1.4) {$\Sup$};
+\node [lbl,anchor=45] at (nLeft.225) {$\Sdown_i$};
+\node [lbl,anchor=135] at (nRight.-45) {$\Sdown_j$};
+
+\node [nN,rectangle] (nCentre) at (0,0) {};
+
+\begin{pgfonlayer}{background}
+
+\draw
+    [-latex,shorten >=1pt]
+    (cLeft) --
+    node [pos=0.6,lbl,inner sep=2pt,anchor=-45] {$\rho$}
+    (nCentre);
+
+\draw
+    [
+        -latex,
+        shorten >=1pt,
+    ]
+    (cRight) --
+    node
+        [
+            pos=0.6,
+            lbl,
+            inner sep=2pt,
+            anchor=-135,
+        ]
+        {$\rho$}
+    (nCentre);
+
+\draw
+    [
+        -latex,
+        shorten >=1pt,
+    ]
+    (0,0) --
+    node
+        [
+            pos=0.4,
+            inner sep=2pt,
+            rlbl,
+        ]
+        {$\rho$}
+    (nTop);
+
+\end{pgfonlayer}
+
+\end{tikzpicture}
