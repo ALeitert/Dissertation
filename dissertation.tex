@@ -10,13 +10,18 @@
 % Use roman numbers for the first pages.
 \pagenumbering{roman}
 
+\pagestyle{plain}
+
 % Titelpage
 \input{singlePages/title}
-\input{singlePages/info}
 
-\input{singlePages/abstract}
+\input{singlePages/signatures}
 
 \tableofcontents
+
+\listoffigures
+
+\listoftables
 
 % Use arabic numbers ans start with 1.
 \newpage
@@ -42,9 +47,5 @@
 % - - - Bibliography - - - 
 \bibliography{references}
 
-
-\listoffigures
-
-\listoftables
 
 \end{document}

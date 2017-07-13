@@ -1,0 +1,62 @@
+
+\newgeometry
+{
+    top=2in,
+    left=1.5in,
+    right=1in,
+    bottom=1in
+}
+\thispagestyle{empty}
+
+\begin{center}
+    \newcommand{\signLine}[1][]
+    {%
+        \tikzset{external/export=false}%
+        \tikz[baseline]%
+        {
+            \node
+                [
+                    anchor=base west,
+                    inner xsep=0pt,
+                    inner ysep=5pt,
+                ]
+                at (0,0)
+                {#1};
+            \draw[yshift=-1.5pt] (0,0)--(\linewidth,0);
+            \path (0,0)--(0,4ex);
+        }%
+    }
+
+    \makeatletter
+
+    Dissertation written by \\
+    \@author
+
+    Diplom, University of Rostock, 2012 \\
+    Ph.D., Kent State University, 2017
+
+    \vspace*{\fill}
+
+    Approved by
+
+    \begin{tabular}{@{}p{0.5\linewidth-1em}@{\qquad}p{0.5\linewidth-1em}@{}}
+        \signLine[Dr.\ Feodor F.\ Dragan], & Chair, Doctoral Dissertation Committee \\
+        \signLine[Dr.\ Ruoming Jin], & Members, Doctoral Dissertation Committee \\
+        \signLine[Dr.\ Ye Zhao], \\
+        \signLine[Dr.\ Artem Zvavitch], \\
+        \signLine[Dr.\ Lothar Reichel] \\
+    \end{tabular}
+
+    \vspace*{6ex}
+
+    Accepted by
+
+    \begin{tabular}{@{}p{0.5\linewidth-1em}@{\qquad}p{0.5\linewidth-1em}@{}}
+        \signLine[Dr.\ Javed Khan], & Chair, Department of Computer Science \\
+        \signLine[Dr.\ James L.\ Blank], & Dean, College of Arts and Sciences \\
+    \end{tabular}
+
+    \makeatother
+\end{center}
+
+\restoregeometry

@@ -4,6 +4,8 @@
 %  Contains the design definitions.
 % -------------------------------------------
 
+\usepackage[doublespacing]{setspace}
+
 \makeatletter
 
 % Set colours for certain use.
@@ -13,100 +15,6 @@
 \colorlet{clTocPart}{black}
 \colorlet{clTocChapter}{black}
 \colorlet{clHeadFoot}{black}
-
-
-%------------------------------
-% - - - Header and Footer - - -
-
-% TikZ style for chapter and page nodes.
-\tikzstyle{chapNodeOdd}=[inner sep=0pt, anchor=base east]
-\tikzstyle{chapNodeEven}=[inner sep=0pt, anchor=base west]
-
-\tikzstyle{pageNodeOdd}=[inner sep=0pt, anchor=base east]
-\tikzstyle{pageNodeEven}=[inner sep=0pt, anchor=base west]
-
-\def\ps@headings%
-{%
-    \def\@oddfoot%
-    {%
-        \tikzset{external/export=false}%
-        \tikz[baseline]
-        {
-            \path[use as bounding box](0,0) rectangle (\textwidth,1.2em-4pt);
-            \node[pageNodeOdd] (pageNode) at (\textwidth,0) {\thepage};
-            \draw[semithick] (0,1.2em) -- (\textwidth,1.2em);
-        }%
-    }
-    \def\@evenfoot%
-    {%
-        \tikzset{external/export=false}%
-        \tikz[baseline]
-        {
-            \path[use as bounding box](0,0) rectangle (\textwidth,1.2em-4pt);
-            \node[pageNodeEven] (pageNode) at (0,0) {\textcolor{black}\thepage};
-            \draw[semithick] (0,1.2em) -- (\textwidth,1.2em);
-        }%
-    }
-    \def\@oddhead%
-    {%
-        \tikzset{external/export=false}%
-        \tikz[baseline]
-        {
-            \path[use as bounding box](0,0) rectangle (\textwidth,\headheight);
-            \node[chapNodeOdd] (chapNode) at (\textwidth,0) {\rightmark};
-            \draw[semithick] (0,-4pt) -- (\textwidth,-4pt);
-        }%
-    }%
-    \def\@evenhead%
-    {%
-        \tikzset{external/export=false}%
-        \tikz[baseline]
-        {
-            \path[use as bounding box](0,0) rectangle (\textwidth,\headheight);
-            \node[chapNodeEven] (chapNode) at (0,0) {\rightmark};
-            \draw[semithick,line cap=rect] (0.3pt,-4pt) -- (\textwidth-0.3pt,-4pt);
-        }%
-    }%
-    \let\@mkboth\markboth
-    \def\chaptermark##1%
-    {%
-        \markright%
-        {{%
-            \ifnum \c@secnumdepth >\m@ne
-                \@chapapp\ \thechapter. \ %
-            \fi
-            ##1%
-        }}%
-    }%
-}
-
-\def\ps@plain%
-{%
-    \def\@oddfoot%
-    {%
-        \tikzset{external/export=false}%
-        \tikz[baseline]
-        {
-            \path[use as bounding box](0,0) rectangle (\textwidth,1.2em-4pt);
-            \node[pageNodeOdd] (pageNode) at (\textwidth,0) {\thepage};
-            \draw[semithick] (0,1.2em) -- (\textwidth,1.2em);
-        }%
-    }
-    \def\@oddhead%
-    {%
-        \tikzset{external/export=false}%
-        \tikz[baseline]
-        {
-            \path[use as bounding box](0,0) rectangle (\textwidth,\headheight);
-            \node[chapNodeOdd] (chapNode) at (\textwidth,0) {};
-            \draw[semithick] (0,-4pt) -- (\textwidth,-4pt);
-        }%
-    }%
-}
-
-% Show chapter names in head line.
-\pagestyle{headings}
-
 
 %---------------------------
 % - - - Chapter design - - -
@@ -133,17 +41,16 @@
     \setlength{\parskip}{1em}
     \interlinepenalty\@M
 
-    \raggedright
+    \centering
     \rmfamily
     \bfseries\boldmath
 
-    \huge
+    \Large
     \color{clChapter}
-    \linenumbers*
 
     \newcommand{\chapterNote}[1]
     {%
-        \renewcommand{\thefootnote}{\raisebox{0.3ex}{\normalsize$\star$}}%
+        \renewcommand{\thefootnote}{\raisebox{0.3ex}{\footnotesize$\star$}}%
         \footnotemark%
         \renewcommand{\thefootnote}{$\star$}%
         \footnotetext{##1}%
@@ -155,9 +62,10 @@
 \def\@makechapterhead#1%
 {{%
     \setChapterStyle
-    \parbox[t][25\p@]{\linewidth}%
+    \parbox[t][1in][b]{\linewidth}%
     {
         \ifnum \c@secnumdepth >\m@ne \vspace{\fill}
+            \centering
             \normalsize \normalfont \@chapapp\space \thechapter
         \fi
     }
@@ -170,9 +78,8 @@
 \def\@makeschapterhead#1%
 {{%
     \setChapterStyle
-    \parbox[t][25\p@]{\linewidth}{}
-    \par\nobreak  \vskip 5\p@
-     #1 \par\nobreak
+    \parbox[t][1in][b]{\linewidth}{\centering#1}
+    \par\nobreak
     \vskip 40\p@
 }}
 
@@ -221,30 +128,10 @@
 {%
     \@startsection{section}{1}{\z@}%
         {%
-            -18\p@ \@plus -4\p@ \@minus -4\p@%
+            -19.8\p@ \@plus -4.4\p@ \@minus -4.4\p@%
         }%
         {%
-            12\p@ \@plus 4\p@ \@minus 4\p@%
-        }%
-        {%
-            \normalfont%
-            \Large%
-            \bfseries%
-            \boldmath%
-            \color{clSection}%
-            \rightskip=\z@ \@plus 8em%
-            \pretolerance=10000%
-        }%
-}
-
-\renewcommand{\subsection}
-{%
-    \@startsection{subsection}{2}{\z@}%
-        {%
-            -18\p@ \@plus -4\p@ \@minus -4\p@%
-        }%
-        {%
-            8\p@ \@plus 4\p@ \@minus 4\p@%
+            13.2\p@ \@plus 4.4\p@ \@minus 4.4\p@%
         }%
         {%
             \normalfont%
@@ -257,14 +144,34 @@
         }%
 }
 
+\renewcommand{\subsection}
+{%
+    \@startsection{subsection}{2}{\z@}%
+        {%
+            -19.8\p@ \@plus -4.4\p@ \@minus -4.4\p@%
+        }%
+        {%
+            8.8\p@ \@plus 4.4\p@ \@minus 4.4\p@%
+        }%
+        {%
+            \normalfont%
+            \normalsize%
+            \bfseries%
+            \boldmath%
+            \color{clSection}%
+            \rightskip=\z@ \@plus 8em%
+            \pretolerance=10000%
+        }%
+}
+
 \renewcommand{\subsubsection}
 {%
     \@startsection{subsubsection}{3}{\z@}%
         {%
-            -18\p@ \@plus -4\p@ \@minus -4\p@%
+            -19.8\p@ \@plus -4.4\p@ \@minus -4.4\p@%
         }%
         {%
-            -0.75em \@plus -0.25em \@minus -0.2em%
+            -0.55em \@plus -0.232em \@minus -0.11em%
         }%
         {%
             \normalfont%
@@ -278,10 +185,10 @@
 {%
     \@startsection{paragraph}{4}{\z@}%
         {%
-            -12\p@ \@plus -4\p@ \@minus -4\p@%
+            -13.2\p@ \@plus -4.4\p@ \@minus -4.4\p@%
         }%
         {%
-            -0.75em \@plus -0.25em \@minus -0.2em%
+            -0.55em \@plus -0.232em \@minus -0.11em%
         }%
         {%
             \normalfont%
@@ -298,8 +205,12 @@
 % - - - Caption design - - -
 %
 
+\usepackage{chngcntr}
+\counterwithout{figure}{chapter}
+\counterwithout{table}{chapter}
+
 \usepackage[font={small,sf}]{caption}
-\DeclareCaptionFormat{plain}{\textsb{#1}#2#3}
+\DeclareCaptionFormat{plain}{\doublespacing\textsb{#1}#2#3}
 \DeclareCaptionLabelSeparator{dot}{. }
 \captionsetup{labelsep=dot}
 

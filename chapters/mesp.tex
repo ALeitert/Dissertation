@@ -701,7 +701,7 @@ For simplicity, we define
     \max_{x \in V^\downarrow_s[Q_j|Q_i]} \min \big( d(x, Q_{i}), d(x, Q_{j}) \big).
 \]
 Note that $\varepsilon_s(Q_i, Q_j)$ does not depend on $P$.
-Therefore, because $\min_{u} \max [ c, f(u) ] = \max [ c, \min_{u} f(u) ]$,
+Thus, because $\min_{u} \max [ c, f(u) ] = \max [ c, \min_{u} f(u) ]$,
 \[
     \varepsilon_s(Q_j)
     =
@@ -909,7 +909,7 @@ Thus, Lemma~\ref{lem:valEpsilon} can be used to compute $\varepsilon_s(Q_j)$.
 This is done in the loop starting in line~\ref{line:QiLoop}.
 Therefore, at the beginning of line~\ref{line:findMinQj}, $\varepsilon_s(Q_j)$ is computed correctly for each subpath~$Q_j$.
 
-Recall that, if $P \in \calP(Q_j)$ and $R_s(Q_j) = Q_j$, then $V^\downarrow_s(Q_j) = V$ and, therefore, $\max_{x \in V^\downarrow_s(Q_j)} d(x, P) = \ecc(P)$.
+Recall that $V^\downarrow_s(Q_j) = V$ if $P \in \calP(Q_j)$ and $R_s(Q_j) = Q_j$. Hence, $\max_{x \in V^\downarrow_s(Q_j)} d(x, P) = \ecc(P)$.
 Thus, $R_s(Q_j) = Q_j$ implies that $\varepsilon_s(Q_j)$ is the minimal eccentricity of all shortest paths starting in~$s$ and containing~$Q_j$.
 Therefore, if $Q_j$ is picked by line~\ref{line:findMinQj}, then $\varepsilon_s(Q_j)$ is the minimal eccentricity of all shortest paths starting in~$s$.
 \end{proof}
