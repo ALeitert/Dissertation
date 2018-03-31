@@ -462,8 +462,8 @@ If $T$ covers the whole graph, the check fails and the algorithm outputs~$T$.
 If $T$ does not cover $G$ completely, there is a connected component~$C$ in~$G - T$.
 By condition~\ref{item:conCompCcond}, the bag~$B_v = \psi(C)$ is in~$T$, $N_G(C) \subseteq B_v$, and $C \in \calC_G[v]$.
 Because of the way $H$ is constructed and $C \in \calC_G[v]$, there is an edge~$(v, w) \in E_H$ with $\phi(v, w) = C$, \ie, $w$ is a potential partner of~$v$ for~$C$.
-Thus, line~\ref{line:weakTB_PickNextBag} is successful and the algorithm adds a new bag~$B_w = N_G^\rho[w] \cap (B_v \cup C)$ (line~\ref{line:weakTB_AddBag}).
-Because $w$ is a potential partner of~$v$ for~$C$, \ie, $N_G(C) \subseteq N_G^\rho[w]$, and $N_G(C) \subseteq B_v$, $B_w \supseteq N_G(C)$.
+Thus, line~\ref{line:weakTB_PickNextBag} is successful and the algorithm adds a new bag~$B_w = N_G^\rho[w] \cap (B_v \cup C)$ to $T$ (line~\ref{line:weakTB_AddBag}).
+Because $w$ is a potential partner of~$v$ for~$C$, \ie, $N_G(C) \subseteq N_G^\rho[w]$, and because $N_G(C) \subseteq B_v$, it follows that $B_w \supseteq N_G(C)$.
 Therefore, after adding $B_w$ to~$T$, $T$ still satisfies condition~\ref{item:TvalidTB}.
 Additionally, $B_w$ splits $C$ in a set~$\calC'$ of connected components such that, for each $C' \in \calC'$, $N_G(C') \subseteq B_w$ and, by Lemma~\ref{lem:potPartProp}, $C' \in \calC_G[w]$.
 Thus, condition~\ref{item:conCompCcond} is also satisfied.
