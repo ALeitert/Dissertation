@@ -644,9 +644,9 @@ For each leaf~\( B' \neq B \) of~\( T_B \), there is a minimum $r$-covering subt
 Assume that $T_r$ is a minimum $r$-covering subtree which does not contain~$B'$.
 Because of Lemma~\ref{lem:rDiskLeaf}, there is a vertex~$v$ of~$G$ such that $B'$ is the only bag of~$T_B$ which intersects the $r$-neighbourhood of~$v$.
 Therefore, $T_r$ contains only bags which are descendants of~$B'$.
-Partition the vertices of~$G$ into the sets $V^\uparrow$ and~$V^\downarrow$ such that $V^\downarrow$ contains the vertices of~$G$ which are contained in~$B'$ or in a descendant of~$B'$.
-Because $T_r$ is an $r$-covering subtree and because $T_r$ only contains descendants of~$B'$, it follows from properties of tree-decompositions that, for each vertex~$v \in V^\uparrow$, there is a path of length at most~$r(v)$ from~$v$ to a bag of~$T_r$ passing through~$B'$ and, thus, $d_G(v, B') \leq r(v)$.
-Similarly, since $T_B$ is an $r$-covering subtree, it follows that, for each vertex~$v \in V^\downarrow$, $d_G(v, B') \leq r(v)$.
+Partition the vertices of~$G$ into the sets $\Vup$ and~$\Vdown$ such that $\Vdown$ contains the vertices of~$G$ which are contained in~$B'$ or in a descendant of~$B'$.
+Because $T_r$ is an $r$-covering subtree and because $T_r$ only contains descendants of~$B'$, it follows from properties of tree-decompositions that, for each vertex~$v \in \Vup$, there is a path of length at most~$r(v)$ from~$v$ to a bag of~$T_r$ passing through~$B'$ and, thus, $d_G(v, B') \leq r(v)$.
+Similarly, since $T_B$ is an $r$-covering subtree, it follows that, for each vertex~$v \in \Vdown$, $d_G(v, B') \leq r(v)$.
 Therefore, for each vertex~$v$ of~$G$, $d_G(v, B') \leq r(v)$ and, thus, $B'$ induces an $r$-covering subtree~$T_r$ of~$\calT$ with $|T_r| = 1$.
 \end{proof}
 
@@ -800,9 +800,9 @@ Thus, because $\beta(u) = B_i$, each bag~$B \neq B_i$ with $d_G(u, B) \leq r(u)$
 Therefore, $d_u$ is in~$B_i$ or in a descendant of~$B_i$.
 Let $v$ be an arbitrary vertex of~$G$ such that $v \notin V^S_{i-1}$ and $d_G(v, d_u) \leq r(v)$, \ie, $v$ is dominated by~$d_u$ but not by~$S_{i-1}$.
 Due to statement~(iii) of the induction hypothesis, $\beta(v) = B_j$ with $j \geq i$, \ie, $B_j$ cannot be a descendant of~$B_i$.
-Partition the vertices of~$G$ into the sets $V^\uparrow_i$ and~$V^\downarrow_i$ such that $V^\downarrow_i$ contains the vertices which are contained in~$B_i$ or in a descendant of~$B_i$.
-If $v \in V^\downarrow_i$, then there is a path of length at most~$r(v)$ from $v$ to~$B_j$ passing through~$B_i$.
-If $v \in V^\uparrow_i$, then, because $d_u \in V^\downarrow_i$, there is a path of length at most~$r(v)$ from $v$ to~$d_u$ passing through~$B_i$.
+Partition the vertices of~$G$ into the sets $\Vup_i$ and~$\Vdown_i$ such that $\Vdown_i$ contains the vertices which are contained in~$B_i$ or in a descendant of~$B_i$.
+If $v \in \Vdown_i$, then there is a path of length at most~$r(v)$ from $v$ to~$B_j$ passing through~$B_i$.
+If $v \in \Vup_i$, then, because $d_u \in \Vdown_i$, there is a path of length at most~$r(v)$ from $v$ to~$d_u$ passing through~$B_i$.
 Therefore, $d_G(v, B_i) \leq r(v)$.
 That is, each vertex $r$-dominated by~$d_u$, is $(r + \rho)$-dominated by some~$c(B_j) \in S_i$.
 Therefore, because $S_i = S_{i-1} \cup \big \{ c(B_i) \big \}$ and $D_i = D_{i-1} \cup \{ d_u \}$, $v \in V^S_i \cap V^D_i $ and, thus, statement~(i) is satisfied.
