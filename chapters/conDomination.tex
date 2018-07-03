@@ -154,14 +154,14 @@ Therefore, $|T_{\delta}| \leq |T_r| - \delta \cdot \Lambda(T_\delta)$.
 
 Now that we have constructed and analysed~$T_\delta$, we show how to construct~$S_\delta$.
 First, we construct a set of shortest paths such that each cluster of~$T_\delta$ is intersected by exactly one path.
-Second, we connect these paths with each other to from a connected set using an approach which is similar to \name{Kruskal}'s algorithm for minimum spanning trees.
+Second, we connect these paths with each other to form a connected set using an approach which is similar to \name{Kruskal}'s algorithm for minimum spanning trees.
 
 Let $\calL = \big \{ C_1, C_2, \ldots, C_\lambda \big \}$ be the leaf clusters of~$T_\delta$ (excluding the root) with either $\lambda = \Lambda(T_\delta) - 1$ if the root of~$T_\delta$ is a leaf, or with  $\lambda = \Lambda(T_\delta)$ otherwise.
 We construct a set~$\calP = \big \{ P_1, P_2, \ldots, P_\lambda \big \}$ of paths as follows.
 Initially, $\calP$ is empty.
 For each cluster~$C_i \in \calL$, in turn, find the ancestor~$C_i'$ of~$C_i$ which is closest to the root of~$T_\delta$ and does not intersect any path in~$\calP$ yet.
 If we assume that the indices of the clusters in~$\calL$ represent the order in which they are processed, then $C_1'$ is the root of~$T_\delta$.
-Then, select an arbitrary vertex~$v$ in~$\calC_i$ and find a shortest path~$P_i$ in~$G$ form~$v$ to~$C_i'$.
+Then, select an arbitrary vertex~$v$ in~$C_i$ and find a shortest path~$P_i$ in~$G$ from~$v$ to~$C_i'$.
 Add $P_i$ to~$\calP$ and continue with the next cluster in~$\calL$.
 Figure~\ref{fig:LayPartPaths} gives an example.
 
@@ -197,7 +197,7 @@ It remains to show that each cluster intersects exactly one path.
 Without loss of generality, assume that the indices of clusters in~$\calL$ and paths in~$\calP$ represent the order in which they are processed and created, \ie, assume that the algorithms first creates $P_1$ which starts in~$C_1$, then $P_2$ which starts in~$C_2$, and so on.
 Additionally, let $\calL_i = \{ C_1, C_2, \ldots, C_i \}$ and $\calP_i = \{ P_1, P_2, \ldots, P_i \}$.
 
-To proof that each cluster intersects exactly one path, we show by induction over~$i$ that, if a cluster~$C_i$ of~$T_\delta$ satisfies the statement, then all ancestors of~$C_i$ satisfy it, too.
+To prove that each cluster intersects exactly one path, we show by induction over~$i$ that, if a cluster~$C_i$ of~$T_\delta$ satisfies the statement, then all ancestors of~$C_i$ satisfy it, too.
 Thus, if $C_\lambda$ satisfies the statement, each cluster satisfies it.
 
 First, consider $i = 1$.
