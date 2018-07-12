@@ -868,11 +868,11 @@ Initially, $\nu(S)$ is undefined for each separator~$S$.
 Now, we show how to compute~$C_\phi$.
 We, first, split $T_\phi$ into the sets $\bbL$, $\bbP$, and~$\bbB$.
 Second, for each~$P \in \bbP$, we create a small connected set~$C_P$, and, third, for each~$B \in \bbB$, we create a small connected set~$C_B$.
-If this is done properly, the union~$C_\phi$ of all these sets forms a connect set which intersects each bag of~$T_\phi$.
+If this is done properly, the union~$C_\phi$ of all these sets forms a connected set which intersects each bag of~$T_\phi$.
 
 Note that, due to properties of tree-decompositions, it can be the case that there are two bags $B$ and~$B'$ which have a common vertex~$v$, even if $B$ and~$B'$ are non-adjacent in~$T_\phi$.
 In such a case, either $v \in \Sdown(B) \cap \Sup(B')$ if $B$ is an ancestor of~$B'$, or $v \in \Sup(B) \cap \Sup(B')$ if neither is ancestor of the other.
-To avoid problems caused by this phenomena and to avoid counting vertices multiple times, we consider any vertex in an up-separator as part of the bag above.
+To avoid problems caused by this phenomenon and to avoid counting vertices multiple times, we consider any vertex in an up-separator as part of the bag above.
 That is, whenever we process some segment or bag~$X \in \bbL \cup \bbP \cup \bbB$, even though we add a vertex~$v \in \Sup(X)$ to~$C_\phi$, $v$ is not contained in~$C_X$.
 
 
