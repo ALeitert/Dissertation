@@ -4,7 +4,7 @@ Recall that tree-breadth~$1$ graphs contain the class of dually chordal graphs w
 A graph~$G$ is dually chordal if it admits a tree-decomposition~$T$ such that, for each vertex~$v$ in~$G$, $T$~contains a bag~$B = N_G[v]$ (see Theorem~\ref{theo:duallyChordDeco}, page~\pageref{theo:duallyChordDeco}).
 That is, the set of bags in~$T$ is the set of \emph{complete} neighbourhoods of \emph{all} vertices.
 
-In this chapter, we investigate the case which lays between dually chordal graphs and general tree-breadth~$\rho$ graphs.
+In this section, we investigate the case which lays between dually chordal graphs and general tree-breadth~$\rho$ graphs.
 In particular, tree-decompositions are considered where the set of bags are the \emph{complete} $\rho$-neighbourhoods of \emph{some} vertices.
 We call this \emph{strong tree-breadth}.
 The \emph{strong breadth} of a tree-decomposition is~$\rho$, if, for each bag~$B$, there is a vertex~$v$ such that $B = N_G^\rho[v]$.
@@ -13,7 +13,7 @@ Accordingly, a graph~$G$ has strong tree-breadth smaller than or equal to~$\rho$
 
 \subsection{NP-Completeness}
 
-In this section, we show that it is NP-complete to determine if a given graph has strong tree-breadth~$\rho$ even if $\rho = 1$.
+In this subsection, we show that it is NP-complete to determine if a given graph has strong tree-breadth~$\rho$ even if $\rho = 1$.
 To do so, we show first that, for some small graphs, the choice of possible centers is restricted.
 Then, we use these small graphs to construct a reduction.
 
@@ -314,8 +314,8 @@ It is NP-complete to decide, for a graph~\( G \) and a given~\( \rho \), if \( \
 
 \subsection{Polynomial Time Cases}
 
-In the previous section, we have shown that, in general, it is NP-complete to determine the strong tree-breadth of a graph.
-In this section, we investigate cases for which a decomposition can be found in polynomial time.
+In the previous subsection, we have shown that, in general, it is NP-complete to determine the strong tree-breadth of a graph.
+In this subsection, we investigate cases for which a decomposition can be found in polynomial time.
 
 Let $G$ be a graph with strong tree-breadth~$\rho$ and let $T$ be a corresponding tree-decomposition.
 For a given vertex~$u$ in~$G$, we denote the set of connected components in $G - N_G^\rho[u]$ as $\calC_G[u]$.
